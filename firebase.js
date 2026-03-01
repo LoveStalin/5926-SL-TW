@@ -1,8 +1,9 @@
+i
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCbyTKzz3z5b2dL87PUIU4JnaLH3tA5ioo",
+    apiKey: import.meta.env.VITE_API_KEY,
     authDomain: "a5-5926-sl.firebaseapp.com",
     databaseURL: "https://a5-5926-sl-default-rtdb.asia-southeast1.firebasedatabase.app/",
     projectId: "a5-5926-sl",
