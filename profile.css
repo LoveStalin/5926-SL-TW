@@ -1,0 +1,166 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Be Vietnam Pro", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Patrick Hand', cursive
+}
+
+body {
+    background: linear-gradient(135deg, #c7a6ff, #a784e6);
+    margin: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 120px auto 0 auto;
+    height: 80vh;
+    background: linear-gradient(145deg, #caa7f7, #b892eb);
+    border-radius: 20px;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    padding: 60px 40px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    width: 100%;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+    transition: 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.1)
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+}
+
+.menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+}
+
+.menu-icon span {
+    width: 28px;
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* Side menu */
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -250px;
+    width: 250px;
+    height: 100vh;
+    background: rgba(30, 0, 60, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    padding: 80px 30px;
+    gap: 30px;
+    transition: 0.4s;
+}
+
+.side-menu.active {
+    right: 0;
+}
+
+.menu-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.menu-btn:hover {
+    color: #ffb3ff;
+    transform: translateX(5px);
+}
+
+.seatmap {
+    display: grid;
+    grid-template-columns: repeat(11, 100px);
+    grid-auto-rows: 160px;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.seat {
+    border: 1px solid #aaa;
+    text-align: center;
+    font-size: 13px;
+}
+
+.empty-seat {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.empty-seat:after {
+    content: "[DMZ]";
+    font-weight: bold;
+}
+
+.aisle {
+    background: yellow;
+}
+
+.seat img {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+}
+
+/*==== Popup Profile ====*/
+.popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
