@@ -1,4 +1,4 @@
-const rightBlock = [
+let rightBlock = [
     ["nguyenhuy", "khongtien", "viethoang"],
     ["manhduy", null, "haily"],
     ["caoson", null, "tiendat"],
@@ -7,7 +7,7 @@ const rightBlock = [
     ["yennhi", "hoangha", "lehuy"]
 ];
 
-const leftBlock = [
+let leftBlock = [
     ["dangkhoi", null, "minhson"],
     ["duyanh", "viettrung", "doankhanh"],
     ["thuyduong", null, "haininh"],
@@ -16,7 +16,7 @@ const leftBlock = [
     ["xuanthanh", null, "ngnamkhanh"]
 ];
 
-const middleBlock = [
+let middleBlock = [
     ["lenam", null, "huuchuong"],
     ["phamnam", "baoyen", "ducanh"],
     ["khanhhuyen", null, "minhtien"],

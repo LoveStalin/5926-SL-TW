@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     onValue(ref(db, "seatmap"), (snapshot) => {
 
-        const data = snapshot.val();
+        let data = snapshot.val();
 
         if (!data) return;
 
