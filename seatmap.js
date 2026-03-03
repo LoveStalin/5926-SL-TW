@@ -1,16 +1,16 @@
 let rightBlock = [
-    ["nguyenhuy", "khongtien", "viethoang"],
+    ["nguyenhuy", null, "viethoang"],
     ["manhduy", null, "haily"],
-    ["caoson", null, "tiendat"],
-    ["vupanh", null, "thaoanh"],
+    ["tiendat", null, "khongtien"],
+    ["caoson", "thaoanh", "vupanh"],
     ["viettrinh", "baongoc", "khanhan"],
     ["yennhi", "hoangha", "lehuy"]
 ];
 
 let leftBlock = [
     ["dangkhoi", null, "minhson"],
-    ["duyanh", "viettrung", "doankhanh"],
-    ["thuyduong", null, "haininh"],
+    ["duyanh", null, "viettrung"],
+    ["haininh", "thuyduong", "doankhanh"],
     ["hoangthao", "baochau", "vinhhung"],
     ["nguyenthao", null, "thienphu"],
     ["xuanthanh", null, "ngnamkhanh"]
