@@ -1,3 +1,4 @@
+import { leftBlock, middleBlock, rightBlock } from "./seatmap.js";
 import { db, ref, set, onValue } from "./firebase.js";
 console.log("render is running");
 
