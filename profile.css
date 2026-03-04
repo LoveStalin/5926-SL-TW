@@ -127,15 +127,10 @@ body {
 }
 
 .empty-seat {
-    background-color: white;
+    background-color: linear-gradient(135deg, #c7a6ff, #a784e6);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-}
-
-.empty-seat:after {
-    content: "[DMZ]";
     font-weight: bold;
 }
 
@@ -179,8 +174,8 @@ body {
 }
 
 .student-avatar {
-    width: 80px;
-    height: 100px;
+    width: 100px;
+    height: 120px;
     object-fit: cover;
     /* Ảnh không méo */
     border-radius: 8px;
@@ -205,4 +200,63 @@ body {
     background: white;
     padding: 20px;
     border-radius: 10px;
+    position: relative;
+}
+
+.close-popup {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+
+    background: #ff4d6d;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.close-popup:hover {
+    background: #ff1e4d;
+    transform: scale(1.05);
+}
+
+.close-popup:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .seatmap {
+        overflow-x: auto;
+        display: grid;
+        grid-template-columns: repeat(11, 80px);
+        grid-auto-rows: 130px;
+        width: max-content;
+    }
+
+    .seat {
+        font-size: 10px;
+        padding: 4px;
+    }
+
+    .avatar-wrapper {
+        width: 35px;
+        height: 35px;
+    }
+
+    .student-avatar {
+        width: 80px;
+        height: 100px;
+    }
+
+    .container {
+        width: 95%;
+        padding: 30px 10px;
+        margin-top: 80px;
+    }
 }
