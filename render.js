@@ -88,7 +88,6 @@ function openProfile(student) {
 
     popup.innerHTML = `
         <div class="popup-content">
-            <img src="https://via.placeholder.com/150x200">
 
             <h2>${student.fullName}</h2>
 
