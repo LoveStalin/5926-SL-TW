@@ -178,6 +178,19 @@ body {
     margin: 0;
 }
 
+.student-avatar {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+    /* Ảnh không méo */
+    border-radius: 8px;
+    /* Bo góc nhẹ cho mềm */
+    border: 2px solid #fff;
+    /* Viền trắng cho nổi */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Đổ bóng nhẹ */
+}
+
 /*==== Popup Profile ====*/
 .popup {
     position: fixed;

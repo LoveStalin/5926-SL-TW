@@ -105,8 +105,8 @@ function openProfile(student) {
     const popup = document.getElementById("profilePopup");
 
     popup.innerHTML = `
-                    < div class="popup-content" >
-             <img src="${student.img}/150x200" >
+                    <div class="popup-content">
+             <img src="${student.img} class="student-avatar">
 
             <h2>${student.fullName}</h2>
 
@@ -115,6 +115,7 @@ function openProfile(student) {
             ${student.role ? `<p><strong>Chức vụ:</strong> ${student.role}</p>` : ""}
 
             <button onclick="closePopup()">Đóng</button>
+            </div>
 `;
 
 
