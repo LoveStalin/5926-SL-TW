@@ -28,25 +28,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 div.className = "aisle";
             }
 
-            else if (seat === null) {
+            else if (!seat) {
                 div.className = "empty-seat";
             }
 
             else {
-                div.className = "seat";
-
                 const student = students[seat];
 
                 if (!student) {
                     console.warn("Không tìm thấy student:", seat);
+                    div.className = "empty-seat";
+                    container.appendChild(div);
                     return;
                 }
 
+                div.className = "seat";
+
                 div.innerHTML = `
-                    <img src="https://via.placeholder.com/80x100">
-                    <p class="name">${student.displayName}</p>
-                    ${student.role ? `<p class="role">${student.role}</p>` : ""}
-                `;
+    <div class="avatar-wrapper">
+        <img src="${student.img}" class="avatar">
+    </div>
+
+    <div class="seat-info">
+        <p class="name">${student.displayName}</p>
+        ${student.role ? `<p class="role">${student.role}</p>` : ""}
+    </div>
+`;
+
                 div.addEventListener("click", () => {
                     openProfile(student);
                 });
@@ -67,10 +75,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         container.innerHTML = "";
 
-        for (let i = 0; i < leftBlock.length; i++) {
-            renderRow(leftBlock[i], middleBlock[i], rightBlock[i]);
-        }
+        const totalRows = Math.max(
+            leftBlock.length,
+            middleBlock.length,
+            rightBlock.length
+        );
 
+        for (let i = 0; i < totalRows; i++) {
+            renderRow(
+                leftBlock[i] || [],
+                middleBlock[i] || [],
+                rightBlock[i] || []
+            );
+        }
     });
     window.initSeatmap = function () {
         set(ref(db, "seatmap"), {
@@ -87,18 +104,16 @@ function openProfile(student) {
     const popup = document.getElementById("profilePopup");
 
     popup.innerHTML = `
-        <div class="popup-content">
-            <img src="https://via.placeholder.com/150x200">
-
+                    < div class="popup-content" >
             <h2>${student.fullName}</h2>
 
             <p><strong>Ngày sinh:</strong> ${student.dob}</p>
 
             ${student.role ? `<p><strong>Chức vụ:</strong> ${student.role}</p>` : ""}
 
-            <button onclick="closePopup()">Đóng</button>
-        </div>
-    `;
+                <button onclick="closePopup()">Đóng</button>
+        </div >
+                    `;
 
     popup.style.display = "flex";
 }

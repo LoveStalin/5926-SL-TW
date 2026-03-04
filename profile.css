@@ -143,10 +143,39 @@ body {
     background: yellow;
 }
 
-.seat img {
-    width: 80px;
-    height: 100px;
+.seat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    text-align: center;
+}
+
+.avatar-wrapper {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.name {
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.role {
+    font-size: 11px;
+    opacity: 0.8;
+    margin: 0;
 }
 
 /*==== Popup Profile ====*/
