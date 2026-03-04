@@ -106,15 +106,17 @@ function openProfile(student) {
 
     popup.innerHTML = `
                     < div class="popup-content" >
+             <img src="${student.img}" class="avatar">
+
             <h2>${student.fullName}</h2>
 
             <p><strong>Ngày sinh:</strong> ${student.dob}</p>
 
             ${student.role ? `<p><strong>Chức vụ:</strong> ${student.role}</p>` : ""}
 
-                <button onclick="closePopup()">Đóng</button>
-        </div >
-                    `;
+            <button onclick="closePopup()">Đóng</button>
+`;
+
 
     popup.style.display = "flex";
 }
