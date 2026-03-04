@@ -4,7 +4,7 @@ export let rightBlock = [
     ["tiendat", null, "khongtien"],
     ["caoson", "thaoanh", "vupanh"],
     ["viettrinh", "baongoc", "khanhan"],
-    ["yennhi", "hoangha", "lehuy"]
+    ["hoangha", "lehuy", "yennhi"]
 ];
 
 export let leftBlock = [
@@ -19,8 +19,8 @@ export let leftBlock = [
 export let middleBlock = [
     ["lenam", null, "huuchuong"],
     ["phamnam", "baoyen", "ducanh"],
-    ["khanhhuyen", null, "minhtien"],
+    ["khanhhuyen", "npanh", "minhtien"],
     ["baongan", "ngochan", "baouyen"],
     ["baoanh", "nhatanh", "tancuong"],
-    ["npanh", "minhanh", "haanh"]
+    ["minhanh", null, "haanh"]
 ];
