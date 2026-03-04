@@ -70,9 +70,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!data) return;
 
-        leftBlock = data.leftBlock;
-        middleBlock = data.middleBlock;
-        rightBlock = data.rightBlock;
+        const leftBlock = data.leftBlock;
+        const middleBlock = data.middleBlock;
+        const rightBlock = data.rightBlock;
 
         container.innerHTML = "";
 
