@@ -90,13 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
     });
-    window.initSeatmap = function () {
+    document.getElementById("initBtn").addEventListener("click", function () {
         set(ref(db, "seatmap"), {
             leftBlock,
             middleBlock,
             rightBlock
         });
-    }
+    });
 
 });
 //Another Function
