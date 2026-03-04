@@ -106,21 +106,20 @@ function openProfile(student) {
 
     popup.innerHTML = `
                     <div class="popup-content">
-             <img src="${student.img} class="student-avatar">
+             <img src="${student.img}" class="student-avatar">
 
             <h2>${student.fullName}</h2>
 
             <p><strong>Ngày sinh:</strong> ${student.dob}</p>
 
             ${student.role ? `<p><strong>Chức vụ:</strong> ${student.role}</p>` : ""}
-
-            <button onclick="closePopup()">Đóng</button>
+        <button class="close-popup">Đóng</button>
             </div>
 `;
 
 
     popup.style.display = "flex";
-}
-function closePopup() {
-    document.getElementById("profilePopup").style.display = "none";
+    popup.querySelector(".close-popup").addEventListener("click", function () {
+        popup.style.display = "none";
+    });
 }
