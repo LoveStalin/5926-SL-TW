@@ -106,7 +106,7 @@ function openProfile(student) {
 
     popup.innerHTML = `
                     < div class="popup-content" >
-             <img src="${student.img}" class="avatar">
+             <img src="${student.img}/150x200" >
 
             <h2>${student.fullName}</h2>
 
