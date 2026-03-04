@@ -43,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 div.innerHTML = `
-                    <img src="https://via.placeholder.com/80x100">
                     <p class="name">${student.displayName}</p>
                     ${student.role ? `<p class="role">${student.role}</p>` : ""}
                 `;
