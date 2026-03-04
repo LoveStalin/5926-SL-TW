@@ -1,4 +1,4 @@
-let rightBlock = [
+export let rightBlock = [
     ["nguyenhuy", null, "viethoang"],
     ["manhduy", null, "haily"],
     ["tiendat", null, "khongtien"],
@@ -7,7 +7,7 @@ let rightBlock = [
     ["yennhi", "hoangha", "lehuy"]
 ];
 
-let leftBlock = [
+export let leftBlock = [
     ["dangkhoi", null, "minhson"],
     ["duyanh", null, "viettrung"],
     ["haininh", "thuyduong", "doankhanh"],
@@ -16,7 +16,7 @@ let leftBlock = [
     ["xuanthanh", null, "ngnamkhanh"]
 ];
 
-let middleBlock = [
+export let middleBlock = [
     ["lenam", null, "huuchuong"],
     ["phamnam", "baoyen", "ducanh"],
     ["khanhhuyen", null, "minhtien"],
