@@ -44,6 +44,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 div.className = "seat";
+                div.dataset.seatId = seat;
+                div.draggable = true;
+                div.addEventListener("dragstart", (e) => {
+                    e.dataTransfer.setData("seatId", seat);
+                });
+
+                div.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                });
+                div.addEventListener("drop", (e) => {
+
+                    const fromId = e.dataTransfer.getData("seatId");
+                    const toId = div.dataset.seatId;
+
+                    swapSeats(fromId, toId);
+
+                });
 
                 div.innerHTML = `
     <div class="avatar-wrapper">
@@ -90,15 +107,18 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
     });
-    document.getElementById("initBtn").addEventListener("click", function () {
-        set(ref(db, "seatmap"), {
-            leftBlock,
-            middleBlock,
-            rightBlock
-        });
-    });
+
 
 });
+function initSeatmap() {
+    set(ref(db, "seatmap"), {
+        leftBlock,
+        middleBlock,
+        rightBlock
+    });
+}
+
+document.getElementById("initBtn").addEventListener("click", initSeatmap);
 //Another Function
 function openProfile(student) {
 
@@ -122,4 +142,22 @@ function openProfile(student) {
     popup.querySelector(".close-popup").addEventListener("click", function () {
         popup.style.display = "none";
     });
+}
+function swapSeats(a, b) {
+
+    const blocks = [leftBlock, middleBlock, rightBlock];
+
+    for (let block of blocks) {
+        for (let row of block) {
+
+            for (let i = 0; i < row.length; i++) {
+
+                if (row[i] === a) row[i] = b;
+                else if (row[i] === b) row[i] = a;
+
+            }
+        }
+    }
+
+    initSeatmap();
 }
