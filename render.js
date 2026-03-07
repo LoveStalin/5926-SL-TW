@@ -1,4 +1,6 @@
-import { leftBlock, middleBlock, rightBlock } from "./seatmap.js";
+let localLeft = [];
+let localMiddle = [];
+let localRight = [];
 import { db, ref, set, onValue } from "./firebase.js";
 console.log("render is running");
 
@@ -84,41 +86,32 @@ document.addEventListener("DOMContentLoaded", () => {
     onValue(ref(db, "seatmap"), (snapshot) => {
 
         let data = snapshot.val();
-
         if (!data) return;
 
-        const leftBlock = data.leftBlock;
-        const middleBlock = data.middleBlock;
-        const rightBlock = data.rightBlock;
+        localLeft = JSON.parse(JSON.stringify(data.leftBlock));
+        localMiddle = JSON.parse(JSON.stringify(data.middleBlock));
+        localRight = JSON.parse(JSON.stringify(data.rightBlock));
 
         container.innerHTML = "";
 
         const totalRows = Math.max(
-            leftBlock.length,
-            middleBlock.length,
-            rightBlock.length
+            localLeft.length,
+            localMiddle.length,
+            localRight.length
         );
 
         for (let i = 0; i < totalRows; i++) {
             renderRow(
-                leftBlock[i] || [],
-                middleBlock[i] || [],
-                rightBlock[i] || []
+                localLeft[i] || [],
+                localMiddle[i] || [],
+                localRight[i] || []
             );
         }
+
     });
 
 
 });
-function initSeatmap() {
-    set(ref(db, "seatmap"), {
-        leftBlock,
-        middleBlock,
-        rightBlock
-    });
-}
-
-document.getElementById("initBtn").addEventListener("click", initSeatmap);
 //Another Function
 function openProfile(student) {
 
@@ -145,7 +138,7 @@ function openProfile(student) {
 }
 function swapSeats(a, b) {
 
-    const blocks = [leftBlock, middleBlock, rightBlock];
+    const blocks = [localLeft, localMiddle, localRight];
 
     for (let block of blocks) {
         for (let row of block) {
@@ -159,5 +152,14 @@ function swapSeats(a, b) {
         }
     }
 
-    initSeatmap();
 }
+function saveSeatmap() {
+
+    set(ref(db, "seatmap"), {
+        leftBlock: localLeft,
+        middleBlock: localMiddle,
+        rightBlock: localRight
+    });
+
+}
+document.getElementById("saveSeat").addEventListener("click", saveSeatmap);
