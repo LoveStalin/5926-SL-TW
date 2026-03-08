@@ -3,15 +3,45 @@ let localMiddle = [];
 let localRight = [];
 import { db, ref, set, onValue } from "./firebase.js";
 console.log("render is running");
+import { auth, provider } from "./firebase.js";
+import { signInWithPopup, signOut }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+let isTeacher = false;
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+
+        const result = await signInWithPopup(auth, provider);
+
+        const user = result.user;
+
+        console.log(user.email);
+
+        if (user.email === "devthanh280625@gmail.com") {
+            isTeacher = true;
+            alert("Teacher mode enabled");
+        }
+
+    });
     const container = document.getElementById("seatmap");
 
     if (!container) {
         console.error("Không tìm thấy container seatmap");
         return;
     }
+
+
+    onAuthStateChanged(auth, (user) => {
+
+        if (user && user.email === "devthanh280625@gmail.com") {
+            isTeacher = true;
+        }
+
+    });
 
     function renderRow(left, middle, right) {
 
@@ -47,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 div.className = "seat";
                 div.dataset.seatId = seat;
-                div.draggable = true;
+                div.draggable = isTeacher;
                 div.addEventListener("dragstart", (e) => {
                     e.dataTransfer.setData("seatId", seat);
                 });
@@ -138,11 +168,15 @@ function openProfile(student) {
 }
 function swapSeats(a, b) {
 
+    if (!isTeacher) return;
+    if (a === b) return;
+
     const blocks = [localLeft, localMiddle, localRight];
+
+    console.log("swap:", a, b);
 
     for (let block of blocks) {
         for (let row of block) {
-
             for (let i = 0; i < row.length; i++) {
 
                 if (row[i] === a) row[i] = b;
@@ -151,9 +185,13 @@ function swapSeats(a, b) {
             }
         }
     }
-
 }
 function saveSeatmap() {
+
+    if (!isTeacher) {
+        alert("Only teacher can save");
+        return;
+    }
 
     set(ref(db, "seatmap"), {
         leftBlock: localLeft,
@@ -163,3 +201,14 @@ function saveSeatmap() {
 
 }
 document.getElementById("saveSeat").addEventListener("click", saveSeatmap);
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+
+    await signOut(auth);
+
+    isTeacher = false;
+
+    alert("Logged out");
+
+    location.reload();
+});
