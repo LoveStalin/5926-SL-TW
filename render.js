@@ -8,6 +8,7 @@ import { signInWithPopup, signOut }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { onAuthStateChanged }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
 let isTeacher = false;
 
 
@@ -21,9 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log(user.email);
 
-        if (user.email === "devthanh280625@gmail.com", "hlee95095@gmail.com") {
+        if (
+            user.email === "devthanh280625@gmail.com" ||
+            user.email === "hlee95095@gmail.com"
+        ) {
             isTeacher = true;
-            alert("Teacher mode enabled");
+            alert("Teacher mode activated");
+        } else {
+            isTeacher = false;
         }
 
     });
@@ -37,10 +43,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     onAuthStateChanged(auth, (user) => {
 
-        if (user && user.email === "devthanh280625@gmail.com", "hlee95095@gmail.com") {
+        if (user &&
+            (user.email === "devthanh280625@gmail.com" ||
+                user.email === "hlee95095@gmail.com")
+        ) {
             isTeacher = true;
+        } else {
+            isTeacher = false;
         }
-
+        updateWelcome(user);
     });
 
     function renderRow(left, middle, right) {
@@ -205,6 +216,7 @@ document.getElementById("saveSeat").addEventListener("click", saveSeatmap);
 document.getElementById("logoutBtn").addEventListener("click", async () => {
 
     await signOut(auth);
+    updateWelcome(null);
 
     isTeacher = false;
 
@@ -212,3 +224,32 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 
     location.reload();
 });
+function updateWelcome(user) {
+
+    const box = document.getElementById("welcome-card");
+
+    if (!user) {
+        box.innerHTML = "";
+        return;
+    }
+
+    const role = isTeacher ? "Teacher 👩‍🏫" : "Student 👨‍🎓";
+
+    box.innerHTML = `
+      <div id="welcome-card">
+
+        <div class="welcome-text">
+          <div class="welcome-title">
+            Welcome back, <b>${user.displayName}</b>
+          </div>
+
+          <div class="role">
+            Your role: <b>${role}</b>
+          </div>
+         </div>
+
+    <img src="${user.photoURL}" class="user-avatar">
+
+</div>
+`;
+}
