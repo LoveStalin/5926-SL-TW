@@ -239,6 +239,35 @@ body {
     fill: #a784e6
 }
 
+#welcome-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    background: rgba(255, 255, 255, 0.7);
+    padding: 10px 16px;
+    border-radius: 12px;
+
+    width: fit-content;
+}
+
+.welcome-title {
+    font-size: 16px;
+}
+
+.role {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-left: 10px;
+}
+
 @media (max-width: 768px) {
     .seatmap {
         overflow-x: auto;
