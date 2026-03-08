@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     onAuthStateChanged(auth, (user) => {
 
-        if (user && user.email === "devthanh280625@gmail.com") {
+        if (user && user.email === "devthanh280625@gmail.com", "hlee95095@gmail.com") {
             isTeacher = true;
         }
 
