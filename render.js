@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log(user.email);
 
-        if (user.email === "devthanh280625@gmail.com") {
+        if (user.email === "devthanh280625@gmail.com", "hlee95095@gmail.com") {
             isTeacher = true;
             alert("Teacher mode enabled");
         }

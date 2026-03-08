@@ -230,6 +230,15 @@ body {
     transform: scale(0.95);
 }
 
+#saveSeat {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    fill: #a784e6
+}
+
 @media (max-width: 768px) {
     .seatmap {
         overflow-x: auto;
@@ -259,13 +268,4 @@ body {
         padding: 30px 10px;
         margin-top: 80px;
     }
-}
-
-#saveSeat {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 10px 16px;
-    border-radius: 10px;
-    fill: linear-gradient(135deg, #c7a6ff, #a784e6);
 }
