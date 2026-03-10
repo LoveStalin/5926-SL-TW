@@ -15,23 +15,26 @@ let isTeacher = false;
 document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("loginBtn").addEventListener("click", async () => {
+        try {
+            const result = await signInWithPopup(auth, provider);
 
-        const result = await signInWithPopup(auth, provider);
+            const user = result.user;
 
-        const user = result.user;
+            console.log(user.email);
 
-        console.log(user.email);
-
-        if (
-            user.email === "devthanh280625@gmail.com" ||
-            user.email === "hlee95095@gmail.com"
-        ) {
-            isTeacher = true;
-            alert("Teacher mode activated");
-        } else {
-            isTeacher = false;
+            if (
+                user.email === "devthanh280625@gmail.com" ||
+                user.email === "hlee95095@gmail.com"
+            ) {
+                isTeacher = true;
+                alert("Teacher mode activated");
+            } else {
+                isTeacher = false;
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            alert("Login failed hoặc popup bị chặn!");
         }
-
     });
     const container = document.getElementById("seatmap");
 
