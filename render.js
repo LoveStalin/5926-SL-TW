@@ -8,6 +8,7 @@ import { signInWithPopup, signOut }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { onAuthStateChanged }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { defaultSeatmap } from "./seatmap.js";
 
 let isTeacher = false;
 
@@ -67,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ...right
         ];
 
-        fullRow.forEach(seat => {
+        fullRow.forEach((seat, index) => {
 
             const div = document.createElement("div");
 
@@ -76,7 +77,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             else if (!seat) {
+
                 div.className = "empty-seat";
+
+                div.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                });
+
+                div.addEventListener("drop", (e) => {
+
+                    const fromId = e.dataTransfer.getData("seatId");
+
+                    moveToEmpty(fromId, left, index);
+
+                });
+
             }
 
             else {
@@ -200,6 +215,60 @@ function swapSeats(a, b) {
         }
     }
 }
+function moveToEmpty(id, targetRow, targetIndex) {
+
+    const blocks = [localLeft, localMiddle, localRight];
+
+    let sourceRow = null;
+    let sourceIndex = null;
+
+    for (let block of blocks) {
+        for (let row of block) {
+            for (let i = 0; i < row.length; i++) {
+
+                if (row[i] === id) {
+                    sourceRow = row;
+                    sourceIndex = i;
+                }
+
+            }
+        }
+    }
+
+    if (sourceRow) {
+
+        sourceRow[sourceIndex] = null;
+        targetRow[targetIndex] = id;
+
+    }
+
+}
+function resetSeatmap() {
+
+    if (!isTeacher) return;
+
+    localLeft = JSON.parse(JSON.stringify(defaultSeatmap.leftBlock));
+    localMiddle = JSON.parse(JSON.stringify(defaultSeatmap.middleBlock));
+    localRight = JSON.parse(JSON.stringify(defaultSeatmap.rightBlock));
+
+    const container = document.getElementById("seatmap");
+    container.innerHTML = "";
+
+    const totalRows = Math.max(
+        localLeft.length,
+        localMiddle.length,
+        localRight.length
+    );
+
+    for (let i = 0; i < totalRows; i++) {
+        renderRow(
+            localLeft[i] || [],
+            localMiddle[i] || [],
+            localRight[i] || []
+        );
+    }
+
+}
 function saveSeatmap() {
 
     if (!isTeacher) {
@@ -256,3 +325,5 @@ function updateWelcome(user) {
 </div>
 `;
 }
+
+document.getElementById("resetSeat").addEventListener("click", resetSeatmap);
