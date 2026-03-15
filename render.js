@@ -11,7 +11,202 @@ import { onAuthStateChanged }
 import { defaultSeatmap } from "./seatmap.js";
 
 let isTeacher = false;
+let container = null;
+let touchSeatId = null;
 
+function renderRow(left, middle, right) {
+
+    if (!Array.isArray(left)) left = [];
+    if (!Array.isArray(middle)) middle = [];
+    if (!Array.isArray(right)) right = [];
+    const fullRow = [
+        ...left,
+        "AISLE",
+        ...middle,
+        "AISLE",
+        ...right
+    ];
+
+    fullRow.forEach((seat, index) => {
+
+        const div = document.createElement("div");
+
+        if (seat === "AISLE") {
+            div.className = "aisle";
+        }
+
+        else if (!seat) {
+
+            div.className = "empty-seat";
+
+            div.addEventListener("dragover", (e) => {
+                e.preventDefault();
+            });
+
+            div.addEventListener("drop", (e) => {
+
+                const fromId = e.dataTransfer.getData("seatId");
+
+                let targetRow;
+                let targetIndex;
+
+                if (index < left.length) {
+                    targetRow = left;
+                    targetIndex = index;
+                }
+                else if (index === left.length) {
+                    return; // AISLE
+                }
+                else if (index < left.length + 1 + middle.length) {
+                    targetRow = middle;
+                    targetIndex = index - left.length - 1;
+                }
+                else if (index === left.length + 1 + middle.length) {
+                    return; // AISLE
+                }
+                else {
+                    targetRow = right;
+                    targetIndex = index - left.length - middle.length - 2;
+                }
+
+                moveToEmpty(fromId, targetRow, targetIndex);
+
+            });
+
+            // Touch drop target for mobile
+            div.addEventListener("touchstart", () => {
+                // no-op, needed so touchend fires on this element
+            }, { passive: true });
+
+            div.addEventListener("touchend", (e) => {
+                if (!isTeacher || !touchSeatId) return;
+                if (e.cancelable) e.preventDefault();
+                moveToEmpty(touchSeatId, targetRow, targetIndex);
+                touchSeatId = null;
+            }, { passive: false });
+
+        }
+
+        else {
+            const student = students[seat];
+
+            if (!student) {
+                console.warn("Không tìm thấy student:", seat);
+                div.className = "empty-seat";
+                if (container) container.appendChild(div);
+                return;
+            }
+
+            div.className = "seat";
+            div.dataset.seatId = seat;
+            div.draggable = isTeacher;
+            div.addEventListener("dragstart", (e) => {
+                e.dataTransfer.setData("seatId", seat);
+            });
+
+            div.addEventListener("dragover", (e) => {
+                e.preventDefault();
+            });
+            div.addEventListener("drop", (e) => {
+
+                const fromId = e.dataTransfer.getData("seatId");
+                const toId = div.dataset.seatId;
+
+                swapSeats(fromId, toId);
+
+            });
+
+            div.innerHTML = `
+    <div class="avatar-wrapper">
+        <img src="${student.img}" class="avatar">
+    </div>
+
+    <div class="seat-info">
+        <p class="name">${student.displayName}</p>
+        ${student.role ? `<p class="role">${student.role}</p>` : ""}
+    </div>
+`;
+
+            div.addEventListener("click", () => {
+                openProfile(student);
+            });
+
+            // Touch drag for mobile
+            div.addEventListener("touchstart", (e) => {
+                if (!isTeacher) return;
+                touchSeatId = seat;
+            }, { passive: true });
+
+            div.addEventListener("touchend", (e) => {
+                if (!isTeacher || !touchSeatId) return;
+                if (e.cancelable) e.preventDefault();
+                const fromId = touchSeatId;
+                const toId = div.dataset.seatId;
+                if (fromId !== toId) {
+                    swapSeats(fromId, toId);
+                }
+                touchSeatId = null;
+            }, { passive: false });
+
+            div.addEventListener("touchcancel", () => {
+                touchSeatId = null;
+            });
+        }
+
+        if (container) container.appendChild(div);
+    });
+}
+
+function renderAll() {
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const totalRows = Math.max(
+        localLeft.length,
+        localMiddle.length,
+        localRight.length
+    );
+
+    for (let i = 0; i < totalRows; i++) {
+        renderRow(
+            localLeft[i] || [],
+            localMiddle[i] || [],
+            localRight[i] || []
+        );
+    }
+}
+
+
+const ensureShape = (block, template) => {
+    const cols = template[0]?.length || 0;
+    const rows = Math.max(
+        template.length,
+        Array.isArray(block) ? block.length : Object.keys(block || {}).length
+    );
+    const safeBlock = block || [];
+
+    const readRow = (r) => {
+        if (Array.isArray(safeBlock)) return safeBlock[r];
+        return safeBlock[r];
+    };
+
+    const toArrayRow = (row) => {
+        if (!row) return Array(cols).fill(null);
+        const res = [];
+        for (let c = 0; c < cols; c++) {
+            if (Array.isArray(row)) res.push(row[c] ?? null);
+            else res.push(row[c] ?? null); // object with numeric keys
+        }
+        return res;
+    };
+
+    const result = [];
+    for (let r = 0; r < rows; r++) {
+        result.push(toArrayRow(readRow(r)));
+    }
+    return result;
+};
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -37,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Login failed hoặc popup bị chặn!");
         }
     });
-    const container = document.getElementById("seatmap");
+    container = document.getElementById("seatmap");
 
     if (!container) {
         console.error("Không tìm thấy container seatmap");
@@ -58,8 +253,12 @@ document.addEventListener("DOMContentLoaded", () => {
         updateWelcome(user);
     });
 
-    function renderRow(left, middle, right) {
+    // Legacy copy kept temporarily; main renderRow is defined globally above.
+    function renderRowLegacy(left, middle, right) {
 
+        if (!Array.isArray(left)) left = [];
+        if (!Array.isArray(middle)) middle = [];
+        if (!Array.isArray(right)) right = [];
         const fullRow = [
             ...left,
             "AISLE",
@@ -88,7 +287,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const fromId = e.dataTransfer.getData("seatId");
 
-                    moveToEmpty(fromId, left, index);
+                    let targetRow;
+                    let targetIndex;
+
+                    if (index < left.length) {
+                        targetRow = left;
+                        targetIndex = index;
+                    }
+                    else if (index === left.length) {
+                        return; // AISLE
+                    }
+                    else if (index < left.length + 1 + middle.length) {
+                        targetRow = middle;
+                        targetIndex = index - left.length - 1;
+                    }
+                    else if (index === left.length + 1 + middle.length) {
+                        return; // AISLE
+                    }
+                    else {
+                        targetRow = right;
+                        targetIndex = index - left.length - middle.length - 2;
+                    }
+
+                    moveToEmpty(fromId, targetRow, targetIndex);
 
                 });
 
@@ -147,25 +368,11 @@ document.addEventListener("DOMContentLoaded", () => {
         let data = snapshot.val();
         if (!data) return;
 
-        localLeft = JSON.parse(JSON.stringify(data.leftBlock));
-        localMiddle = JSON.parse(JSON.stringify(data.middleBlock));
-        localRight = JSON.parse(JSON.stringify(data.rightBlock));
+        localLeft = ensureShape(data.leftBlock, defaultSeatmap.leftBlock);
+        localMiddle = ensureShape(data.middleBlock, defaultSeatmap.middleBlock);
+        localRight = ensureShape(data.rightBlock, defaultSeatmap.rightBlock);
 
-        container.innerHTML = "";
-
-        const totalRows = Math.max(
-            localLeft.length,
-            localMiddle.length,
-            localRight.length
-        );
-
-        for (let i = 0; i < totalRows; i++) {
-            renderRow(
-                localLeft[i] || [],
-                localMiddle[i] || [],
-                localRight[i] || []
-            );
-        }
+        renderAll();
 
     });
 
@@ -214,8 +421,14 @@ function swapSeats(a, b) {
             }
         }
     }
+
+    renderAll();
 }
 function moveToEmpty(id, targetRow, targetIndex) {
+    console.log("MOVE DEBUG:");
+    console.log("student:", id);
+    console.log("targetRow:", targetRow);
+    console.log("targetIndex:", targetIndex);
 
     const blocks = [localLeft, localMiddle, localRight];
 
@@ -235,14 +448,15 @@ function moveToEmpty(id, targetRow, targetIndex) {
         }
     }
 
-    if (sourceRow) {
-
+    if (sourceRow && targetRow && targetRow[targetIndex] == null) {
         sourceRow[sourceIndex] = null;
         targetRow[targetIndex] = id;
+        renderAll();
 
     }
 
 }
+
 function resetSeatmap() {
 
     if (!isTeacher) return;
@@ -251,22 +465,7 @@ function resetSeatmap() {
     localMiddle = JSON.parse(JSON.stringify(defaultSeatmap.middleBlock));
     localRight = JSON.parse(JSON.stringify(defaultSeatmap.rightBlock));
 
-    const container = document.getElementById("seatmap");
-    container.innerHTML = "";
-
-    const totalRows = Math.max(
-        localLeft.length,
-        localMiddle.length,
-        localRight.length
-    );
-
-    for (let i = 0; i < totalRows; i++) {
-        renderRow(
-            localLeft[i] || [],
-            localMiddle[i] || [],
-            localRight[i] || []
-        );
-    }
+    renderAll();
 
 }
 function saveSeatmap() {
@@ -277,9 +476,9 @@ function saveSeatmap() {
     }
 
     set(ref(db, "seatmap"), {
-        leftBlock: localLeft,
-        middleBlock: localMiddle,
-        rightBlock: localRight
+        leftBlock: ensureShape(localLeft, defaultSeatmap.leftBlock),
+        middleBlock: ensureShape(localMiddle, defaultSeatmap.middleBlock),
+        rightBlock: ensureShape(localRight, defaultSeatmap.rightBlock)
     });
 
 }
