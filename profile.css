@@ -260,13 +260,7 @@ body {
     opacity: 0.8;
 }
 
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-left: 10px;
-}
+
 
 @media (max-width: 768px) {
     .seatmap {
@@ -296,5 +290,13 @@ body {
         width: 95%;
         padding: 30px 10px;
         margin-top: 80px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-left: 10px;
     }
 }
