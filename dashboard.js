@@ -26,6 +26,39 @@ const avatar = document.getElementById("avatar");
 const adminPanel = document.getElementById("adminPanel");
 const statusText = document.getElementById("status");
 const logoutButton = document.getElementById("logoutButton");
+const greetingLabel = document.getElementById("greetingLabel");
+const currentTime = document.getElementById("currentTime");
+const currentDate = document.getElementById("currentDate");
+
+function getTimeGreeting(hour) {
+    if (hour >= 5 && hour < 12) return "Chào buổi sáng";
+    if (hour >= 12 && hour < 18) return "Chào buổi chiều";
+    if (hour >= 18 && hour < 22) return "Chào buổi tối";
+    return "Chào buổi đêm";
+}
+
+function updateDashboardClock() {
+    const now = new Date();
+    const timeFormatter = new Intl.DateTimeFormat("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    });
+    const dateFormatter = new Intl.DateTimeFormat("vi-VN", {
+        weekday: "long",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
+
+    currentTime.textContent = timeFormatter.format(now);
+    currentDate.textContent = dateFormatter.format(now);
+    greetingLabel.textContent = getTimeGreeting(now.getHours());
+}
+
+updateDashboardClock();
+window.setInterval(updateDashboardClock, 1000);
 
 
 onAuthStateChanged(classAuth, async (user) => {
