@@ -173,14 +173,20 @@ body {
     word-break: break-word;
 }
 
-.role {
-    font-size: 10px;
-    opacity: 0.9;
-    margin: 4px 0 0;
-    line-height: 1.25;
-    max-width: 80px;
+.role-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 5px 7px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.2;
+    max-width: 90px;
     word-break: break-word;
-    color: #2d1e45;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .student-avatar {
@@ -249,14 +255,80 @@ body {
 }
 
 .role-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #7c4de0, #a98aff);
-    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     border-radius: 999px;
     padding: 8px 12px;
     font-size: 0.85rem;
     font-weight: 700;
     box-shadow: 0 10px 20px rgba(124, 77, 224, 0.25);
+}
+
+.role-badge.role-default,
+.role-tag.role-default {
+    background: linear-gradient(135deg, #c7b4ff, #8a72d8);
+    color: #fff;
+}
+
+.role-badge.role-red,
+.role-tag.role-red {
+    background: linear-gradient(135deg, #ff7a7a, #ff4d6d);
+    color: #fff;
+}
+
+.role-badge.role-gold,
+.role-tag.role-gold {
+    background: linear-gradient(135deg, #f4c95d, #e9a822);
+    color: #4d2d00;
+}
+
+.role-badge.role-cyan,
+.role-tag.role-cyan {
+    background: linear-gradient(135deg, #59d0ff, #1d9bf0);
+    color: white;
+}
+
+.role-badge.role-green,
+.role-tag.role-green {
+    background: linear-gradient(135deg, #54d88b, #1faa63);
+    color: white;
+}
+
+.role-badge.role-orange,
+.role-tag.role-orange {
+    background: linear-gradient(135deg, #ffbb70, #ff8a3d);
+    color: white;
+}
+
+.role-badge.role-blue,
+.role-tag.role-blue {
+    background: linear-gradient(135deg, #6cc2ff, #3d7cff);
+    color: white;
+}
+
+.role-badge.role-pink,
+.role-tag.role-pink {
+    background: linear-gradient(135deg, #ff9acc, #ff5ebc);
+    color: white;
+}
+
+.role-badge.role-amber,
+.role-tag.role-amber {
+    background: linear-gradient(135deg, #f7d77d, #d49f38);
+    color: #3f2a00;
+}
+
+.role-badge.role-teal,
+.role-tag.role-teal {
+    background: linear-gradient(135deg, #6fe7d9, #22b7a8);
+    color: #003a33;
+}
+
+.role-badge.role-violet,
+.role-tag.role-violet {
+    background: linear-gradient(135deg, #b08cff, #7d5af5);
+    color: white;
 }
 
 .profile-body {
