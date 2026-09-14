@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | 11A5</title>
+
+    <link rel="stylesheet" href="./class-dashboard.css">
+</head>
+
+<body>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+
+    <header class="topbar">
+        <a href="./index.html" class="brand">
+            A5-K68
+        </a>
+
+        <div class="topbar-right">
+            <span id="topbarUser">Đang tải...</span>
+
+            <button id="logoutButton" class="logout-button">
+                Đăng xuất
+            </button>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="welcome-section">
+            <p class="eyebrow">CLASS ACCOUNT SYSTEM</p>
+
+            <h1>
+                Xin chào,
+                <span id="displayName">...</span>
+                👋
+            </h1>
+
+            <p class="welcome-description">
+                Chào mừng trở lại với không gian riêng của tập thể
+                <strong>11A5 — A5 Khóa 68</strong>.
+            </p>
+        </section>
+
+        <section class="account-card">
+            <div class="avatar" id="avatar">
+                A
+            </div>
+
+            <div class="account-info">
+                <h2 id="accountName">Đang tải...</h2>
+
+                <p id="accountEmail">
+                    Đang tải email...
+                </p>
+
+                <div class="account-tags">
+                    <span class="tag" id="roleTag">
+                        ...
+                    </span>
+
+                    <span class="tag" id="classTag">
+                        11A5
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-grid">
+            <a href="./index.html" class="dashboard-card">
+                <span class="card-icon">🏠</span>
+
+                <h2>Trang chủ</h2>
+
+                <p>
+                    Quay lại website chính của A5-K68.
+                </p>
+            </a>
+
+            <a href="./profile.html" class="dashboard-card">
+                <span class="card-icon">🪑</span>
+
+                <h2>SeatMap</h2>
+
+                <p>
+                    Xem sơ đồ chỗ ngồi của lớp.
+                </p>
+            </a>
+
+            <button class="dashboard-card disabled-card" disabled>
+                <span class="card-icon">📢</span>
+
+                <h2>Thông báo</h2>
+
+                <p>
+                    Khu vực thông báo sẽ được phát triển sau.
+                </p>
+            </button>
+
+            <button class="dashboard-card disabled-card" disabled>
+                <span class="card-icon">📅</span>
+
+                <h2>Sự kiện</h2>
+
+                <p>
+                    Các hoạt động của tập thể 11A5.
+                </p>
+            </button>
+        </section>
+
+        <section id="adminPanel" class="admin-panel hidden">
+            <p class="eyebrow">ADMIN AREA</p>
+
+            <h2>Khu vực quản trị</h2>
+
+            <p>
+                Tài khoản của mày có quyền quản trị hệ thống Class Account.
+            </p>
+
+            <button class="admin-button" disabled>
+                Quản lý tài khoản — sắp ra mắt
+            </button>
+        </section>
+
+        <p id="status" class="status-text">
+            Đang xác thực tài khoản...
+        </p>
+    </main>
+
+    <script type="module" src="./dashboard.js"></script>
+</body>
+</html>
