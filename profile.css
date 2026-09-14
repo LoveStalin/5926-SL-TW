@@ -446,6 +446,7 @@ body {
 #saveSeat,
 #changeSeatRowBtn,
 #resetSeat,
+#exportPdfBtn,
 #loginBtn,
 #logoutBtn {
     padding: 10px 16px;
@@ -468,6 +469,7 @@ body {
 #changeSeatRowBtn:hover,
 #saveSeat:hover,
 #resetSeat:hover,
+#exportPdfBtn:hover,
 #loginBtn:hover,
 #logoutBtn:hover {
     transform: translateY(-2px);
@@ -510,6 +512,51 @@ body {
 .role {
     font-size: 14px;
     opacity: 0.8;
+}
+
+.print-title {
+    display: none;
+}
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 10mm;
+    }
+
+    body {
+        background: white;
+        color: #111;
+    }
+
+    .navbar,
+    #loginBtn,
+    #logoutBtn,
+    #welcome-card,
+    .seatmap-actions,
+    .popup,
+    .stars {
+        display: none !important;
+    }
+
+    .print-title {
+        display: block;
+        margin: 0 0 14px;
+        color: #24113c;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .seatmap {
+        width: max-content;
+        margin: 0 auto;
+        transform: scale(0.82);
+        transform-origin: top center;
+    }
+
+    .seat {
+        break-inside: avoid;
+    }
 }
 
 

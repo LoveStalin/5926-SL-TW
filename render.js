@@ -663,6 +663,10 @@ function saveSeatmap() {
 }
 document.getElementById("saveSeat").addEventListener("click", saveSeatmap);
 
+document.getElementById("exportPdfBtn").addEventListener("click", () => {
+    window.print();
+});
+
 document.getElementById("logoutBtn").addEventListener("click", async () => {
 
     await signOut(auth);

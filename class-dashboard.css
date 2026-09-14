@@ -127,6 +127,31 @@ button {
     font-size: 11px;
 }
 
+.topbar .time-panel {
+    gap: 8px;
+    margin: 0 2px 0 0;
+    padding: 6px 10px 6px 7px;
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+.topbar .time-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.topbar .time-panel strong {
+    font-size: 13px;
+}
+
+.topbar .time-panel span {
+    margin-top: 1px;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
 .system-status i {
     width: 7px;
     height: 7px;
@@ -561,7 +586,8 @@ a.dashboard-card:hover {
         justify-content: space-between;
     }
 
-    .system-status {
+    .system-status,
+    .topbar .time-panel {
         display: none;
     }
 
@@ -577,11 +603,6 @@ a.dashboard-card:hover {
 
     .quick-stats {
         grid-template-columns: 1fr;
-    }
-
-    .time-panel {
-        width: 100%;
-        max-width: 320px;
     }
 
     .dashboard-grid {
