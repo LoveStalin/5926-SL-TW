@@ -77,11 +77,12 @@ loginForm.addEventListener("submit", async (event) => {
 
         statusText.className = "success";
 
-        statusText.textContent =
-            "Đăng nhập thành công!\n\n" +
-            `Tên: ${userData.displayName}\n` +
-            `Vai trò: ${userData.role}\n` +
-            `Lớp: ${userData.className}`;
+statusText.textContent =
+    "Đăng nhập thành công! Đang chuyển đến dashboard...";
+
+setTimeout(() => {
+    window.location.href = "./dashboard.html";
+}, 700);
 
         console.log("Profile:", userData);
 

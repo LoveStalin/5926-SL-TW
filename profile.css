@@ -66,33 +66,50 @@ body {
     gap: 6px;
     cursor: pointer;
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 18px;
+    right: 26px;
     z-index: 2000;
+    background: rgba(84, 53, 146, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    padding: 12px 10px;
+    box-shadow: 0 14px 30px rgba(28, 12, 48, 0.18);
 }
 
 .menu-icon span {
     width: 28px;
     height: 3px;
-    background: white;
-    border-radius: 2px;
-    transition: 0.3s;
+    background: #2b1149;
+    border-radius: 10px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.menu-icon:hover span:nth-child(1) {
+    transform: translateY(-1px);
+}
+
+.menu-icon:hover span:nth-child(3) {
+    transform: translateY(1px);
 }
 
 /* Side menu */
 .side-menu {
     position: fixed;
     top: 0;
-    right: -250px;
-    width: 250px;
+    right: -290px;
+    width: 270px;
     height: 100vh;
-    background: rgba(30, 0, 60, 0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(30, 16, 52, 0.92);
+    backdrop-filter: blur(14px);
     display: flex;
     flex-direction: column;
-    padding: 80px 30px;
-    gap: 30px;
-    transition: 0.4s;
+    justify-content: center;
+    padding: 80px 30px 40px;
+    gap: 22px;
+    transition: right 0.35s ease;
+    box-shadow: -12px 0 25px rgba(19, 9, 31, 0.2);
+    z-index: 1500;
 }
 
 .side-menu.active {
@@ -100,15 +117,22 @@ body {
 }
 
 .menu-btn {
-    color: white;
+    color: #ffffff;
     text-decoration: none;
-    font-size: 18px;
-    transition: 0.3s;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
 .menu-btn:hover {
-    color: #ffb3ff;
-    transform: translateX(5px);
+    color: #f6ebff;
+    background: rgba(153, 121, 255, 0.18);
+    transform: translateX(6px);
+    box-shadow: 0 0 18px rgba(197, 173, 255, 0.3);
 }
 
 .seatmap {
