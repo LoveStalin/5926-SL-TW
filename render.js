@@ -13,19 +13,34 @@ import { defaultSeatmap } from "./seatmap.js";
 let isTeacher = false;
 let container = null;
 let touchSeatId = null;
-let studentRoles = {};
+
+function getStaticRoleMap() {
+    const roleMap = {};
+    Object.entries(students).forEach(([studentId, student]) => {
+        if (student?.role) {
+            roleMap[studentId] = student.role;
+        }
+    });
+    return roleMap;
+}
+
+let studentRoles = getStaticRoleMap();
 
 function syncStudentRolesFromDb() {
+    const roleMap = Object.keys(studentRoles).length ? studentRoles : getStaticRoleMap();
+
     Object.keys(students).forEach((studentId) => {
         const student = students[studentId];
         if (!student) return;
 
-        if (Object.prototype.hasOwnProperty.call(studentRoles, studentId)) {
-            student.role = studentRoles[studentId];
+        if (Object.prototype.hasOwnProperty.call(roleMap, studentId)) {
+            student.role = roleMap[studentId];
         } else {
             delete student.role;
         }
     });
+
+    studentRoles = { ...roleMap };
 }
 
 function renderRow(left, middle, right) {
@@ -391,8 +406,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     onValue(ref(db, "studentRoles"), (snapshot) => {
-        const data = snapshot.val() || {};
-        studentRoles = data;
+        const data = snapshot.val();
+        studentRoles = data ? { ...data } : getStaticRoleMap();
         syncStudentRolesFromDb();
         renderAll();
     });
