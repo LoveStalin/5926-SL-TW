@@ -13,6 +13,20 @@ import { defaultSeatmap } from "./seatmap.js";
 let isTeacher = false;
 let container = null;
 let touchSeatId = null;
+let studentRoles = {};
+
+function syncStudentRolesFromDb() {
+    Object.keys(students).forEach((studentId) => {
+        const student = students[studentId];
+        if (!student) return;
+
+        if (Object.prototype.hasOwnProperty.call(studentRoles, studentId)) {
+            student.role = studentRoles[studentId];
+        } else {
+            delete student.role;
+        }
+    });
+}
 
 function renderRow(left, middle, right) {
 
@@ -376,6 +390,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    onValue(ref(db, "studentRoles"), (snapshot) => {
+        const data = snapshot.val() || {};
+        studentRoles = data;
+        syncStudentRolesFromDb();
+        renderAll();
+    });
 
 });
 const ROLE_LIBRARY = Object.freeze([
@@ -405,6 +425,7 @@ function assignStudentRole(studentId, selectedRole) {
     if (!targetStudent) return;
 
     if (selectedRole === "__clear__") {
+        delete studentRoles[studentId];
         delete targetStudent.role;
         renderAll();
         return;
@@ -413,9 +434,11 @@ function assignStudentRole(studentId, selectedRole) {
     for (const [id, student] of Object.entries(students)) {
         if (id !== studentId && student.role === selectedRole) {
             delete student.role;
+            delete studentRoles[id];
         }
     }
 
+    studentRoles[studentId] = selectedRole;
     targetStudent.role = selectedRole;
     renderAll();
 }
@@ -580,11 +603,23 @@ function saveSeatmap() {
         return;
     }
 
+    const studentRoleMap = {};
+
+    Object.keys(students).forEach((studentId) => {
+        if (students[studentId].role) {
+            studentRoleMap[studentId] = students[studentId].role;
+        }
+    });
+
+    studentRoles = { ...studentRoleMap };
+
     set(ref(db, "seatmap"), {
         leftBlock: ensureShape(localLeft, defaultSeatmap.leftBlock),
         middleBlock: ensureShape(localMiddle, defaultSeatmap.middleBlock),
         rightBlock: ensureShape(localRight, defaultSeatmap.rightBlock)
     });
+
+    set(ref(db, "studentRoles"), studentRoleMap);
 
 }
 document.getElementById("saveSeat").addEventListener("click", saveSeatmap);
