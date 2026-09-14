@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Class Firebase Test</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #8aff80;
+        }
+
+        button {
+            padding: 10px 16px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        pre {
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        }
+
+        .success {
+            color: #8aff80;
+        }
+
+        .error {
+            color: #ff7777;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>11A5 Class Account Firebase Test</h1>
+
+    <p id="status">Đang kiểm tra Firebase...</p>
+
+    <button id="databaseTest">
+        Test Realtime Database
+    </button>
+
+    <pre id="result">Chưa có kết quả.</pre>
+
+    <script type="module">
+        import {
+            classAuth,
+            classDb
+        } from "./class-firebase.js";
+
+        import {
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        import {
+            ref,
+            get
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const status = document.getElementById("status");
+        const result = document.getElementById("result");
+        const databaseTest = document.getElementById("databaseTest");
+
+        status.textContent = "Firebase đã load thành công.";
+        status.className = "success";
+
+        onAuthStateChanged(classAuth, (user) => {
+            if (user) {
+                result.textContent =
+                    "Đang đăng nhập:\n" +
+                    user.email;
+            } else {
+                result.textContent =
+                    "Firebase Auth hoạt động.\n" +
+                    "Hiện tại chưa có tài khoản đăng nhập.";
+            }
+        });
+
+        databaseTest.addEventListener("click", async () => {
+            result.textContent = "Đang đọc dữ liệu classInfo...";
+
+            try {
+                const snapshot = await get(
+                    ref(classDb, "classInfo")
+                );
+
+                if (snapshot.exists()) {
+                    result.textContent =
+                        "Realtime Database hoạt động.\n\n" +
+                        JSON.stringify(
+                            snapshot.val(),
+                            null,
+                            2
+                        );
+                } else {
+                    result.textContent =
+                        "Kết nối Database thành công,\n" +
+                        "nhưng chưa có dữ liệu tại classInfo.";
+                }
+
+            } catch (error) {
+                result.textContent =
+                    "Lỗi đọc Realtime Database:\n\n" +
+                    error.message;
+            }
+        });
+    </script>
+</body>
+</html>

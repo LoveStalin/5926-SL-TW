@@ -1,0 +1,17 @@
+{
+  "users": {
+    "zSb3ZLMLnbVwye5Oj0aUqQOT0QJ3": {
+      "username": "admin",
+      "displayName": "Class Administrator",
+      "role": "admin",
+      "className": "11A5",
+      "group": "A5 Khóa 68",
+      "active": true
+    }
+  },
+  "classInfo": {
+    "name": "11A5",
+    "group": "A5 Khóa 68",
+    "schoolYear": "2026-2027"
+  }
+}
