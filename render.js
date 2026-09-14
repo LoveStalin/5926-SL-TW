@@ -145,6 +145,8 @@ function renderRow(left, middle, right) {
 
             });
 
+            const roleMeta = getRoleMeta(student.role);
+
             div.innerHTML = `
     <div class="avatar-wrapper">
         <img src="${student.img}" class="avatar">
@@ -152,7 +154,7 @@ function renderRow(left, middle, right) {
 
     <div class="seat-info">
         <p class="name">${student.displayName}</p>
-        ${student.role ? `<p class="role">${student.role}</p>` : ""}
+        ${student.role ? `<div class="role-tag ${roleMeta.className}">${roleMeta.icon} ${student.role}</div>` : ""}
     </div>
 `;
 
@@ -373,6 +375,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 });
 
+                const roleMeta = getRoleMeta(student.role);
+
                 div.innerHTML = `
     <div class="avatar-wrapper">
         <img src="${student.img}" class="avatar">
@@ -380,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <div class="seat-info">
         <p class="name">${student.displayName}</p>
-        ${student.role ? `<p class="role">${student.role}</p>` : ""}
+        ${student.role ? `<div class="role-tag ${roleMeta.className}">${roleMeta.icon} ${student.role}</div>` : ""}
     </div>
 `;
 
@@ -429,6 +433,25 @@ const ROLE_LIBRARY = Object.freeze([
     "Lớp phó học tập-Lớp phó đời sống-Thủ quỹ"
 ].sort());
 
+function getRoleMeta(role) {
+    const map = {
+        "XUNG KÍCH": { icon: "⚔️", className: "role-red" },
+        "Lớp trưởng": { icon: "👑", className: "role-gold" },
+        "Bí Thư": { icon: "📝", className: "role-cyan" },
+        "Tổ trưởng Tổ 1": { icon: "🏆", className: "role-green" },
+        "Tổ trưởng Tổ 2": { icon: "🏆", className: "role-green" },
+        "Tổ trưởng Tổ 3": { icon: "🏆", className: "role-green" },
+        "Lớp phó lao động": { icon: "🧹", className: "role-orange" },
+        "Lớp phó học tập": { icon: "📚", className: "role-blue" },
+        "Lớp phó văn thể": { icon: "🏃", className: "role-pink" },
+        "Lớp phó đời sống": { icon: "🏠", className: "role-amber" },
+        "Thủ quỹ": { icon: "💰", className: "role-teal" },
+        "Lớp phó học tập-Lớp phó đời sống-Thủ quỹ": { icon: "💼", className: "role-violet" }
+    };
+
+    return map[role] || { icon: "✨", className: "role-default" };
+}
+
 function getAvailableRoles() {
     return [...ROLE_LIBRARY];
 }
@@ -466,6 +489,7 @@ function openProfile(studentId) {
     const popup = document.getElementById("profilePopup");
     const availableRoles = getAvailableRoles();
     const selectedRole = student.role || "";
+    const roleMeta = getRoleMeta(student.role);
 
     popup.innerHTML = `
         <div class="popup-content">
@@ -476,7 +500,7 @@ function openProfile(studentId) {
                 <div class="profile-main">
                     <span class="profile-tag">Thông tin học sinh</span>
                     <h2>${student.fullName}</h2>
-                    <div class="role-badge">${student.role || "Chưa có chức vụ"}</div>
+                    <div class="role-badge ${roleMeta.className}">${roleMeta.icon} ${student.role || "Chưa có chức vụ"}</div>
                 </div>
             </div>
 
