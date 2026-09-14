@@ -10,7 +10,8 @@ const classData = {
             { image: "image/20-10-girl.jpg", title: "20/10 của các bạn nữ 10A5", details: ["📅 20/10/2025", "📍Lớp 10A5", "🎯Tổ chức cho cô và các bạn nữ ngày phụ nữ Việt Nam"], link: "https://www.facebook.com/share/p/1Bp7wY4itt/" },
             { image: "image/20-10-boy.jpg", title: "Các bạn nam cầm hoa tặng các bạn nữ 20/10", details: ["📅 20/10/2025", "📍Lớp 10A5", "🎯Tặng hoa cho các bạn nữ"], link: "https://www.facebook.com/share/p/1Bp7wY4itt/" },
             { image: "image/Chinese-new-year.jpg", title: "Tết Bính Ngọ 2026", details: ["📅 13/02/2025", "📍Sân Trường THPT Trần Phú", "🎯Chụp ảnh Tết 2026-tiễn bạn sì nếch🐍"], link: "https://www.facebook.com/share/p/18JxVehBTx/" },
-            { image: "image/8-3.jpg", title: "Ngày Quốc Tế Phụ Nữ", details: ["📅 08/03/2026", "📍Lớp 10A5", "🎯Chúc các bạn nữ lớp 10A5 nhân ngày 8/3"], link: "https://www.facebook.com/share/p/18CstkvDCy/" }
+            { image: "image/8-3.jpg", title: "Ngày Quốc Tế Phụ Nữ", details: ["📅 08/03/2026", "📍Lớp 10A5", "🎯Chúc các bạn nữ lớp 10A5 nhân ngày 8/3"], link: "https://www.facebook.com/share/p/18CstkvDCy/" },
+            { image: "image/hoi-thanh-nien-khoe-2026.jpg", title: "Hội Thanh Niên Khỏe 2026", details: ["📅 14/03/2026", "📍Sân Trường THPT Trần Phú", "🎯Tham gia Hội Thanh Niên Khỏe 2026"], link: "https://www.facebook.com/share/p/14w7LASZb8M/" },
         ]
     },
     "11A5": {
@@ -18,10 +19,10 @@ const classData = {
         memoryAlt: "Memory lớp 11A5",
         year: "Trần Phú • 2026",
         moments: [
-            { title: "Khoảnh khắc 11A5", details: ["✨ Gallery đang được cập nhật", "📸 Những kỷ niệm mới đang chờ bạn"], placeholder: true },
-            { title: "Our Moments 11A5", details: ["🌟 Một chương mới của A5-K68", "🗓️ Hẹn gặp lại trong những bức ảnh sắp tới"], placeholder: true },
-            { title: "Kỷ niệm đang đến", details: ["💜 Nội dung sẽ được bổ sung sớm", "📍Lớp 11A5"], placeholder: true },
-            { title: "Memory loading...", details: ["🎞️ Thẻ ảnh cùng kích thước với 10A5", "✨ Chờ những khoảnh khắc thật đẹp"], placeholder: true }
+            { title: "AUF WIEDERSEHEN", details: ["Đcu mày", "Ko có j đâu"], placeholder: true },
+            { title: "PLAYOFF Week 1 NHƯ CĐB", details: ["DALLAS GÀ VÃI LOL", "Ceedee Lamb biết chơi không vậy?"], placeholder: true },
+            { title: "NGỦ", details: ["TAO BUỒN NGỦ", "TAO MUỐN NGỦ"], placeholder: true },
+            { title: "THÈM MỲ QUÁ", details: ["GIỜ LẠI THẤY ĐÓI", "NẤU CHO ANH BÁT MỲ ĐI"], placeholder: true }
         ]
     }
 };
