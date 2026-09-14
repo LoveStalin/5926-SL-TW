@@ -128,7 +128,7 @@ function renderRow(left, middle, right) {
 `;
 
             div.addEventListener("click", () => {
-                openProfile(student);
+                openProfile(seat);
             });
 
             // Touch drag for mobile
@@ -378,29 +378,115 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 });
+const ROLE_LIBRARY = Object.freeze([
+    "XUNG KÍCH",
+    "Lớp phó lao động",
+    "Tổ trưởng Tổ 1",
+    "Tổ trưởng Tổ 2",
+    "Tổ trưởng Tổ 3",
+    "Bí Thư",
+    "Lớp trưởng",
+    "Lớp phó học tập",
+    "Lớp phó văn thể",
+    "Lớp phó đời sống",
+    "Thủ quỹ",
+    "Lớp phó lao động",
+    "Lớp phó học tập-Lớp phó đời sống-Thủ quỹ"
+].sort());
+
+function getAvailableRoles() {
+    return [...ROLE_LIBRARY];
+}
+
+function assignStudentRole(studentId, selectedRole) {
+    if (!studentId || !selectedRole) return;
+
+    const targetStudent = students[studentId];
+    if (!targetStudent) return;
+
+    if (selectedRole === "__clear__") {
+        delete targetStudent.role;
+        renderAll();
+        return;
+    }
+
+    for (const [id, student] of Object.entries(students)) {
+        if (id !== studentId && student.role === selectedRole) {
+            delete student.role;
+        }
+    }
+
+    targetStudent.role = selectedRole;
+    renderAll();
+}
+
 //Another Function
-function openProfile(student) {
+function openProfile(studentId) {
+    const student = students[studentId];
+    if (!student) return;
 
     const popup = document.getElementById("profilePopup");
+    const availableRoles = getAvailableRoles();
+    const selectedRole = student.role || "";
 
     popup.innerHTML = `
-                    <div class="popup-content">
-             <img src="${student.img}" class="student-avatar">
+        <div class="popup-content">
+            <button class="close-popup" aria-label="Đóng popup">✕</button>
 
-            <h2>${student.fullName}</h2>
-
-            <p><strong>Ngày sinh:</strong> ${student.dob}</p>
-
-            ${student.role ? `<p><strong>Chức vụ:</strong> ${student.role}</p>` : ""}
-        <button class="close-popup">Đóng</button>
+            <div class="profile-header">
+                <img src="${student.img}" class="student-avatar">
+                <div class="profile-main">
+                    <span class="profile-tag">Thông tin học sinh</span>
+                    <h2>${student.fullName}</h2>
+                    <div class="role-badge">${student.role || "Chưa có chức vụ"}</div>
+                </div>
             </div>
-`;
 
+            <div class="profile-body">
+                <p><strong>Ngày sinh:</strong> ${student.dob}</p>
+                <p><strong>Họ tên hiển thị:</strong> ${student.displayName}</p>
+                <p><strong>Chức vụ hiện tại:</strong> ${student.role || "Chưa được bổ nhiệm"}</p>
+            </div>
+
+            ${isTeacher ? `
+                <div class="role-manager">
+                    <label for="roleSelect">Bổ nhiệm chức vụ</label>
+                    <select id="roleSelect">
+                        <option value="__clear__">Xóa chức vụ</option>
+                        ${availableRoles.map((role) => `
+                            <option value="${role}" ${role === selectedRole ? "selected" : ""}>${role}</option>
+                        `).join("")}
+                    </select>
+                    <button id="assignRoleBtn" class="assign-role-btn">Bổ nhiệm chức vụ</button>
+                </div>
+            ` : ""}
+
+            <button class="close-popup secondary">Đóng</button>
+        </div>
+    `;
 
     popup.style.display = "flex";
-    popup.querySelector(".close-popup").addEventListener("click", function () {
-        popup.style.display = "none";
+
+    const closeButtons = popup.querySelectorAll(".close-popup");
+    closeButtons.forEach((btn) => {
+        btn.addEventListener("click", function () {
+            popup.style.display = "none";
+        });
     });
+
+    const assignRoleBtn = document.getElementById("assignRoleBtn");
+    if (assignRoleBtn) {
+        assignRoleBtn.addEventListener("click", () => {
+            const roleSelect = document.getElementById("roleSelect");
+            if (!roleSelect) return;
+
+            const chosenRole = roleSelect.value;
+            if (!chosenRole) return;
+
+            assignStudentRole(studentId, chosenRole);
+            openProfile(studentId);
+        });
+    }
 }
 function swapSeats(a, b) {
 
@@ -455,6 +541,25 @@ function moveToEmpty(id, targetRow, targetIndex) {
 
     }
 
+}
+
+function changeSeatRows() {
+
+    if (!isTeacher) {
+        alert("Only teacher can change seat rows");
+        return;
+    }
+
+    const nextLeft = JSON.parse(JSON.stringify(localMiddle));
+    const nextMiddle = JSON.parse(JSON.stringify(localRight));
+    const nextRight = JSON.parse(JSON.stringify(localLeft));
+
+    localLeft = nextLeft;
+    localMiddle = nextMiddle;
+    localRight = nextRight;
+
+    renderAll();
+    saveSeatmap();
 }
 
 function resetSeatmap() {
@@ -526,3 +631,4 @@ function updateWelcome(user) {
 }
 
 document.getElementById("resetSeat").addEventListener("click", resetSeatmap);
+document.getElementById("changeSeatRowBtn").addEventListener("click", changeSeatRows);

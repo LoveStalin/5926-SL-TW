@@ -190,39 +190,146 @@ body {
 .popup {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(17, 10, 30, 0.62);
     display: none;
     justify-content: center;
     align-items: center;
+    z-index: 9999;
+    padding: 20px;
 }
 
 .popup-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
     position: relative;
+    width: min(520px, 90vw);
+    background: linear-gradient(135deg, #ffffff, #f5f0ff);
+    border: 1px solid rgba(112, 78, 179, 0.18);
+    border-radius: 24px;
+    padding: 28px 24px 22px;
+    box-shadow: 0 24px 60px rgba(44, 19, 80, 0.28);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.profile-main {
+    flex: 1;
+}
+
+.profile-tag {
+    display: inline-block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(124, 77, 224, 0.12);
+    color: #4f2c8a;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.profile-main h2 {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    color: #2b1149;
+    margin-bottom: 8px;
+}
+
+.role-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #7c4de0, #a98aff);
+    color: white;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(124, 77, 224, 0.25);
+}
+
+.profile-body {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+    color: #3a2954;
+}
+
+.profile-body p {
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(128, 96, 181, 0.12);
+    border-radius: 12px;
+}
+
+.role-manager {
+    display: grid;
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(124, 77, 224, 0.12);
+}
+
+.role-manager label {
+    font-weight: 700;
+    color: #452b72;
+}
+
+.role-manager select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(124, 77, 224, 0.2);
+    background: white;
+    color: #2e1f47;
+    font-size: 1rem;
+}
+
+.assign-role-btn {
+    padding: 12px 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7c4de0, #5e37af);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 12px 25px rgba(94, 55, 175, 0.26);
+}
+
+.assign-role-btn:hover {
+    transform: translateY(-2px);
 }
 
 .close-popup {
     position: absolute;
     top: 15px;
     right: 15px;
-
-    background: #ff4d6d;
-    color: white;
+    background: #f0e7ff;
+    color: #4c2c8b;
     border: none;
-    padding: 8px 14px;
-    border-radius: 20px;
-
-    font-size: 13px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-
     transition: 0.2s ease;
 }
 
+.close-popup.secondary {
+    position: static;
+    width: auto;
+    height: auto;
+    border-radius: 12px;
+    padding: 10px 18px;
+    margin-top: 18px;
+    background: #efe5ff;
+}
+
 .close-popup:hover {
-    background: #ff1e4d;
+    background: #e2d1ff;
     transform: scale(1.05);
 }
 
@@ -230,13 +337,53 @@ body {
     transform: scale(0.95);
 }
 
+#saveSeat,
+#changeSeatRowBtn,
+#resetSeat,
+#loginBtn,
+#logoutBtn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #a784e6, #7c4de0);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(105, 73, 169, 0.25);
+    transition: 0.2s ease;
+}
+
 #saveSeat {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    padding: 10px 16px;
-    border-radius: 10px;
-    fill: #a784e6
+}
+
+#changeSeatRowBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 170px;
+}
+
+#resetSeat {
+    position: fixed;
+    bottom: 20px;
+    right: 310px;
+}
+
+#loginBtn,
+#logoutBtn {
+    position: static;
+    margin: 10px 10px 0 0;
+}
+
+#changeSeatRowBtn:hover,
+#saveSeat:hover,
+#resetSeat:hover,
+#loginBtn:hover,
+#logoutBtn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
 }
 
 #welcome-card {
