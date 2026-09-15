@@ -750,12 +750,61 @@ h1 {
         padding-top: 20px;
     }
 
+    .hero-visual {
+        min-height: 430px;
+        width: 100%;
+        margin-top: 24px;
+    }
+
+    .card-main {
+        position: relative;
+        top: 18px;
+        left: auto;
+        width: 100%;
+        height: min(76vw, 360px);
+        min-height: 290px;
+        transform: none;
+        animation: none;
+    }
+
+    .class-switcher {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        justify-content: center;
+    }
+
+    .card-mini {
+        top: 0;
+        right: 4%;
+        bottom: auto;
+        width: 170px;
+        padding: 14px;
+        transform: rotate(3deg);
+        animation: none;
+        z-index: 3;
+    }
+
+    .card-mini strong {
+        font-size: 1.6rem;
+    }
+
     .gallery {
         padding-top: 86px;
     }
 
     .gallery-grid {
         grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .photo-card {
+        height: min(78vw, 320px);
+        min-height: 260px;
+    }
+
+    .photo-back h3 {
+        font-size: 1.45rem;
     }
 
     .footer-container {
@@ -765,5 +814,52 @@ h1 {
 
     .footer-column {
         width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        width: calc(100% - 28px);
+        margin-top: 48px;
+    }
+
+    .hero-visual {
+        min-height: 390px;
+    }
+
+    .card-main {
+        height: 285px;
+        min-height: 0;
+    }
+
+    .switcher-label {
+        display: none;
+    }
+
+    .class-option {
+        min-width: 92px;
+        padding: 9px 12px;
+    }
+
+    .card-mini {
+        width: 148px;
+        padding: 12px;
+    }
+
+    .card-mini small {
+        font-size: 0.72rem;
+    }
+
+    .gallery {
+        padding: 76px 14px 62px;
+        margin-top: 70px;
+    }
+
+    .section-header {
+        margin-bottom: 28px;
+    }
+
+    .gallery h2 {
+        font-size: 2rem;
     }
 }

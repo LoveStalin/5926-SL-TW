@@ -613,3 +613,77 @@ a.dashboard-card:hover {
         align-items: flex-start;
     }
 }
+
+@media (max-width: 480px) {
+    .topbar {
+        padding: 12px;
+    }
+
+    .brand {
+        font-size: 13px;
+    }
+
+    .brand-mark {
+        width: 34px;
+        height: 34px;
+    }
+
+    .topbar-right {
+        gap: 8px;
+    }
+
+    #topbarUser {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 11px;
+    }
+
+    .logout-button {
+        padding: 9px 11px;
+        font-size: 12px;
+    }
+
+    .dashboard-container {
+        margin-top: 38px;
+    }
+
+    h1 {
+        font-size: clamp(2rem, 10vw, 2.7rem);
+    }
+
+    .welcome-description {
+        font-size: 14px;
+    }
+
+    .account-card {
+        gap: 14px;
+        padding: 18px;
+    }
+
+    .avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        font-size: 24px;
+    }
+
+    .account-info h2 {
+        font-size: 19px;
+        overflow-wrap: anywhere;
+    }
+
+    .account-info p {
+        overflow-wrap: anywhere;
+    }
+
+    .dashboard-card {
+        min-height: 170px;
+        padding: 20px;
+    }
+
+    .admin-panel {
+        padding: 20px;
+    }
+}

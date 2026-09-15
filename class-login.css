@@ -76,3 +76,26 @@
         .success {
             color: #8aff80;
         }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+                place-items: start center;
+            }
+
+            .login-box {
+                margin-top: 8vh;
+                padding: 24px 18px;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: clamp(1.8rem, 9vw, 2.4rem);
+                line-height: 1.1;
+            }
+
+            input,
+            button {
+                min-height: 48px;
+            }
+        }
