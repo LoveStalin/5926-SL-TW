@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Control Room | A5-K68</title>
+
+    <link rel="stylesheet" href="./class-dashboard.css">
+    <link rel="stylesheet" href="./admin.css">
+</head>
+
+<body>
+    <header class="admin-topbar">
+        <a href="./dashboard.html" class="admin-brand">
+            <span class="brand-mark">A5</span>
+            <span>A5-K68 <small>ADMIN CONTROL ROOM</small></span>
+        </a>
+
+        <div class="admin-topbar-actions">
+            <a href="./dashboard.html" class="admin-back-button">← Dashboard</a>
+            <button id="logoutButton" class="logout-button">Đăng xuất</button>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <section class="admin-intro">
+            <div class="section-kicker">
+                <p class="eyebrow">ADMINISTRATOR ACCESS</p>
+                <span class="admin-mark">CONTROL ROOM</span>
+            </div>
+
+            <h1>Quản trị hệ thống<span>.</span></h1>
+
+            <p>
+                Quản lý và theo dõi các tài khoản thuộc hệ thống Class Account
+                của tập thể 11A5 — A5 Khóa 68.
+            </p>
+        </section>
+
+        <section class="admin-stats" aria-label="Thống kê tài khoản">
+            <article class="admin-stat-card">
+                <span class="stat-symbol">◈</span>
+                <span class="stat-label">Tổng tài khoản</span>
+                <strong id="totalUsers">--</strong>
+                <small>Hồ sơ trong hệ thống</small>
+            </article>
+
+            <article class="admin-stat-card">
+                <span class="stat-symbol">✦</span>
+                <span class="stat-label">Administrators</span>
+                <strong id="adminUsers">--</strong>
+                <small>Tài khoản quản trị</small>
+            </article>
+
+            <article class="admin-stat-card">
+                <span class="stat-symbol">◇</span>
+                <span class="stat-label">Teachers</span>
+                <strong id="teacherUsers">--</strong>
+                <small>Tài khoản giáo viên</small>
+            </article>
+
+            <article class="admin-stat-card">
+                <span class="stat-symbol">○</span>
+                <span class="stat-label">Students</span>
+                <strong id="studentUsers">--</strong>
+                <small>Tài khoản học sinh</small>
+            </article>
+        </section>
+
+        <section class="directory-card">
+            <div class="directory-header">
+                <div>
+                    <p class="eyebrow">USER DIRECTORY</p>
+                    <h2>Danh sách tài khoản</h2>
+                    <p class="directory-description">
+                        Chỉ tài khoản quản trị mới có thể xem danh sách này.
+                    </p>
+                </div>
+
+                <label class="search-box">
+                    <span>⌕</span>
+                    <input id="searchInput" type="search" placeholder="Tìm tài khoản...">
+                </label>
+            </div>
+
+            <div id="usersList" class="users-list">
+                <div class="loading-state">Đang tải danh sách tài khoản...</div>
+            </div>
+        </section>
+
+        <p id="status" class="status-text">Đang xác thực quyền quản trị...</p>
+    </main>
+
+    <script type="module" src="./admin.js"></script>
+</body>
+</html>
