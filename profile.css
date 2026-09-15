@@ -562,12 +562,36 @@ body {
 
 
 @media (max-width: 768px) {
+    .navbar {
+        padding: 16px 18px;
+    }
+
+    .logo {
+        width: 56px;
+        height: 56px;
+    }
+
+    #loginBtn,
+    #logoutBtn {
+        margin: 8px 6px 0 0;
+        padding: 10px 13px;
+    }
+
+    #welcome-card {
+        max-width: calc(100% - 24px);
+        margin: 8px 12px 0;
+    }
+
     .seatmap {
         overflow-x: auto;
         display: grid;
         grid-template-columns: repeat(11, 80px);
         grid-auto-rows: 130px;
-        width: max-content;
+        width: calc(100% - 24px);
+        max-width: 1100px;
+        margin: 28px 12px 0;
+        justify-content: start;
+        padding-bottom: 8px;
     }
 
     .seat {
@@ -591,11 +615,74 @@ body {
         margin-top: 80px;
     }
 
+    .seatmap-actions {
+        width: calc(100% - 24px);
+        margin: 18px 12px 44px;
+        gap: 10px;
+    }
+
+    .seatmap-actions button {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .popup {
+        align-items: flex-start;
+        overflow-y: auto;
+        padding: 72px 12px 20px;
+    }
+
+    .popup-content {
+        width: 100%;
+        max-height: none;
+        padding: 24px 16px 20px;
+    }
+
+    .profile-header {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .student-avatar {
+        width: 76px;
+        height: 92px;
+    }
+
+    .profile-main h2 {
+        font-size: 1.7rem;
+    }
+
+    .role-badge {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
     .user-avatar {
         width: 40px;
         height: 40px;
         border-radius: 50%;
         object-fit: cover;
         margin-left: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .side-menu {
+        width: calc(100vw - 18px);
+        right: -100vw;
+    }
+
+    .side-menu.active {
+        right: 0;
+    }
+
+    .profile-header {
+        flex-direction: column;
+    }
+
+    .student-avatar {
+        width: 88px;
+        height: 104px;
     }
 }
