@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A5-K68</title>
+    <link rel="icon" type="image/png" href="image/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="seatingchart.css" />
+</head>
+
+<body>
+    <div class="stars"></div>
+    <header class="navbar">
+        <img src="image/logo.png" class="logo">
+        <div class="nav">
+            <div class="menu-icon" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div id="sideMenu" class="side-menu">
+                <a href="index.html" class="menu-btn">About</a>
+                <a href="class-login.html" class="menu-btn">Dashboard</a>
+            </div>
+        </div>
+    </header>
+    <button id="loginBtn">Login</button>
+    <button id="logoutBtn">Logout</button>
+    <div id="welcome-card"></div>
+    <h1 class="print-title">Sơ đồ chỗ ngồi A5-K68</h1>
+    <div class="seatmap" id="seatmap"></div>
+    <div class="seatmap-actions">
+        <button id="changeSeatRowBtn">Đổi dãy</button>
+        <button id="resetSeat">Thay đổi mọi thứ về ban đầu-Lớp 10</button>
+        <button id="saveSeat">Lưu thay đổi</button>
+        <button id="exportPdfBtn">Xuất dưới dạng PDF</button>
+    </div>
+    <script src="students.js"></script>
+    <script type="module" src="seatmap.js"></script>
+    <script type="module" src="render.js"></script>
+    <script type="module" src="firebase.js"></script>
+    <div id="profilePopup" class="popup">
+    </div>
+
+    <script src="seatingchart.js"></script>
+</body>
+
+</html>

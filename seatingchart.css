@@ -1,0 +1,688 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Be Vietnam Pro", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Patrick Hand', cursive
+}
+
+body {
+    background: linear-gradient(135deg, #c7a6ff, #a784e6);
+    margin: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 120px auto 0 auto;
+    height: 80vh;
+    background: linear-gradient(145deg, #caa7f7, #b892eb);
+    border-radius: 20px;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    padding: 60px 40px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    width: 100%;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+    transition: 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.1)
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+}
+
+.menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    position: fixed;
+    top: 18px;
+    right: 26px;
+    z-index: 2000;
+    background: rgba(84, 53, 146, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    padding: 12px 10px;
+    box-shadow: 0 14px 30px rgba(28, 12, 48, 0.18);
+}
+
+.menu-icon span {
+    width: 28px;
+    height: 3px;
+    background: #2b1149;
+    border-radius: 10px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.menu-icon:hover span:nth-child(1) {
+    transform: translateY(-1px);
+}
+
+.menu-icon:hover span:nth-child(3) {
+    transform: translateY(1px);
+}
+
+/* Side menu */
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -290px;
+    width: 270px;
+    height: 100vh;
+    background: rgba(30, 16, 52, 0.92);
+    backdrop-filter: blur(14px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 30px 40px;
+    gap: 22px;
+    transition: right 0.35s ease;
+    box-shadow: -12px 0 25px rgba(19, 9, 31, 0.2);
+    z-index: 1500;
+}
+
+.side-menu.active {
+    right: 0;
+}
+
+.menu-btn {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.menu-btn:hover {
+    color: #f6ebff;
+    background: rgba(153, 121, 255, 0.18);
+    transform: translateX(6px);
+    box-shadow: 0 0 18px rgba(197, 173, 255, 0.3);
+}
+
+.seatmap {
+    display: grid;
+    grid-template-columns: repeat(11, 100px);
+    grid-auto-rows: 160px;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.seat {
+    border: 1px solid #aaa;
+    text-align: center;
+    font-size: 13px;
+}
+
+.empty-seat {
+    background-color: linear-gradient(135deg, #c7a6ff, #a784e6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.aisle {
+    background: yellow;
+}
+
+.seat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-wrapper {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.name {
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    line-height: 1.2;
+    max-width: 80px;
+    word-break: break-word;
+}
+
+.role-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 5px 7px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.2;
+    max-width: 90px;
+    word-break: break-word;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.student-avatar {
+    width: 100px;
+    height: 120px;
+    object-fit: cover;
+    /* Ảnh không méo */
+    border-radius: 8px;
+    /* Bo góc nhẹ cho mềm */
+    border: 2px solid #fff;
+    /* Viền trắng cho nổi */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Đổ bóng nhẹ */
+}
+
+/*==== Popup Profile ====*/
+.popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 10, 30, 0.62);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.popup-content {
+    position: relative;
+    width: min(520px, 90vw);
+    background: linear-gradient(135deg, #ffffff, #f5f0ff);
+    border: 1px solid rgba(112, 78, 179, 0.18);
+    border-radius: 24px;
+    padding: 28px 24px 22px;
+    box-shadow: 0 24px 60px rgba(44, 19, 80, 0.28);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.profile-main {
+    flex: 1;
+}
+
+.profile-tag {
+    display: inline-block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(124, 77, 224, 0.12);
+    color: #4f2c8a;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.profile-main h2 {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    color: #2b1149;
+    margin-bottom: 8px;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(124, 77, 224, 0.25);
+}
+
+.role-badge.role-default,
+.role-tag.role-default {
+    background: linear-gradient(135deg, #c7b4ff, #8a72d8);
+    color: #fff;
+}
+
+.role-badge.role-red,
+.role-tag.role-red {
+    background: linear-gradient(135deg, #ff7a7a, #ff4d6d);
+    color: #fff;
+}
+
+.role-badge.role-gold,
+.role-tag.role-gold {
+    background: linear-gradient(135deg, #f4c95d, #e9a822);
+    color: #4d2d00;
+}
+
+.role-badge.role-cyan,
+.role-tag.role-cyan {
+    background: linear-gradient(135deg, #59d0ff, #1d9bf0);
+    color: white;
+}
+
+.role-badge.role-green,
+.role-tag.role-green {
+    background: linear-gradient(135deg, #54d88b, #1faa63);
+    color: white;
+}
+
+.role-badge.role-orange,
+.role-tag.role-orange {
+    background: linear-gradient(135deg, #ffbb70, #ff8a3d);
+    color: white;
+}
+
+.role-badge.role-blue,
+.role-tag.role-blue {
+    background: linear-gradient(135deg, #6cc2ff, #3d7cff);
+    color: white;
+}
+
+.role-badge.role-pink,
+.role-tag.role-pink {
+    background: linear-gradient(135deg, #ff9acc, #ff5ebc);
+    color: white;
+}
+
+.role-badge.role-amber,
+.role-tag.role-amber {
+    background: linear-gradient(135deg, #f7d77d, #d49f38);
+    color: #3f2a00;
+}
+
+.role-badge.role-teal,
+.role-tag.role-teal {
+    background: linear-gradient(135deg, #6fe7d9, #22b7a8);
+    color: #003a33;
+}
+
+.role-badge.role-violet,
+.role-tag.role-violet {
+    background: linear-gradient(135deg, #b08cff, #7d5af5);
+    color: white;
+}
+
+.profile-body {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+    color: #3a2954;
+}
+
+.profile-body p {
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(128, 96, 181, 0.12);
+    border-radius: 12px;
+}
+
+.role-manager {
+    display: grid;
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(124, 77, 224, 0.12);
+}
+
+.role-manager label {
+    font-weight: 700;
+    color: #452b72;
+}
+
+.role-manager select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(124, 77, 224, 0.2);
+    background: white;
+    color: #2e1f47;
+    font-size: 1rem;
+}
+
+.assign-role-btn {
+    padding: 12px 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7c4de0, #5e37af);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 12px 25px rgba(94, 55, 175, 0.26);
+}
+
+.assign-role-btn:hover {
+    transform: translateY(-2px);
+}
+
+.close-popup {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #f0e7ff;
+    color: #4c2c8b;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.close-popup.secondary {
+    position: static;
+    width: auto;
+    height: auto;
+    border-radius: 12px;
+    padding: 10px 18px;
+    margin-top: 18px;
+    background: #efe5ff;
+}
+
+.close-popup:hover {
+    background: #e2d1ff;
+    transform: scale(1.05);
+}
+
+.close-popup:active {
+    transform: scale(0.95);
+}
+
+#saveSeat,
+#changeSeatRowBtn,
+#resetSeat,
+#exportPdfBtn,
+#loginBtn,
+#logoutBtn {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #a784e6, #7c4de0);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(105, 73, 169, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+#loginBtn,
+#logoutBtn {
+    position: static;
+    margin: 10px 10px 0 0;
+}
+
+#changeSeatRowBtn:hover,
+#saveSeat:hover,
+#resetSeat:hover,
+#exportPdfBtn:hover,
+#loginBtn:hover,
+#logoutBtn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+}
+
+.seatmap-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin: 24px auto 60px;
+    width: min(1100px, 90%);
+}
+
+.seatmap-actions button {
+    min-width: 180px;
+    max-width: 290px;
+    white-space: normal;
+    line-height: 1.4;
+}
+
+#welcome-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    background: rgba(255, 255, 255, 0.7);
+    padding: 10px 16px;
+    border-radius: 12px;
+
+    width: fit-content;
+}
+
+.welcome-title {
+    font-size: 16px;
+}
+
+.role {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.print-title {
+    display: none;
+}
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 10mm;
+    }
+
+    body {
+        background: white;
+        color: #111;
+    }
+
+    .navbar,
+    #loginBtn,
+    #logoutBtn,
+    #welcome-card,
+    .seatmap-actions,
+    .popup,
+    .stars {
+        display: none !important;
+    }
+
+    .print-title {
+        display: block;
+        margin: 0 0 14px;
+        color: #24113c;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .seatmap {
+        width: max-content;
+        margin: 0 auto;
+        transform: scale(0.82);
+        transform-origin: top center;
+    }
+
+    .seat {
+        break-inside: avoid;
+    }
+}
+
+
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 16px 18px;
+    }
+
+    .logo {
+        width: 56px;
+        height: 56px;
+    }
+
+    #loginBtn,
+    #logoutBtn {
+        margin: 8px 6px 0 0;
+        padding: 10px 13px;
+    }
+
+    #welcome-card {
+        max-width: calc(100% - 24px);
+        margin: 8px 12px 0;
+    }
+
+    .seatmap {
+        overflow-x: auto;
+        display: grid;
+        grid-template-columns: repeat(11, 80px);
+        grid-auto-rows: 130px;
+        width: calc(100% - 24px);
+        max-width: 1100px;
+        margin: 28px 12px 0;
+        justify-content: start;
+        padding-bottom: 8px;
+    }
+
+    .seat {
+        font-size: 10px;
+        padding: 4px;
+    }
+
+    .avatar-wrapper {
+        width: 35px;
+        height: 35px;
+    }
+
+    .student-avatar {
+        width: 80px;
+        height: 100px;
+    }
+
+    .container {
+        width: 95%;
+        padding: 30px 10px;
+        margin-top: 80px;
+    }
+
+    .seatmap-actions {
+        width: calc(100% - 24px);
+        margin: 18px 12px 44px;
+        gap: 10px;
+    }
+
+    .seatmap-actions button {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .popup {
+        align-items: flex-start;
+        overflow-y: auto;
+        padding: 72px 12px 20px;
+    }
+
+    .popup-content {
+        width: 100%;
+        max-height: none;
+        padding: 24px 16px 20px;
+    }
+
+    .profile-header {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .student-avatar {
+        width: 76px;
+        height: 92px;
+    }
+
+    .profile-main h2 {
+        font-size: 1.7rem;
+    }
+
+    .role-badge {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-left: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .side-menu {
+        width: calc(100vw - 18px);
+        right: -100vw;
+    }
+
+    .side-menu.active {
+        right: 0;
+    }
+
+    .profile-header {
+        flex-direction: column;
+    }
+
+    .student-avatar {
+        width: 88px;
+        height: 104px;
+    }
+}

@@ -1,52 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A5-K68</title>
-    <link rel="icon" type="image/png" href="image/logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="profile.css" />
+
+    <title>Profile | A5-K68</title>
+
+    <link rel="stylesheet" href="./class-dashboard.css">
+    <link rel="stylesheet" href="./class-profile.css">
 </head>
 
 <body>
-    <div class="stars"></div>
-    <header class="navbar">
-        <img src="image/logo.png" class="logo">
-        <div class="nav">
-            <div class="menu-icon" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
 
-            <div id="sideMenu" class="side-menu">
-                <a href="index.html" class="menu-btn">About</a>
-                <a href="class-login.html" class="menu-btn">Dashboard</a>
-            </div>
+    <header class="profile-topbar">
+        <a href="./dashboard.html" class="profile-brand">
+            <span class="brand-mark">A5</span>
+            <span>K68 / PROFILE</span>
+        </a>
+
+        <div class="profile-topbar-actions">
+            <a href="./dashboard.html" class="back-button">
+                ← Dashboard
+            </a>
+
+            <button id="logoutButton" class="logout-button">
+                Đăng xuất
+            </button>
         </div>
     </header>
-    <button id="loginBtn">Login</button>
-    <button id="logoutBtn">Logout</button>
-    <div id="welcome-card"></div>
-    <h1 class="print-title">Sơ đồ chỗ ngồi A5-K68</h1>
-    <div class="seatmap" id="seatmap"></div>
-    <div class="seatmap-actions">
-        <button id="changeSeatRowBtn">Đổi dãy</button>
-        <button id="resetSeat">Thay đổi mọi thứ về ban đầu-Lớp 10</button>
-        <button id="saveSeat">Lưu thay đổi</button>
-        <button id="exportPdfBtn">Xuất dưới dạng PDF</button>
-    </div>
-    <script src="students.js"></script>
-    <script type="module" src="seatmap.js"></script>
-    <script type="module" src="render.js"></script>
-    <script type="module" src="firebase.js"></script>
-    <div id="profilePopup" class="popup">
-    </div>
 
-    <script src="profile.js"></script>
+    <main class="profile-container">
+        <section class="profile-intro">
+            <p class="eyebrow">PERSONAL IDENTITY</p>
+
+            <h1>
+                Hồ sơ cá nhân<span>.</span>
+            </h1>
+
+            <p class="profile-intro-description">
+                Không gian thông tin riêng của tài khoản trong hệ thống
+                Class Account — A5 Khóa 68.
+            </p>
+        </section>
+
+        <section class="profile-layout">
+            <article class="profile-main-card">
+                <div class="profile-card-header">
+                    <span class="profile-card-label">
+                        VERIFIED ACCOUNT
+                    </span>
+
+                    <span class="verified-badge">
+                        ✓ Verified
+                    </span>
+                </div>
+
+                <div class="profile-identity">
+                    <div class="profile-avatar" id="profileAvatar">
+                        A
+                    </div>
+
+                    <div class="profile-identity-content">
+                        <p class="profile-role-label">
+                            CLASS ADMINISTRATOR
+                        </p>
+
+                        <h2 id="profileName">
+                            Đang tải...
+                        </h2>
+
+                        <p id="profileEmail">
+                            Đang tải email...
+                        </p>
+                    </div>
+                </div>
+
+                <div class="profile-divider"></div>
+
+                <div class="profile-data-grid">
+                    <div class="profile-data-item">
+                        <span class="data-label">
+                            Vai trò
+                        </span>
+
+                        <strong id="profileRole">
+                            Đang tải...
+                        </strong>
+                    </div>
+
+                    <div class="profile-data-item">
+                        <span class="data-label">
+                            Lớp
+                        </span>
+
+                        <strong id="profileClass">
+                            Đang tải...
+                        </strong>
+                    </div>
+
+                    <div class="profile-data-item">
+                        <span class="data-label">
+                            Tập thể
+                        </span>
+
+                        <strong id="profileGroup">
+                            Đang tải...
+                        </strong>
+                    </div>
+
+                    <div class="profile-data-item">
+                        <span class="data-label">
+                            Trạng thái
+                        </span>
+
+                        <strong id="profileStatus" class="active-status">
+                            Đang tải...
+                        </strong>
+                    </div>
+                </div>
+            </article>
+
+            <aside class="profile-side-card">
+                <div class="side-card-icon">
+                    ✦
+                </div>
+
+                <p class="eyebrow">
+                    ACCESS LEVEL
+                </p>
+
+                <h2 id="accessTitle">
+                    Administrator
+                </h2>
+
+                <p id="accessDescription">
+                    Tài khoản này có quyền quản trị hệ thống
+                    Class Account của A5-K68.
+                </p>
+
+                <div class="access-line">
+                    <span></span>
+                    <span>Private class system</span>
+                </div>
+            </aside>
+        </section>
+
+        <section class="profile-security-card">
+            <div>
+                <p class="eyebrow">ACCOUNT SECURITY</p>
+
+                <h2>Thông tin bảo mật</h2>
+
+                <p>
+                    Các thông tin quyền hạn của tài khoản hiện đang được
+                    quản lý bởi hệ thống. Không thể tự thay đổi role hoặc
+                    trạng thái tài khoản tại đây.
+                </p>
+            </div>
+
+            <div class="security-status">
+                <span class="security-dot"></span>
+                <span>Session đang hoạt động</span>
+            </div>
+        </section>
+
+        <p id="status" class="status-text">
+            Đang xác thực tài khoản...
+        </p>
+    </main>
+
+    <script type="module" src="./profile.js"></script>
 </body>
-
 </html>
