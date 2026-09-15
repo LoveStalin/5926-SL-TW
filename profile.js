@@ -154,4 +154,4 @@ logoutButton.addEventListener("click", async () => {
             true
         );
     }
-});s
+});
