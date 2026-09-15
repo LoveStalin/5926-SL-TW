@@ -114,6 +114,27 @@ button {
     gap: 14px;
 }
 
+.header-profile-button {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(213, 194, 255, 0.18);
+    border-radius: 12px;
+    background: rgba(158, 114, 242, 0.12);
+    box-shadow: 0 8px 20px rgba(109, 60, 176, 0.18);
+    color: #f4edff;
+    font-size: 22px;
+    text-decoration: none;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.header-profile-button:hover {
+    transform: translateY(-2px);
+    background: rgba(158, 114, 242, 0.2);
+    box-shadow: 0 10px 24px rgba(109, 60, 176, 0.25);
+}
+
 #topbarUser {
     color: var(--muted);
     font-size: 14px;
@@ -630,6 +651,13 @@ a.dashboard-card:hover {
 
     .topbar-right {
         gap: 8px;
+    }
+
+    .header-profile-button {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        font-size: 18px;
     }
 
     #topbarUser {
