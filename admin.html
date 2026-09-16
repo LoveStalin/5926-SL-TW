@@ -88,7 +88,54 @@
                 <div class="loading-state">Đang tải danh sách tài khoản...</div>
             </div>
         </section>
+        <section class="notification-control-card">
+            <div class="notification-control-header">
+                <div>
+                    <p class="eyebrow">TRUYỀN TIN LỚP</p>
+                    <h2>Gửi thông báo mới</h2>
+                    <p class="directory-description">
+                        Gửi thông báo đến những thiết bị đã bật nhận push notification.
+                    </p>
+                </div>
 
+                <span class="admin-mark">FCM PUSH</span>
+            </div>
+
+            <form id="notificationForm" class="notification-form">
+                <label>
+                    <span>Tiêu đề thông báo</span>
+                    <input
+                        id="notificationTitle"
+                        type="text"
+                        maxlength="120"
+                        placeholder="Ví dụ: Lịch học ngày mai"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Nội dung thông báo</span>
+                    <textarea
+                        id="notificationMessage"
+                        rows="5"
+                        maxlength="2000"
+                        placeholder="Nhập nội dung muốn gửi đến lớp..."
+                        required
+                    ></textarea>
+                </label>
+
+                <label class="notification-checkbox">
+                    <input id="notificationPinned" type="checkbox">
+                    <span>Ghim thông báo trong trang thông báo</span>
+                </label>
+
+                <button id="sendNotificationButton" type="submit">
+                    Gửi thông báo →
+                </button>
+
+                <p id="notificationStatus" class="status-text"></p>
+            </form>
+        </section>
         <p id="status" class="status-text">Đang xác thực quyền quản trị...</p>
     </main>
 
