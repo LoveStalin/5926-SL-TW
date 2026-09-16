@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo | 11A5</title>
+    <link rel="stylesheet" href="./class-dashboard.css">
+    <link rel="stylesheet" href="./notifications.css">
+</head>
+<body>
+    <header class="topbar">
+        <a href="./dashboard.html" class="brand"><span class="brand-mark">A5</span><span>A5-K68 <small>NOTIFICATIONS</small></span></a>
+        <div class="topbar-right"><a href="./dashboard.html" class="header-profile-button" title="Dashboard">⌂</a><button id="logoutButton" class="logout-button">Đăng xuất</button></div>
+    </header>
+    <main class="dashboard-container notifications-container">
+        <p class="eyebrow">CLASS COMMUNICATION</p>
+        <h1>Thông báo <span class="live-pill">● LIVE</span></h1>
+        <p class="welcome-description">Cập nhật mới nhất từ ban quản trị và tập thể 11A5.</p>
+        <section class="notification-permission">
+            <div><strong>🔔 Nhận thông báo trên máy</strong><p id="permissionText">Bật để nhận thông báo ngay cả khi không mở trang này.</p></div>
+            <button id="enableNotifications" class="notification-button">Bật thông báo</button>
+        </section>
+        <section id="notificationsList" class="notifications-list"><p class="empty-state">Đang tải thông báo...</p></section>
+        <p id="status" class="status-text"></p>
+    </main>
+    <script type="module" src="./notifications.js"></script>
+</body>
+</html>
