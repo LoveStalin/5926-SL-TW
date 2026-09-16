@@ -219,6 +219,8 @@ async function sendNotification(event) {
 
     try {
         const idToken = await currentAdmin.getIdToken(true);
+          console.log("Firebase project:", currentAdmin.auth.app.options.projectId);
+          console.log("Token length:", idToken.length);
 
         const response = await fetch(WORKER_URL, {
             method: "POST",
