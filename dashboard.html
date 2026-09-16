@@ -3,157 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Dashboard | 11A5</title>
-
     <link rel="stylesheet" href="./class-dashboard.css">
 </head>
-
 <body>
     <header class="topbar">
-        <a href="./index.html" class="brand">
-            <span class="brand-mark">A5</span>
-            <span>A5-K68 <small>CLASS ACCOUNT</small></span>
-        </a>
-
+        <a href="./index.html" class="brand"><span class="brand-mark">A5</span><span>A5-K68 <small>CLASS ACCOUNT</small></span></a>
         <div class="topbar-right">
             <a href="./profile.html" class="header-profile-button" aria-label="Trang cá nhân" title="Profile">👤</a>
-            <div class="time-panel" aria-live="polite">
-                <div class="time-icon">◷</div>
-                <div>
-                    <strong id="currentTime">--:--:--</strong>
-                    <span id="currentDate">Đang cập nhật ngày tháng...</span>
-                </div>
-            </div>
+            <div class="time-panel" aria-live="polite"><div class="time-icon">◷</div><div><strong id="currentTime">--:--:--</strong><span id="currentDate">Đang cập nhật ngày tháng...</span></div></div>
             <span class="system-status"><i></i> Hệ thống đang hoạt động</span>
             <span id="topbarUser">Đang tải...</span>
-
-            <button id="logoutButton" class="logout-button">
-                Đăng xuất
-            </button>
+            <button id="logoutButton" class="logout-button">Đăng xuất</button>
         </div>
     </header>
-
     <main class="dashboard-container">
         <section class="welcome-section">
-            <div class="section-kicker">
-                <p class="eyebrow">CLASS ACCOUNT SYSTEM</p>
-                <span class="live-pill">● LIVE</span>
-            </div>
-
-            <h1>
-                <span id="greetingLabel">Xin chào</span>,
-                <span id="displayName">...</span>
-                👋
-            </h1>
-
-            <p class="welcome-description">
-                Chào mừng trở lại với không gian riêng của tập thể
-                <strong>11A5 — A5 Khóa 68</strong>.
-            </p>
-
-            <div class="quick-stats" aria-label="Tổng quan hệ thống">
-                <div class="quick-stat">
-                    <span class="quick-stat-icon">✦</span>
-                    <div><strong>11A5</strong><small>lớp hiện tại</small></div>
-                </div>
-                <div class="quick-stat">
-                    <span class="quick-stat-icon">◈</span>
-                    <div><strong>01</strong><small>tài khoản cá nhân</small></div>
-                </div>
-                <div class="quick-stat">
-                    <span class="quick-stat-icon">↗</span>
-                    <div><strong>100%</strong><small>trạng thái truy cập</small></div>
-                </div>
-            </div>
+            <div class="section-kicker"><p class="eyebrow">CLASS ACCOUNT SYSTEM</p><span class="live-pill">● LIVE</span></div>
+            <h1><span id="greetingLabel">Xin chào</span>, <span id="displayName">...</span> 👋</h1>
+            <p class="welcome-description">Chào mừng trở lại với không gian riêng của tập thể <strong>11A5 — A5 Khóa 68</strong>.</p>
+            <div class="quick-stats" aria-label="Tổng quan hệ thống"><div class="quick-stat"><span class="quick-stat-icon">✦</span><div><strong>11A5</strong><small>lớp hiện tại</small></div></div><div class="quick-stat"><span class="quick-stat-icon">◈</span><div><strong>01</strong><small>tài khoản cá nhân</small></div></div><div class="quick-stat"><span class="quick-stat-icon">↗</span><div><strong>100%</strong><small>trạng thái truy cập</small></div></div></div>
         </section>
-
-        <section class="account-card">
-            <div class="avatar" id="avatar">
-                A
-            </div>
-
-            <div class="account-info">
-                <span class="account-kicker">PERSONAL ACCESS</span>
-                <h2 id="accountName">Đang tải...</h2>
-
-                <p id="accountEmail">
-                    Đang tải email...
-                </p>
-
-                <div class="account-tags">
-                    <span class="tag" id="roleTag">
-                        ...
-                    </span>
-
-                    <span class="tag" id="classTag">
-                        11A5
-                    </span>
-                </div>
-            </div>
-        </section>
-
+        <section class="account-card"><div class="avatar" id="avatar">A</div><div class="account-info"><span class="account-kicker">PERSONAL ACCESS</span><h2 id="accountName">Đang tải...</h2><p id="accountEmail">Đang tải email...</p><div class="account-tags"><span class="tag" id="roleTag">...</span><span class="tag" id="classTag">11A5</span></div></div></section>
         <section class="dashboard-grid">
-            <a href="./index.html" class="dashboard-card">
-                <div class="card-topline"><span class="card-icon">⌂</span><span class="card-arrow">↗</span></div>
-
-                <h2>Trang chủ</h2>
-
-                <p>
-                    Quay lại website chính của A5-K68.
-                </p>
-            </a>
-
-            <a href="./seatingchart.html" class="dashboard-card">
-                <div class="card-topline"><span class="card-icon">⌗</span><span class="card-arrow">↗</span></div>
-
-                <h2>SeatMap</h2>
-
-                <p>
-                    Xem sơ đồ chỗ ngồi của lớp.
-                </p>
-            </a>
-
-            <button class="dashboard-card disabled-card" disabled>
-                <div class="card-topline"><span class="card-icon">!</span><span class="card-state">SẮP RA MẮT</span></div>
-
-                <h2>Thông báo</h2>
-
-                <p>
-                    Khu vực thông báo sẽ được phát triển sau.
-                </p>
-            </button>
-
-            <button class="dashboard-card disabled-card" disabled>
-                <div class="card-topline"><span class="card-icon">◷</span><span class="card-state">SẮP RA MẮT</span></div>
-
-                <h2>Sự kiện</h2>
-
-                <p>
-                    Các hoạt động của tập thể 11A5.
-                </p>
-            </button>
+            <a href="./index.html" class="dashboard-card"><div class="card-topline"><span class="card-icon">⌂</span><span class="card-arrow">↗</span></div><h2>Trang chủ</h2><p>Quay lại website chính của A5-K68.</p></a>
+            <a href="./seatingchart.html" class="dashboard-card"><div class="card-topline"><span class="card-icon">⌗</span><span class="card-arrow">↗</span></div><h2>SeatMap</h2><p>Xem sơ đồ chỗ ngồi của lớp.</p></a>
+            <a href="./notifications.html" class="dashboard-card"><div class="card-topline"><span class="card-icon">🔔</span><span class="card-arrow">↗</span></div><h2>Thông báo</h2><p>Xem cập nhật mới và bật thông báo trên máy.</p></a>
+            <button class="dashboard-card disabled-card" disabled><div class="card-topline"><span class="card-icon">◷</span><span class="card-state">SẮP RA MẮT</span></div><h2>Sự kiện</h2><p>Các hoạt động của tập thể 11A5.</p></button>
         </section>
-
-        <section id="adminPanel" class="admin-panel hidden">
-            <div class="section-kicker"><p class="eyebrow">ADMIN AREA</p><span class="admin-mark">CONTROL ROOM</span></div>
-
-            <h2>Khu vực quản trị</h2>
-
-            <p>
-                Tài khoản này sẽ có quyền quản trị hệ thống Class Account.
-            </p>
-
-            <a href="./admin.html" class="admin-button">
-                Mở Admin Control Room ↗
-            </a>
-        </section>
-
-        <p id="status" class="status-text">
-            Đang xác thực tài khoản...
-        </p>
+        <section id="adminPanel" class="admin-panel hidden"><div class="section-kicker"><p class="eyebrow">ADMIN AREA</p><span class="admin-mark">CONTROL ROOM</span></div><h2>Khu vực quản trị</h2><p>Tài khoản này sẽ có quyền quản trị hệ thống Class Account.</p><a href="./admin.html" class="admin-button">Mở Admin Control Room ↗</a></section>
+        <p id="status" class="status-text">Đang xác thực tài khoản...</p>
     </main>
-
     <script type="module" src="./dashboard.js"></script>
 </body>
 </html>
