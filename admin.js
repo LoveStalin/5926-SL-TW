@@ -10,6 +10,9 @@ import {
     get
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+const WORKER_URL =
+    "https://a5-k68-notification-worker.thanhnguyenxuan917.workers.dev";
+
 const totalUsers = document.getElementById("totalUsers");
 const adminUsers = document.getElementById("adminUsers");
 const teacherUsers = document.getElementById("teacherUsers");
@@ -19,15 +22,32 @@ const searchInput = document.getElementById("searchInput");
 const statusText = document.getElementById("status");
 const logoutButton = document.getElementById("logoutButton");
 
+const notificationForm = document.getElementById("notificationForm");
+const notificationTitle = document.getElementById("notificationTitle");
+const notificationMessage = document.getElementById("notificationMessage");
+const notificationPinned = document.getElementById("notificationPinned");
+const sendNotificationButton = document.getElementById(
+    "sendNotificationButton"
+);
+const notificationStatus = document.getElementById("notificationStatus");
+
 let users = [];
+let currentAdmin = null;
 
 function setStatus(message, isError = false) {
     statusText.textContent = message;
     statusText.classList.toggle("error", isError);
 }
 
+function setNotificationStatus(message, isError = false) {
+    notificationStatus.textContent = message;
+    notificationStatus.classList.toggle("error", isError);
+}
+
 function getInitial(name) {
-    return (name || "A").trim().charAt(0).toUpperCase() || "A";
+    return (
+        (name || "A").trim().charAt(0).toUpperCase() || "A"
+    );
 }
 
 function roleLabel(role) {
@@ -42,9 +62,18 @@ function roleLabel(role) {
 
 function renderStats() {
     totalUsers.textContent = users.length;
-    adminUsers.textContent = users.filter(user => user.role === "admin").length;
-    teacherUsers.textContent = users.filter(user => user.role === "teacher").length;
-    studentUsers.textContent = users.filter(user => user.role === "student").length;
+
+    adminUsers.textContent = users.filter(
+        user => user.role === "admin"
+    ).length;
+
+    teacherUsers.textContent = users.filter(
+        user => user.role === "teacher"
+    ).length;
+
+    studentUsers.textContent = users.filter(
+        user => user.role === "student"
+    ).length;
 }
 
 function renderUsers(keyword = "") {
@@ -57,7 +86,9 @@ function renderUsers(keyword = "") {
             user.role,
             user.className,
             user.group
-        ].join(" ").toLowerCase();
+        ]
+            .join(" ")
+            .toLowerCase();
 
         return searchableText.includes(normalizedKeyword);
     });
@@ -97,7 +128,9 @@ function renderUsers(keyword = "") {
                         <p class="user-email"></p>
                     </div>
                 </div>
+
                 <span class="user-role"></span>
+
                 <span class="user-status ${isActive ? "" : "disabled"}">
                     ${isActive ? "Đang hoạt động" : "Tạm ẩn"}
                 </span>
@@ -132,11 +165,110 @@ async function loadUsers() {
     renderUsers();
 }
 
+async function sendNotification(event) {
+    event.preventDefault();
+
+    if (!currentAdmin) {
+        setNotificationStatus(
+            "Chưa xác thực tài khoản quản trị.",
+            true
+        );
+        return;
+    }
+
+    const title = notificationTitle.value.trim();
+    const message = notificationMessage.value.trim();
+    const pinned = notificationPinned.checked;
+
+    if (!title || !message) {
+        setNotificationStatus(
+            "Hãy nhập đầy đủ tiêu đề và nội dung.",
+            true
+        );
+        return;
+    }
+
+    if (title.length > 120) {
+        setNotificationStatus(
+            "Tiêu đề không được dài quá 120 ký tự.",
+            true
+        );
+        return;
+    }
+
+    if (message.length > 2000) {
+        setNotificationStatus(
+            "Nội dung không được dài quá 2000 ký tự.",
+            true
+        );
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Gửi thông báo này đến các thiết bị đã bật push?\n\n` +
+        `Tiêu đề: ${title}\n\n${message}`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    sendNotificationButton.disabled = true;
+    sendNotificationButton.textContent = "Đang gửi...";
+    setNotificationStatus("Đang xác thực và gửi thông báo...");
+
+    try {
+        const idToken = await currentAdmin.getIdToken(true);
+
+        const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                title,
+                message,
+                pinned
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.error || `Worker trả về lỗi HTTP ${response.status}.`
+            );
+        }
+
+        setNotificationStatus(
+            `Đã gửi thành công. ` +
+            `Đã gửi: ${result.sent || 0}; ` +
+            `Thất bại: ${result.failed || 0}; ` +
+            `Tổng thiết bị: ${result.totalTokens || 0}.`
+        );
+
+        notificationForm.reset();
+    } catch (error) {
+        console.error("Notification sending error:", error);
+
+        setNotificationStatus(
+            `Gửi thông báo thất bại: ${error.message}`,
+            true
+        );
+    } finally {
+        sendNotificationButton.disabled = false;
+        sendNotificationButton.textContent = "Gửi thông báo →";
+    }
+}
+
 onAuthStateChanged(classAuth, async user => {
     if (!user) {
         window.location.href = "./class-login.html";
         return;
     }
+
+    currentAdmin = user;
 
     try {
         const ownProfileSnapshot = await get(
@@ -151,7 +283,10 @@ onAuthStateChanged(classAuth, async user => {
 
         const ownProfile = ownProfileSnapshot.val();
 
-        if (ownProfile.active !== true || ownProfile.role !== "admin") {
+        if (
+            ownProfile.active !== true ||
+            ownProfile.role !== "admin"
+        ) {
             setStatus(
                 "Tài khoản không có quyền truy cập khu vực quản trị.",
                 true
@@ -165,9 +300,18 @@ onAuthStateChanged(classAuth, async user => {
         }
 
         await loadUsers();
+
         setStatus("Đã xác thực quyền quản trị.");
+
+        if (notificationForm) {
+            notificationForm.addEventListener(
+                "submit",
+                sendNotification
+            );
+        }
     } catch (error) {
         console.error("Admin loading error:", error);
+
         setStatus(
             "Không thể tải danh sách tài khoản. Kiểm tra Firebase Rules.",
             true
@@ -175,21 +319,27 @@ onAuthStateChanged(classAuth, async user => {
     }
 });
 
-searchInput.addEventListener("input", event => {
-    renderUsers(event.target.value);
-});
+if (searchInput) {
+    searchInput.addEventListener("input", event => {
+        renderUsers(event.target.value);
+    });
+}
 
-logoutButton.addEventListener("click", async () => {
-    logoutButton.disabled = true;
-    logoutButton.textContent = "Đang đăng xuất...";
+if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+        logoutButton.disabled = true;
+        logoutButton.textContent = "Đang đăng xuất...";
 
-    try {
-        await signOut(classAuth);
-        window.location.href = "./class-login.html";
-    } catch (error) {
-        console.error("Logout error:", error);
-        logoutButton.disabled = false;
-        logoutButton.textContent = "Đăng xuất";
-        setStatus("Đăng xuất thất bại.", true);
-    }
-});
+        try {
+            await signOut(classAuth);
+            window.location.href = "./class-login.html";
+        } catch (error) {
+            console.error("Logout error:", error);
+
+            logoutButton.disabled = false;
+            logoutButton.textContent = "Đăng xuất";
+
+            setStatus("Đăng xuất thất bại.", true);
+        }
+    });
+}

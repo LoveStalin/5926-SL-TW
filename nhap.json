@@ -7,7 +7,15 @@
       "className": "11A5",
       "group": "A5 Khóa 68",
       "active": true
-    }
+    },
+      "za3xCrSGYpNejfrWaO8wCygbsVE3": {
+        "username": "student",
+        "displayName": "Nguyễn Xuân Thành",
+        "role": "student",
+        "className": "11A5",
+        "group": "A5 Khóa 68",
+        "active": true
+      }
   },
   "classInfo": {
     "name": "11A5",
