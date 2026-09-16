@@ -12,7 +12,7 @@ const statusText = document.getElementById("status");
 const logoutButton = document.getElementById("logoutButton");
 
 const app = initializeApp({
-    apiKey: "AIzaSyASwLRIHvF9qZQx8GRsC63kadfZIsKkFoc",
+    apiKey: "AIzaSyASwLRIHvF9qZQx8GRsC63kadfZIskKfOc",
     authDomain: "a5-k68.firebaseapp.com",
     databaseURL: "https://a5-k68-default-rtdb.asia-southeast1.firebasedatabase.app/",
     projectId: "a5-k68",
