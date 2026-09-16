@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Admin Control Room | A5-K68</title>
+    <title>Góc điều hành lớp | A5-K68</title>
 
     <link rel="stylesheet" href="./class-dashboard.css">
     <link rel="stylesheet" href="./admin.css">
@@ -14,11 +14,11 @@
     <header class="admin-topbar">
         <a href="./dashboard.html" class="admin-brand">
             <span class="brand-mark">A5</span>
-            <span>A5-K68 <small>ADMIN CONTROL ROOM</small></span>
+            <span>A5-K68 <small>GÓC ĐIỀU HÀNH LỚP</small></span>
         </a>
 
         <div class="admin-topbar-actions">
-            <a href="./dashboard.html" class="admin-back-button">← Dashboard</a>
+            <a href="./dashboard.html" class="admin-back-button">← Về trang lớp</a>
             <button id="logoutButton" class="logout-button">Đăng xuất</button>
         </div>
     </header>
@@ -26,61 +26,61 @@
     <main class="admin-container">
         <section class="admin-intro">
             <div class="section-kicker">
-                <p class="eyebrow">ADMINISTRATOR ACCESS</p>
-                <span class="admin-mark">CONTROL ROOM</span>
+                <p class="eyebrow">GÓC ĐIỀU HÀNH 11A5</p>
+                <span class="admin-mark">BAN CÁN SỰ</span>
             </div>
 
-            <h1>Quản trị hệ thống<span>.</span></h1>
+            <h1>Nhịp sống lớp mình<span>.</span></h1>
 
             <p>
-                Quản lý và theo dõi các tài khoản thuộc hệ thống Class Account
-                của tập thể 11A5 — A5 Khóa 68.
+                Một góc nhỏ để ban cán sự theo dõi thành viên và giữ cho
+                không gian chung của 11A5 luôn hoạt động thật gọn gàng.
             </p>
         </section>
 
-        <section class="admin-stats" aria-label="Thống kê tài khoản">
+        <section class="admin-stats" aria-label="Tổng quan thành viên lớp">
             <article class="admin-stat-card">
                 <span class="stat-symbol">◈</span>
-                <span class="stat-label">Tổng tài khoản</span>
+                <span class="stat-label">Bạn trong lớp</span>
                 <strong id="totalUsers">--</strong>
-                <small>Hồ sơ trong hệ thống</small>
+                <small>Thành viên đã có mặt</small>
             </article>
 
             <article class="admin-stat-card">
                 <span class="stat-symbol">✦</span>
-                <span class="stat-label">Administrators</span>
+                <span class="stat-label">Ban cán sự</span>
                 <strong id="adminUsers">--</strong>
-                <small>Tài khoản quản trị</small>
+                <small>Người giữ nhịp cho lớp</small>
             </article>
 
             <article class="admin-stat-card">
                 <span class="stat-symbol">◇</span>
-                <span class="stat-label">Teachers</span>
+                <span class="stat-label">Thầy cô</span>
                 <strong id="teacherUsers">--</strong>
-                <small>Tài khoản giáo viên</small>
+                <small>Người đồng hành cùng lớp</small>
             </article>
 
             <article class="admin-stat-card">
                 <span class="stat-symbol">○</span>
-                <span class="stat-label">Students</span>
+                <span class="stat-label">Học sinh</span>
                 <strong id="studentUsers">--</strong>
-                <small>Tài khoản học sinh</small>
+                <small>Những mảnh ghép của 11A5</small>
             </article>
         </section>
 
         <section class="directory-card">
             <div class="directory-header">
                 <div>
-                    <p class="eyebrow">USER DIRECTORY</p>
-                    <h2>Danh sách tài khoản</h2>
+                    <p class="eyebrow">SỔ THÀNH VIÊN</p>
+                    <h2>Những người trong lớp</h2>
                     <p class="directory-description">
-                        Chỉ tài khoản quản trị mới có thể xem danh sách này.
+                        Danh sách riêng dành cho ban cán sự 11A5.
                     </p>
                 </div>
 
                 <label class="search-box">
                     <span>⌕</span>
-                    <input id="searchInput" type="search" placeholder="Tìm tài khoản...">
+                        <input id="searchInput" type="search" placeholder="Tìm bạn trong lớp...">
                 </label>
             </div>
 

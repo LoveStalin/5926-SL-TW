@@ -32,12 +32,12 @@ function getInitial(name) {
 
 function roleLabel(role) {
     const roles = {
-        admin: "Administrator",
-        teacher: "Teacher",
-        student: "Student"
+        admin: "Ban cán sự",
+        teacher: "Thầy cô",
+        student: "Học sinh"
     };
 
-    return roles[role] || role || "Unknown";
+    return roles[role] || role || "Chưa cập nhật";
 }
 
 function renderStats() {
@@ -99,7 +99,7 @@ function renderUsers(keyword = "") {
                 </div>
                 <span class="user-role"></span>
                 <span class="user-status ${isActive ? "" : "disabled"}">
-                    ${isActive ? "Active" : "Disabled"}
+                    ${isActive ? "Đang hoạt động" : "Tạm ẩn"}
                 </span>
             `;
 
