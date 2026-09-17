@@ -102,9 +102,9 @@ function renderRow(left, middle, right) {
 
             });
 
-            // Touch drop target for mobile
+            
             div.addEventListener("touchstart", () => {
-                // no-op, needed so touchend fires on this element
+              
             }, { passive: true });
 
             div.addEventListener("touchend", (e) => {
@@ -162,7 +162,7 @@ function renderRow(left, middle, right) {
                 openProfile(seat);
             });
 
-            // Touch drag for mobile
+           
             div.addEventListener("touchstart", (e) => {
                 if (!isTeacher) return;
                 touchSeatId = seat;
@@ -227,7 +227,7 @@ const ensureShape = (block, template) => {
         const res = [];
         for (let c = 0; c < cols; c++) {
             if (Array.isArray(row)) res.push(row[c] ?? null);
-            else res.push(row[c] ?? null); // object with numeric keys
+            else res.push(row[c] ?? null);
         }
         return res;
     };
@@ -251,7 +251,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (
                 user.email === "devthanh280625@gmail.com" ||
-                user.email === "hlee95095@gmail.com"
+                user.email === "hlee95095@gmail.com" ||
+                user.email === "cuonghaminhsang@gmail.com"
             ) {
                 isTeacher = true;
                 alert("Teacher mode activated");
@@ -275,7 +276,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (user &&
             (user.email === "devthanh280625@gmail.com" ||
-                user.email === "hlee95095@gmail.com")
+                user.email === "hlee95095@gmail.com" || 
+                    user.email === "cuonghaminhsang@gmail.com")
+
         ) {
             isTeacher = true;
         } else {
@@ -284,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateWelcome(user);
     });
 
-    // Legacy copy kept temporarily; main renderRow is defined globally above.
+    
     function renderRowLegacy(left, middle, right) {
 
         if (!Array.isArray(left)) left = [];
@@ -419,6 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 const ROLE_LIBRARY = Object.freeze([
     "XUNG KÍCH",
+    "Cờ đỏ",
     "Lớp phó lao động",
     "Tổ trưởng Tổ 1",
     "Tổ trưởng Tổ 2",
@@ -433,9 +437,12 @@ const ROLE_LIBRARY = Object.freeze([
     "Lớp phó học tập-Lớp phó đời sống-Thủ quỹ"
 ].sort());
 
+const MULTI_HOLDER_ROLES = new Set(["Cờ đỏ", "XUNG KÍCH"]);
+
 function getRoleMeta(role) {
     const map = {
         "XUNG KÍCH": { icon: "⚔️", className: "role-red" },
+        "Cờ đỏ": { icon: "🚩", className: "role-flag" },
         "Lớp trưởng": { icon: "👑", className: "role-gold" },
         "Bí Thư": { icon: "📝", className: "role-cyan" },
         "Tổ trưởng Tổ 1": { icon: "🏆", className: "role-green" },
@@ -469,8 +476,16 @@ function assignStudentRole(studentId, selectedRole) {
         return;
     }
 
-    for (const [id, student] of Object.entries(students)) {
-        if (id !== studentId && student.role === selectedRole) {
+    const currentHolders = Object.entries(students)
+        .filter(([id, student]) => id !== studentId && student.role === selectedRole);
+
+    if (MULTI_HOLDER_ROLES.has(selectedRole) && currentHolders.length >= 2) {
+        alert(`Chức vụ ${selectedRole} đã đủ 2 người.`);
+        return;
+    }
+
+    if (!MULTI_HOLDER_ROLES.has(selectedRole)) {
+        for (const [id, student] of currentHolders) {
             delete student.role;
             delete studentRoles[id];
         }
