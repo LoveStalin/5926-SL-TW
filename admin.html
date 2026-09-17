@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="./class-dashboard.css">
     <link rel="stylesheet" href="./admin.css">
+    <link rel="stylesheet" href="./theme.css">
 </head>
 
 <body>
@@ -18,6 +19,7 @@
         </a>
 
         <div class="admin-topbar-actions">
+            <button class="theme-toggle" data-theme-toggle type="button" aria-label="Chuyển theme">☾</button>
             <a href="./dashboard.html" class="admin-back-button">← Về trang lớp</a>
             <button id="logoutButton" class="logout-button">Đăng xuất</button>
         </div>
@@ -139,6 +141,7 @@
         <p id="status" class="status-text">Đang xác thực quyền quản trị...</p>
     </main>
 
+    <script src="./theme.js"></script>
     <script type="module" src="./admin.js"></script>
 </body>
 </html>

@@ -29,37 +29,6 @@ const logoutButton = document.getElementById("logoutButton");
 const greetingLabel = document.getElementById("greetingLabel");
 const currentTime = document.getElementById("currentTime");
 const currentDate = document.getElementById("currentDate");
-const themeToggle = document.getElementById("themeToggle");
-
-const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
-const savedTheme = window.localStorage.getItem("dashboard-theme");
-
-function applyDashboardTheme(theme) {
-    document.documentElement.dataset.theme = theme;
-
-    if (!themeToggle) return;
-
-    const isDark = theme === "dark";
-    themeToggle.textContent = isDark ? "☀" : "☾";
-    themeToggle.setAttribute("aria-label", isDark ? "Chuyển sang nền sáng" : "Chuyển sang nền tối");
-    themeToggle.setAttribute("title", isDark ? "Chuyển sang nền sáng" : "Chuyển sang nền tối");
-}
-
-applyDashboardTheme(savedTheme === "dark" || savedTheme === "light"
-    ? savedTheme
-    : (systemTheme.matches ? "dark" : "light"));
-
-themeToggle?.addEventListener("click", () => {
-    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    window.localStorage.setItem("dashboard-theme", nextTheme);
-    applyDashboardTheme(nextTheme);
-});
-
-systemTheme.addEventListener("change", (event) => {
-    if (!window.localStorage.getItem("dashboard-theme")) {
-        applyDashboardTheme(event.matches ? "dark" : "light");
-    }
-});
 
 function getTimeGreeting(hour) {
     if (hour >= 5 && hour < 12) return "Chào buổi sáng";
