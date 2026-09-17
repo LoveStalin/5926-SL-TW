@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="seatingchart.css" />
+    <link rel="stylesheet" href="theme.css" />
 </head>
 
 <body>
@@ -16,6 +17,7 @@
     <header class="navbar">
         <img src="image/logo.png" class="logo">
         <div class="nav">
+            <button class="theme-toggle theme-corner" data-theme-toggle type="button" aria-label="Chuyển theme">☾</button>
             <div class="menu-icon" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
@@ -39,6 +41,7 @@
         <button id="saveSeat">Lưu thay đổi</button>
         <button id="exportPdfBtn">Xuất dưới dạng PDF</button>
     </div>
+    <script src="theme.js"></script>
     <script src="students.js"></script>
     <script type="module" src="seatmap.js"></script>
     <script type="module" src="render.js"></script>

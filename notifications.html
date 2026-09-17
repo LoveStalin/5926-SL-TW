@@ -6,11 +6,12 @@
     <title>Thông báo | 11A5</title>
     <link rel="stylesheet" href="./class-dashboard.css">
     <link rel="stylesheet" href="./notifications.css">
+    <link rel="stylesheet" href="./theme.css">
 </head>
 <body>
     <header class="topbar">
         <a href="./dashboard.html" class="brand"><span class="brand-mark">A5</span><span>A5-K68 <small>NOTIFICATIONS</small></span></a>
-        <div class="topbar-right"><a href="./dashboard.html" class="header-profile-button" title="Dashboard">⌂</a><button id="logoutButton" class="logout-button">Đăng xuất</button></div>
+        <div class="topbar-right"><button class="theme-toggle" data-theme-toggle type="button" aria-label="Chuyển theme">☾</button><a href="./dashboard.html" class="header-profile-button" title="Dashboard">⌂</a><button id="logoutButton" class="logout-button">Đăng xuất</button></div>
     </header>
     <main class="dashboard-container notifications-container">
         <p class="eyebrow">CLASS COMMUNICATION</p>
@@ -23,6 +24,7 @@
         <section id="notificationsList" class="notifications-list"><p class="empty-state">Đang tải thông báo...</p></section>
         <p id="status" class="status-text"></p>
     </main>
+    <script src="./theme.js"></script>
     <script type="module" src="./notifications.js"></script>
 </body>
 </html>
