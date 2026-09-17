@@ -456,7 +456,7 @@ function getRoleMeta(role) {
         "Lớp phó học tập-Lớp phó đời sống-Thủ quỹ": { icon: "💼", className: "role-violet" }
     };
 
-    return map[role] || { icon: "✨", className: "role-default" };
+    return map[role] || { icon: "💩", className: "role-default" };
 }
 
 function getAvailableRoles() {
@@ -515,7 +515,7 @@ function openProfile(studentId) {
                 <div class="profile-main">
                     <span class="profile-tag">Thông tin học sinh</span>
                     <h2>${student.fullName}</h2>
-                    <div class="role-badge ${roleMeta.className}">${roleMeta.icon} ${student.role || "Chưa có chức vụ"}</div>
+                    <div class="role-badge ${roleMeta.className}">${roleMeta.icon} ${student.role || "Dân thường"}</div>
                 </div>
             </div>
 
