@@ -14,6 +14,64 @@ h3 {
 body {
     background: linear-gradient(135deg, #c7a6ff, #a784e6);
     margin: 0;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    color: #2e1f47;
+    isolation: isolate;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    opacity: 0.34;
+    background-image: linear-gradient(rgba(91, 58, 151, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(91, 58, 151, 0.08) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    width: 440px;
+    height: 440px;
+    right: -150px;
+    bottom: -170px;
+    z-index: -2;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 50%;
+    box-shadow: 0 0 0 28px rgba(255, 255, 255, 0.07), 0 0 0 58px rgba(255, 255, 255, 0.045), 0 0 80px rgba(103, 64, 176, 0.22);
+    pointer-events: none;
+    animation: orbitDrift 18s linear infinite;
+}
+
+.stars {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.stars::before,
+.stars::after {
+    content: "";
+    position: absolute;
+    inset: -20% 0 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.8) 1.3px, transparent 1.3px);
+    background-size: 86px 86px;
+    opacity: 0.34;
+    animation: starDrift 46s linear infinite;
+}
+
+.stars::after {
+    background-size: 143px 143px;
+    opacity: 0.22;
+    animation-duration: 66s;
+    animation-direction: reverse;
 }
 
 .container {
@@ -39,6 +97,10 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
+    background: rgba(255, 255, 255, 0.16);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.36);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 12px 30px rgba(65, 37, 116, 0.08);
 }
 
 .logo {
@@ -48,11 +110,13 @@ body {
     object-fit: cover;
     border: 3px solid white;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
-    transition: 0.3s;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: logoGlow 4s ease-in-out infinite;
 }
 
 .logo:hover {
-    transform: scale(1.1)
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.95), 0 12px 30px rgba(89, 52, 157, 0.28);
 }
 
 .nav {
@@ -75,6 +139,12 @@ body {
     border-radius: 14px;
     padding: 12px 10px;
     box-shadow: 0 14px 30px rgba(28, 12, 48, 0.18);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.menu-icon:hover {
+    transform: translateY(-2px) rotate(-2deg);
+    box-shadow: 0 18px 34px rgba(28, 12, 48, 0.25), 0 0 20px rgba(255, 255, 255, 0.22);
 }
 
 .menu-icon span {
@@ -301,6 +371,13 @@ body {
     color: #fff;
 }
 
+.role-badge.role-flag,
+.role-tag.role-flag {
+    background: linear-gradient(135deg, #ff6b6b, #e53935 58%, #b71c1c);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(198, 40, 40, 0.28);
+}
+
 .role-badge.role-gold,
 .role-tag.role-gold {
     background: linear-gradient(135deg, #f4c95d, #e9a822);
@@ -456,8 +533,36 @@ body {
     color: white;
     font-weight: 700;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
     box-shadow: 0 8px 20px rgba(105, 73, 169, 0.25);
     transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+#saveSeat::after,
+#changeSeatRowBtn::after,
+#resetSeat::after,
+#exportPdfBtn::after,
+#loginBtn::after,
+#logoutBtn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -85%;
+    width: 45%;
+    height: 100%;
+    background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+    transform: skewX(-18deg);
+    transition: left 0.55s ease;
+}
+
+#saveSeat:hover::after,
+#changeSeatRowBtn:hover::after,
+#resetSeat:hover::after,
+#exportPdfBtn:hover::after,
+#loginBtn:hover::after,
+#logoutBtn:hover::after {
+    left: 140%;
 }
 
 #loginBtn,
@@ -503,6 +608,11 @@ body {
     border-radius: 12px;
 
     width: fit-content;
+    margin: 14px 0 0 5%;
+    border: 1px solid rgba(255, 255, 255, 0.46);
+    box-shadow: 0 14px 32px rgba(75, 44, 135, 0.14), 0 0 24px rgba(255, 255, 255, 0.24);
+    backdrop-filter: blur(12px);
+    animation: welcomeFloat 5s ease-in-out infinite;
 }
 
 .welcome-title {
@@ -516,6 +626,35 @@ body {
 
 .print-title {
     display: none;
+}
+
+@keyframes orbitDrift {
+    from { transform: rotate(0deg) translateY(0); }
+    50% { transform: rotate(180deg) translateY(-16px); }
+    to { transform: rotate(360deg) translateY(0); }
+}
+
+@keyframes logoGlow {
+    0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.7); }
+    50% { box-shadow: 0 0 26px rgba(255, 255, 255, 0.96), 0 0 36px rgba(150, 111, 232, 0.3); }
+}
+
+@keyframes welcomeFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes starDrift {
+    from { transform: translateY(0); }
+    to { transform: translateY(-420px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 @media print {
