@@ -19,10 +19,10 @@ const classData = {
         memoryAlt: "Memory lớp 11A5",
         year: "Trần Phú • 2026",
         moments: [
-            { title: "AUF WIEDERSEHEN", details: ["Đcu mày", "Ko có j đâu"], placeholder: true },
-            { title: "PLAYOFF Week 1 NHƯ CĐB", details: ["DALLAS GÀ VÃI LOL", "Ceedee Lamb biết chơi không vậy?"], placeholder: true },
+            { title: "Holland Lop 🐰", details: ["Thỏ đáng yêu mà ae", "Chịu"], placeholder: true },
+            { title: "PLAYOFF Week 1", details: ["DALLAS GÀ QUÁAAAA", "Ceedee Lamb biết chơi không vậy?"], placeholder: true },
             { title: "NGỦ", details: ["TAO BUỒN NGỦ", "TAO MUỐN NGỦ"], placeholder: true },
-            { title: "THÈM MỲ QUÁ", details: ["GIỜ LẠI THẤY ĐÓI", "NẤU CHO ANH BÁT MỲ ĐI"], placeholder: true }
+            { title: "THÈM MỲ QUÁ", details: ["GIỜ LẠI THẤY ĐÓI", "NẤU CHO TAO BÁT MỲ ĐI"], placeholder: true }
         ]
     }
 };
