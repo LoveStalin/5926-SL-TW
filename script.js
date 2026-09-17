@@ -99,3 +99,19 @@ renderGallery(currentClass);
 function toggleMenu() {
     document.getElementById("sideMenu").classList.toggle("active");
 }
+
+const heroVisual = document.querySelector(".hero-visual");
+const mainCard = document.querySelector(".card-main");
+
+if (heroVisual && mainCard && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    heroVisual.addEventListener("pointermove", (event) => {
+        const bounds = heroVisual.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+        mainCard.style.transform = `translate(${x * 10}px, ${y * 10}px) rotate(${x * 5 - 4}deg)`;
+    });
+
+    heroVisual.addEventListener("pointerleave", () => {
+        mainCard.style.transform = "";
+    });
+}
