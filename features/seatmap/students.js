@@ -25,7 +25,6 @@ const students = {
     "haily": { displayName: "Hải Ly", img: "/assets/images/haily.jpg", role: "Tổ trưởng Tổ 2", fullName: "Hoàng Hải Ly", dob: "16/04/2010" },
     "thaoanh": { displayName: "Thảo Anh", img: "/assets/images/thaoanh.jpg", fullName: "Nguyễn Hoàng Thảo Anh", dob: "29/07/2010" },
     "hoangthao": { displayName: "Hoàng Thảo", img: "/assets/images/hoangthao.jpg", fullName: "Hoàng Thị Hương Thảo", dob: "12/11/2010" },
-    "nguyenthao": { displayName: "Nguyễn Thảo", img: "/assets/images/nguyenthao.jpg", fullName: "Nguyễn Phương Thảo", dob: "25/02/2010" },
     "tancuong": { displayName: "Tân Cương", img: "/assets/images/tancuong.jpg", fullName: "Vũ Tân Cương", dob: "21/06/2010" },
     "ngochan": { displayName: "Ngọc Hân", img: "/assets/images/ngochan.jpg", fullName: "Vy Ngọc Hân", dob: "18/11/2010" },
     "baouyen": { displayName: "Bảo Uyên", img: "/assets/images/baouyen.jpg", fullName: "Nguyễn Bảo Uyên", dob: "19/06/2010" },

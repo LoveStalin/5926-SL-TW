@@ -13,7 +13,7 @@ export const defaultSeatmap = {
         ["duyanh", null, "viettrung"],
         ["haininh", "thuyduong", "doankhanh"],
         ["hoangthao", "baochau", "vinhhung"],
-        ["nguyenthao", null, "thienphu"],
+        [null, null, "thienphu"],
         ["xuanthanh", null, "ngnamkhanh"]
     ],
 
