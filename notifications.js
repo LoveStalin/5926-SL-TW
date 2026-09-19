@@ -10,6 +10,7 @@ const enableButton = document.getElementById("enableNotifications");
 const permissionText = document.getElementById("permissionText");
 const statusText = document.getElementById("status");
 const logoutButton = document.getElementById("logoutButton");
+const notificationCount = document.getElementById("notificationCount");
 
 const app = initializeApp({
     apiKey: "AIzaSyASwLRIHvF9qZQx8GRsC63kadfZIskKfOc",
@@ -29,17 +30,63 @@ function showStatus(message, type = "") {
 function renderNotifications(data) {
     list.innerHTML = "";
     const items = Object.entries(data || {}).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+
+    notificationCount.textContent = items.length
+        ? `${items.length} thông báo`
+        : "Hộp thư trống";
+
     if (!items.length) {
         list.innerHTML = '<p class="empty-state">Chưa có thông báo nào.</p>';
         return;
     }
+
     for (const [, item] of items) {
         const article = document.createElement("article");
-        article.className = "notification-item";
-        const date = item.createdAt ? new Date(item.createdAt).toLocaleString("vi-VN") : "Mới cập nhật";
-        article.innerHTML = `<div class="notification-meta"><span>${item.type || "Chung"}</span><span>${date}</span></div><h2></h2><p></p>`;
-        article.querySelector("h2").textContent = item.title || "Thông báo A5-K68";
-        article.querySelector("p").textContent = item.message || "";
+        article.className = `notification-item${item.pinned ? " notification-item--pinned" : ""}`;
+
+        const icon = document.createElement("span");
+        icon.className = "notification-item-icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = item.pinned ? "⌖" : "✦";
+
+        const content = document.createElement("div");
+        content.className = "notification-item-content";
+
+        const meta = document.createElement("div");
+        meta.className = "notification-meta";
+
+        const type = document.createElement("span");
+        type.className = "notification-type";
+        type.textContent = item.type || "Chung";
+
+        const createdAt = item.createdAt ? new Date(item.createdAt) : null;
+        const hasValidDate = createdAt && !Number.isNaN(createdAt.getTime());
+        const time = document.createElement("time");
+        time.textContent = hasValidDate
+            ? createdAt.toLocaleString("vi-VN")
+            : "Mới cập nhật";
+
+        if (hasValidDate) {
+            time.dateTime = createdAt.toISOString();
+        }
+
+        meta.append(type, time);
+
+        if (item.pinned) {
+            const pin = document.createElement("span");
+            pin.className = "notification-pin";
+            pin.textContent = "Đã ghim";
+            meta.append(pin);
+        }
+
+        const title = document.createElement("h2");
+        title.textContent = item.title || "Thông báo A5-K68";
+
+        const message = document.createElement("p");
+        message.textContent = item.message || "";
+
+        content.append(meta, title, message);
+        article.append(icon, content);
         list.appendChild(article);
     }
 }

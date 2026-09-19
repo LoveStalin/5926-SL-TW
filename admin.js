@@ -29,7 +29,13 @@ const notificationPinned = document.getElementById("notificationPinned");
 const sendNotificationButton = document.getElementById(
     "sendNotificationButton"
 );
+const sendNotificationButtonDefaultContent = sendNotificationButton.innerHTML;
 const notificationStatus = document.getElementById("notificationStatus");
+const notificationTitleCount = document.getElementById("notificationTitleCount");
+const notificationMessageCount = document.getElementById("notificationMessageCount");
+const notificationPreviewTitle = document.getElementById("notificationPreviewTitle");
+const notificationPreviewMessage = document.getElementById("notificationPreviewMessage");
+const notificationPreviewPin = document.getElementById("notificationPreviewPin");
 
 let users = [];
 let currentAdmin = null;
@@ -42,6 +48,19 @@ function setStatus(message, isError = false) {
 function setNotificationStatus(message, isError = false) {
     notificationStatus.textContent = message;
     notificationStatus.classList.toggle("error", isError);
+}
+
+function updateNotificationComposer() {
+    if (!notificationTitle || !notificationMessage) return;
+
+    const title = notificationTitle.value.trim();
+    const message = notificationMessage.value.trim();
+
+    notificationTitleCount.textContent = `${notificationTitle.value.length} / 120`;
+    notificationMessageCount.textContent = `${notificationMessage.value.length} / 2000`;
+    notificationPreviewTitle.textContent = title || "Tiêu đề thông báo";
+    notificationPreviewMessage.textContent = message || "Nội dung thông báo của bạn sẽ hiện ở đây.";
+    notificationPreviewPin.hidden = !notificationPinned.checked;
 }
 
 function getInitial(name) {
@@ -251,6 +270,7 @@ async function sendNotification(event) {
         );
 
         notificationForm.reset();
+        updateNotificationComposer();
     } catch (error) {
         console.error("Notification sending error:", error);
 
@@ -260,7 +280,7 @@ async function sendNotification(event) {
         );
     } finally {
         sendNotificationButton.disabled = false;
-        sendNotificationButton.textContent = "Gửi thông báo →";
+        sendNotificationButton.innerHTML = sendNotificationButtonDefaultContent;
     }
 }
 
@@ -310,6 +330,10 @@ onAuthStateChanged(classAuth, async user => {
                 "submit",
                 sendNotification
             );
+            notificationTitle.addEventListener("input", updateNotificationComposer);
+            notificationMessage.addEventListener("input", updateNotificationComposer);
+            notificationPinned.addEventListener("change", updateNotificationComposer);
+            updateNotificationComposer();
         }
     } catch (error) {
         console.error("Admin loading error:", error);

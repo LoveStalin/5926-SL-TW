@@ -104,38 +104,90 @@
             </div>
 
             <form id="notificationForm" class="notification-form">
-                <label>
-                    <span>Tiêu đề thông báo</span>
-                    <input
-                        id="notificationTitle"
-                        type="text"
-                        maxlength="120"
-                        placeholder="Ví dụ: Lịch học ngày mai"
-                        required
-                    >
-                </label>
+                <div class="notification-composer-grid">
+                    <div class="notification-fields">
+                        <div class="notification-form-intro">
+                            <span class="composer-spark" aria-hidden="true">✦</span>
+                            <p>Soạn một lời nhắn thật rõ ràng cho cả lớp.</p>
+                        </div>
 
-                <label>
-                    <span>Nội dung thông báo</span>
-                    <textarea
-                        id="notificationMessage"
-                        rows="5"
-                        maxlength="2000"
-                        placeholder="Nhập nội dung muốn gửi đến lớp..."
-                        required
-                    ></textarea>
-                </label>
+                        <label class="notification-field">
+                            <span class="notification-field-label">
+                                <span>Tiêu đề thông báo</span>
+                                <small id="notificationTitleCount">0 / 120</small>
+                            </span>
+                            <span class="notification-input-shell">
+                                <span class="field-icon" aria-hidden="true">✦</span>
+                                <input
+                                    id="notificationTitle"
+                                    type="text"
+                                    maxlength="120"
+                                    placeholder="Ví dụ: Lịch học ngày mai"
+                                    autocomplete="off"
+                                    required
+                                >
+                            </span>
+                        </label>
 
-                <label class="notification-checkbox">
-                    <input id="notificationPinned" type="checkbox">
-                    <span>Ghim thông báo trong trang thông báo</span>
-                </label>
+                        <label class="notification-field">
+                            <span class="notification-field-label">
+                                <span>Nội dung thông báo</span>
+                                <small id="notificationMessageCount">0 / 2000</small>
+                            </span>
+                            <span class="notification-textarea-shell">
+                                <textarea
+                                    id="notificationMessage"
+                                    rows="5"
+                                    maxlength="2000"
+                                    placeholder="Nhập nội dung muốn gửi đến lớp..."
+                                    required
+                                ></textarea>
+                                <span class="textarea-corner" aria-hidden="true"></span>
+                            </span>
+                        </label>
+                    </div>
 
-                <button id="sendNotificationButton" type="submit">
-                    Gửi thông báo →
-                </button>
+                    <aside class="notification-preview" aria-label="Xem trước thông báo">
+                        <div class="preview-topline">
+                            <span class="preview-live-dot" aria-hidden="true"></span>
+                            <span>XEM TRƯỚC</span>
+                        </div>
+                        <div class="preview-device">
+                            <div class="preview-device-bar">
+                                <span class="preview-app-icon">A5</span>
+                                <div>
+                                    <strong>A5-K68</strong>
+                                    <small>vừa xong</small>
+                                </div>
+                            </div>
+                            <strong id="notificationPreviewTitle" class="preview-title">Tiêu đề thông báo</strong>
+                            <p id="notificationPreviewMessage" class="preview-message">Nội dung thông báo của bạn sẽ hiện ở đây.</p>
+                            <span id="notificationPreviewPin" class="preview-pin" hidden>⌖ Đã ghim</span>
+                        </div>
+                        <p class="preview-caption">Mọi người sẽ nhận được thông báo như thế này.</p>
+                    </aside>
+                </div>
 
-                <p id="notificationStatus" class="status-text"></p>
+                <div class="notification-form-footer">
+                    <label class="notification-checkbox">
+                        <input id="notificationPinned" type="checkbox">
+                        <span class="notification-toggle" aria-hidden="true"><span></span></span>
+                        <span class="notification-checkbox-copy">
+                            <strong>Ghim thông báo</strong>
+                            <small>Giữ thông báo ở đầu trang thông báo</small>
+                        </span>
+                    </label>
+
+                    <div class="notification-send-area">
+                        <span class="notification-recipient"><span aria-hidden="true">◉</span> Gửi đến thiết bị đã bật push</span>
+                        <button id="sendNotificationButton" type="submit">
+                            <span>Gửi thông báo</span>
+                            <span aria-hidden="true">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <p id="notificationStatus" class="status-text notification-status" aria-live="polite"></p>
             </form>
         </section>
         <p id="status" class="status-text">Đang xác thực quyền quản trị...</p>
