@@ -5,12 +5,16 @@ import { getMessaging, getToken, onMessage, isSupported } from "https://www.gsta
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
 const VAPID_KEY = "BN7OVxfwgAKxwXX7chYbsQUSHGsDeGpn7yiU5H2k-sifPYZL1kui1Vbh2BRoZTdp8_dvzH5EZ8zTCjqq2h5e3EU";
+const WORKER_URL = "https://a5-k68-notification-worker.thanhnguyenxuan917.workers.dev";
 const list = document.getElementById("notificationsList");
 const enableButton = document.getElementById("enableNotifications");
 const permissionText = document.getElementById("permissionText");
 const statusText = document.getElementById("status");
 const logoutButton = document.getElementById("logoutButton");
 const notificationCount = document.getElementById("notificationCount");
+
+let currentUser = null;
+let canManageNotifications = false;
 
 const app = initializeApp({
     apiKey: "AIzaSyASwLRIHvF9qZQx8GRsC63kadfZIskKfOc",
@@ -40,7 +44,7 @@ function renderNotifications(data) {
         return;
     }
 
-    for (const [, item] of items) {
+    for (const [notificationId, item] of items) {
         const article = document.createElement("article");
         article.className = `notification-item${item.pinned ? " notification-item--pinned" : ""}`;
 
@@ -87,6 +91,39 @@ function renderNotifications(data) {
 
         content.append(meta, title, message);
         article.append(icon, content);
+
+        if (canManageNotifications) {
+            const actions = document.createElement("div");
+            actions.className = "notification-actions";
+
+            const pinButton = document.createElement("button");
+            pinButton.type = "button";
+            pinButton.className = "notification-action-button";
+            pinButton.textContent = item.pinned ? "Bỏ ghim" : "Ghim";
+            pinButton.setAttribute(
+                "aria-label",
+                `${item.pinned ? "Bỏ ghim" : "Ghim"} thông báo: ${item.title || "Thông báo A5-K68"}`
+            );
+            pinButton.addEventListener("click", () =>
+                manageNotification(notificationId, "set-pinned", !item.pinned)
+            );
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "notification-action-button notification-action-button--danger";
+            deleteButton.textContent = "Xóa";
+            deleteButton.setAttribute(
+                "aria-label",
+                `Xóa thông báo: ${item.title || "Thông báo A5-K68"}`
+            );
+            deleteButton.addEventListener("click", () =>
+                manageNotification(notificationId, "delete-notification")
+            );
+
+            actions.append(pinButton, deleteButton);
+            content.append(actions);
+        }
+
         list.appendChild(article);
     }
 }
@@ -94,6 +131,44 @@ function renderNotifications(data) {
 async function loadNotifications() {
     const snapshot = await get(ref(classDb, "notifications"));
     renderNotifications(snapshot.exists() ? snapshot.val() : {});
+}
+
+async function manageNotification(notificationId, action, pinned) {
+    if (!currentUser || !canManageNotifications) return;
+
+    const isDeleting = action === "delete-notification";
+
+    if (isDeleting && !window.confirm("Xóa thông báo này? Thao tác không thể hoàn tác.")) {
+        return;
+    }
+
+    try {
+        showStatus(isDeleting ? "Đang xóa thông báo..." : "Đang cập nhật trạng thái ghim...");
+
+        const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${await currentUser.getIdToken(true)}`
+            },
+            body: JSON.stringify({ action, notificationId, pinned })
+        });
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || `Worker trả về lỗi HTTP ${response.status}.`);
+        }
+
+        showStatus(
+            isDeleting
+                ? "Đã xóa thông báo."
+                : (pinned ? "Đã ghim thông báo." : "Đã bỏ ghim thông báo."),
+            "success"
+        );
+        await loadNotifications();
+    } catch (error) {
+        showStatus(`Không thể cập nhật thông báo: ${error.message}`, "error");
+    }
 }
 
 async function enablePush(user) {
@@ -134,6 +209,14 @@ onAuthStateChanged(classAuth, async (user) => {
         return;
     }
     try {
+        currentUser = user;
+        const ownProfileSnapshot = await get(ref(classDb, `users/${user.uid}`));
+        const ownProfile = ownProfileSnapshot.exists()
+            ? ownProfileSnapshot.val()
+            : null;
+        canManageNotifications = ownProfile?.active === true
+            && ["admin", "teacher"].includes(ownProfile?.role);
+
         await loadNotifications();
         enableButton.addEventListener("click", () => enablePush(user).catch(error => showStatus("Không thể bật thông báo: " + error.message, "error")), { once: true });
     } catch (error) {

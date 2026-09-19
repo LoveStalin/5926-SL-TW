@@ -305,10 +305,10 @@ onAuthStateChanged(classAuth, async user => {
 
         const ownProfile = ownProfileSnapshot.val();
 
-        if (
-            ownProfile.active !== true ||
-            ownProfile.role !== "admin"
-        ) {
+        const hasAdminAccess = ownProfile.active === true
+            && ["admin", "teacher"].includes(ownProfile.role);
+
+        if (!hasAdminAccess) {
             setStatus(
                 "Tài khoản không có quyền truy cập khu vực quản trị.",
                 true
@@ -322,7 +322,6 @@ onAuthStateChanged(classAuth, async user => {
         }
 
         await loadUsers();
-
         setStatus("Đã xác thực quyền quản trị.");
 
         if (notificationForm) {
