@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thông báo | 11A5</title>
     <link rel="stylesheet" href="./class-dashboard.css">
-    <link rel="stylesheet" href="./notifications.css">
     <link rel="stylesheet" href="./theme.css">
+    <link rel="stylesheet" href="./notifications.css">
 </head>
 <body>
     <header class="topbar">
@@ -14,14 +14,27 @@
         <div class="topbar-right"><button class="theme-toggle" data-theme-toggle type="button" aria-label="Chuyển theme">☾</button><a href="./dashboard.html" class="header-profile-button" title="Dashboard">⌂</a><button id="logoutButton" class="logout-button">Đăng xuất</button></div>
     </header>
     <main class="dashboard-container notifications-container">
-        <p class="eyebrow">CLASS COMMUNICATION</p>
-        <h1>Thông báo <span class="live-pill">● LIVE</span></h1>
-        <p class="welcome-description">Cập nhật mới nhất từ ban quản trị và tập thể 11A5.</p>
+        <section class="notifications-hero" aria-labelledby="notificationsTitle">
+            <div class="notifications-kicker">
+                <span class="hero-bell" aria-hidden="true">♢</span>
+                <span>CLASS COMMUNICATION</span>
+            </div>
+            <div class="notifications-title-row">
+                <h1 id="notificationsTitle">Thông báo</h1>
+                <span class="live-pill"><span aria-hidden="true">●</span> LIVE</span>
+            </div>
+            <p>Cập nhật mới nhất từ ban quản trị và tập thể 11A5.</p>
+        </section>
         <section class="notification-permission">
-            <div><strong>🔔 Nhận thông báo trên máy</strong><p id="permissionText">Bật để nhận thông báo ngay cả khi không mở trang này.</p></div>
+            <span class="permission-icon" aria-hidden="true">♧</span>
+            <div class="permission-copy"><strong>Không bỏ lỡ điều quan trọng</strong><p id="permissionText">Bật để nhận thông báo ngay cả khi không mở trang này.</p></div>
             <button id="enableNotifications" class="notification-button">Bật thông báo</button>
         </section>
-        <section id="notificationsList" class="notifications-list"><p class="empty-state">Đang tải thông báo...</p></section>
+        <div class="notifications-list-heading">
+            <span>HỘP THƯ LỚP</span>
+            <span id="notificationCount">Đang tải</span>
+        </div>
+        <section id="notificationsList" class="notifications-list" aria-live="polite"><p class="empty-state">Đang tải thông báo...</p></section>
         <p id="status" class="status-text"></p>
     </main>
     <script src="./theme.js"></script>
