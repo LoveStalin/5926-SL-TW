@@ -1,4 +1,4 @@
-import { classAuth, classDb } from "./class-firebase.js";
+import { classAuth, classDb } from "../../shared/scripts/class-firebase.js";
 
 import {
     onAuthStateChanged,
@@ -286,7 +286,7 @@ async function sendNotification(event) {
 
 onAuthStateChanged(classAuth, async user => {
     if (!user) {
-        window.location.href = "./class-login.html";
+        window.location.href = "../auth/class-login.html";
         return;
     }
 
@@ -299,7 +299,7 @@ onAuthStateChanged(classAuth, async user => {
 
         if (!ownProfileSnapshot.exists()) {
             await signOut(classAuth);
-            window.location.href = "./class-login.html";
+            window.location.href = "../auth/class-login.html";
             return;
         }
 
@@ -315,7 +315,7 @@ onAuthStateChanged(classAuth, async user => {
             );
 
             setTimeout(() => {
-                window.location.href = "./dashboard.html";
+                window.location.href = "../dashboard/dashboard.html";
             }, 1500);
 
             return;
@@ -357,7 +357,7 @@ if (logoutButton) {
 
         try {
             await signOut(classAuth);
-            window.location.href = "./class-login.html";
+            window.location.href = "../auth/class-login.html";
         } catch (error) {
             console.error("Logout error:", error);
 

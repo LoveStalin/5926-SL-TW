@@ -352,7 +352,7 @@ button, input { font: inherit; }
 .preview-device-bar strong { display: block; color: #f5ebff; font-size: 10px; }
 .preview-device-bar small { display: block; margin-top: 2px; color: #8f7e9e; font-size: 9px; }
 .preview-title { overflow: hidden; color: #fff7ff; font-size: 12px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
-.preview-message { display: -webkit-box; overflow: hidden; margin: 0; color: #b5a7c3; font-size: 10px; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.preview-message { display: -webkit-box; overflow: hidden; margin: 0; color: #b5a7c3; font-size: 10px; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; }
 .preview-pin { width: fit-content; padding: 4px 6px; border-radius: 6px; color: #8cf0c9; background: rgba(95, 224, 176, .1); font-size: 9px; font-weight: 700; }
 .preview-caption { margin: 12px 1px 0; color: #867590; font-size: 10px; line-height: 1.45; }
 

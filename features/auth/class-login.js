@@ -1,7 +1,7 @@
 import {
     classAuth,
     classDb
-} from "./class-firebase.js";
+} from "../../shared/scripts/class-firebase.js";
 
 import {
     signInWithEmailAndPassword,
@@ -81,7 +81,7 @@ statusText.textContent =
     "Đăng nhập thành công! Đang chuyển đến dashboard...";
 
 setTimeout(() => {
-    window.location.href = "./dashboard.html";
+    window.location.href = "../dashboard/dashboard.html";
 }, 700);
 
         console.log("Profile:", userData);
