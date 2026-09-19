@@ -137,7 +137,9 @@ async function verifyFirebaseUser(apiKey, idToken) {
   const data = await response.json();
 
   if (!response.ok || !data.users?.length) {
-    throw new Error(data.error?.message || `Firebase token HTTP ${response.status}`);
+    throw new Error(
+      `FIREBASE_AUTH HTTP ${response.status}: ${data.error?.message || "token không hợp lệ"}`
+    );
   }
 
   return data.users[0];
@@ -160,7 +162,7 @@ async function firebaseRequest(databaseUrl, path, accessToken, options = {}) {
 
   if (!response.ok) {
     throw new Error(
-      `Firebase ${options.method || "GET"} ${path}: HTTP ${response.status} - ${text || "empty response"}`
+      `REALTIME_DATABASE ${options.method || "GET"} ${path}: HTTP ${response.status} - ${text || "empty response"}`
     );
   }
 
@@ -193,7 +195,13 @@ async function sendFcmMessage(projectId, token, title, message, accessToken) {
     }
   );
 
-  return response.ok;
+  const responseText = await response.text();
+
+  return {
+    ok: response.ok,
+    status: response.status,
+    error: response.ok ? null : responseText
+  };
 }
 
 export default {
@@ -281,6 +289,7 @@ export default {
       let totalTokens = 0;
       let sent = 0;
       let failed = 0;
+      const fcmErrors = [];
 
       for (const profile of Object.values(users || {})) {
         for (const tokenData of Object.values(profile?.fcmTokens || {})) {
@@ -288,15 +297,40 @@ export default {
           if (!token) continue;
 
           totalTokens += 1;
-          if (await sendFcmMessage(projectId, token, title, message, accessToken)) {
+          const fcmResult = await sendFcmMessage(
+            projectId,
+            token,
+            title,
+            message,
+            accessToken
+          );
+
+          if (fcmResult.ok) {
             sent += 1;
           } else {
             failed += 1;
+            if (fcmErrors.length < 5) {
+              fcmErrors.push({
+                status: fcmResult.status,
+                error: fcmResult.error
+              });
+            }
           }
         }
       }
 
-      return json({ success: true, notificationId, totalTokens, sent, failed }, 200, origin);
+      return json(
+        {
+          success: true,
+          notificationId,
+          totalTokens,
+          sent,
+          failed,
+          fcmErrors
+        },
+        200,
+        origin
+      );
     } catch (error) {
       console.error(
         "FCM Worker error:",

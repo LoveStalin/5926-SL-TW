@@ -181,6 +181,25 @@ html[data-theme="dark"] body:has(.login-box) .login-box {
     box-shadow: 0 24px 70px rgba(5, 2, 12, 0.3);
 }
 
+html[data-theme="dark"] body:has(.login-box) h1 {
+    color: #f7f2ff;
+}
+
+html[data-theme="dark"] body:has(.login-box) label {
+    color: #d9c7ff;
+}
+
+html[data-theme="dark"] body:has(.login-box) input {
+    border-color: rgba(214, 193, 255, 0.18);
+    color: #f7f2ff;
+    background: rgba(16, 9, 29, 0.54);
+}
+
+html[data-theme="dark"] body:has(.login-box) #status,
+html[data-theme="dark"] body:has(.login-box) .login-back-link {
+    color: #bda9dc;
+}
+
 html[data-theme="light"] body:has(#databaseTest) {
     color: #2e1f47;
     background: linear-gradient(135deg, #f6f0ff, #e7dcff 55%, #cdb4ff) !important;
@@ -215,9 +234,21 @@ html[data-theme="dark"] body:has(#databaseTest) pre {
     z-index: 3000;
 }
 
+body:has(.hero) .theme-corner,
+body:has(.seatmap) .theme-corner {
+    top: 20px;
+    right: 84px;
+}
+
 @media (max-width: 650px) {
     .theme-corner {
         top: 14px;
         right: 14px;
+    }
+
+    body:has(.hero) .theme-corner,
+    body:has(.seatmap) .theme-corner {
+        top: 14px;
+        right: 76px;
     }
 }
