@@ -82,7 +82,13 @@ async function createGoogleAccessToken(serviceAccount) {
   }));
   const claim = stringToBase64Url(JSON.stringify({
     iss: serviceAccount.client_email,
-    scope: "https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/firebase.messaging",
+    // Realtime Database REST yêu cầu cả hai scope này khi xác thực bằng
+    // service account. Thiếu `userinfo.email` sẽ khiến access token bị 401.
+    scope: [
+      "https://www.googleapis.com/auth/firebase.database",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/firebase.messaging"
+    ].join(" "),
     aud: "https://oauth2.googleapis.com/token",
     iat: now,
     exp: now + 3600
@@ -247,7 +253,10 @@ export default {
 
       const firebaseUser = await verifyFirebaseUser(apiKey, idToken);
       const accessToken = await createGoogleAccessToken(serviceAccount);
-      const users = await firebaseRequest(databaseUrl, "users", idToken);
+      // Đọc/ghi toàn bộ nhánh `users` và tạo notification bằng quyền service
+      // account. Firebase ID token của admin trên web vẫn bị Realtime Database
+      // Rules giới hạn, nên request này từng trả về HTTP 401.
+      const users = await firebaseRequest(databaseUrl, "users", accessToken);
       const ownProfile = users?.[firebaseUser.localId];
 
       if (ownProfile?.active !== true || ownProfile?.role !== "admin") {
@@ -274,7 +283,7 @@ export default {
       }
 
       const notificationId = crypto.randomUUID();
-      await firebaseRequest(databaseUrl, `notifications/${notificationId}`, idToken, {
+      await firebaseRequest(databaseUrl, `notifications/${notificationId}`, accessToken, {
         method: "PUT",
         body: JSON.stringify({
           title,
