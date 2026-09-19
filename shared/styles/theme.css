@@ -122,6 +122,90 @@ html[data-theme="dark"] body:has(.notifications-container) .empty-state {
     color: #a99bbf;
 }
 
+html[data-theme="light"] body:has(.profile-container) {
+    color: #2e1f47;
+    background:
+        radial-gradient(circle at 85% 8%, rgba(255, 255, 255, 0.86), transparent 30%),
+        radial-gradient(circle at 10% 90%, rgba(120, 204, 255, 0.2), transparent 30%),
+        linear-gradient(135deg, #f6f0ff, #e7dcff 48%, #cdb4ff);
+}
+
+html[data-theme="light"] body:has(.profile-container) .profile-topbar {
+    border-color: rgba(255, 255, 255, 0.58);
+    background: rgba(255, 255, 255, 0.46);
+    box-shadow: 0 20px 60px rgba(77, 46, 123, 0.14);
+}
+
+html[data-theme="light"] body:has(.profile-container) .profile-brand,
+html[data-theme="light"] body:has(.profile-container) .profile-intro h1,
+html[data-theme="light"] body:has(.profile-container) .profile-identity-content h2,
+html[data-theme="light"] body:has(.profile-container) .profile-side-card h2,
+html[data-theme="light"] body:has(.profile-container) .profile-security-card h2,
+html[data-theme="light"] body:has(.profile-container) .profile-data-item strong {
+    color: #2b1149;
+}
+
+html[data-theme="light"] body:has(.profile-container) .back-button {
+    border-color: rgba(124, 77, 224, 0.15);
+    color: #6b6080;
+    background: rgba(255, 255, 255, 0.48);
+}
+
+html[data-theme="light"] body:has(.profile-container) .profile-intro-description,
+html[data-theme="light"] body:has(.profile-container) .profile-identity-content p:last-child,
+html[data-theme="light"] body:has(.profile-container) .profile-side-card p:not(.eyebrow),
+html[data-theme="light"] body:has(.profile-container) .profile-security-card p:not(.eyebrow),
+html[data-theme="light"] body:has(.profile-container) .status-text {
+    color: #6b6080;
+}
+
+html[data-theme="light"] body:has(.profile-container) .profile-main-card,
+html[data-theme="light"] body:has(.profile-container) .profile-side-card,
+html[data-theme="light"] body:has(.profile-container) .profile-security-card {
+    border-color: rgba(255, 255, 255, 0.58);
+    background: rgba(255, 255, 255, 0.42);
+    box-shadow: 0 24px 60px rgba(77, 46, 123, 0.14);
+}
+
+html[data-theme="light"] body:has(.profile-container) .profile-card-label,
+html[data-theme="light"] body:has(.profile-container) .data-label,
+html[data-theme="light"] body:has(.profile-container) .profile-role-label,
+html[data-theme="light"] body:has(.profile-container) .access-line {
+    color: #6b6080;
+}
+
+html[data-theme="light"] body:has(.profile-container) .profile-data-item {
+    border-color: rgba(124, 77, 224, 0.12);
+    background: rgba(255, 255, 255, 0.42);
+}
+
+html[data-theme="light"] body:has(.profile-container) .profile-divider,
+html[data-theme="light"] body:has(.profile-container) .access-line {
+    border-color: rgba(124, 77, 224, 0.14);
+}
+
+html[data-theme="dark"] body:has(.profile-container) {
+    background:
+        radial-gradient(circle at 85% 8%, rgba(125, 70, 196, 0.26), transparent 32%),
+        radial-gradient(circle at 10% 90%, rgba(52, 83, 151, 0.18), transparent 34%),
+        linear-gradient(135deg, #10091d, #171027 48%, #0c0a18);
+}
+
+html[data-theme="dark"] body:has(.profile-container) .profile-main-card,
+html[data-theme="dark"] body:has(.profile-container) .profile-side-card,
+html[data-theme="dark"] body:has(.profile-container) .profile-security-card {
+    background: linear-gradient(135deg, rgba(62, 35, 91, 0.78), rgba(26, 16, 43, 0.84));
+}
+
+html[data-theme="dark"] body:has(.profile-container) .profile-brand,
+html[data-theme="dark"] body:has(.profile-container) .profile-intro h1,
+html[data-theme="dark"] body:has(.profile-container) .profile-identity-content h2,
+html[data-theme="dark"] body:has(.profile-container) .profile-side-card h2,
+html[data-theme="dark"] body:has(.profile-container) .profile-security-card h2,
+html[data-theme="dark"] body:has(.profile-container) .profile-data-item strong {
+    color: #f7f0ff;
+}
+
 html[data-theme="dark"] .topbar,
 html[data-theme="dark"] .profile-topbar,
 html[data-theme="dark"] .admin-topbar,

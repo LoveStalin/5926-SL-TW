@@ -66,6 +66,7 @@ button {
     background: rgba(30, 17, 48, 0.72);
     backdrop-filter: blur(22px);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    animation: profileDrop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .profile-brand {
@@ -201,6 +202,28 @@ button {
 
     backdrop-filter: blur(24px);
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+    animation: profileRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.profile-side-card {
+    animation-delay: 0.12s;
+}
+
+.profile-security-card {
+    animation-delay: 0.2s;
+}
+
+.profile-main-card,
+.profile-side-card,
+.profile-security-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.profile-main-card:hover,
+.profile-side-card:hover,
+.profile-security-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 76px rgba(77, 46, 123, 0.24);
 }
 
 .profile-main-card {
@@ -267,6 +290,7 @@ button {
 
     font-size: 48px;
     font-weight: 800;
+    animation: profileAvatarPulse 4s ease-in-out infinite;
 }
 
 .profile-role-label {
@@ -389,6 +413,7 @@ button {
     background: rgba(158, 111, 235, 0.12);
 
     font-size: 28px;
+    animation: profileIconFloat 4s ease-in-out infinite;
 }
 
 .profile-side-card .eyebrow {
@@ -489,6 +514,34 @@ button {
 
 .status-text.error {
     color: #ff8c9b;
+}
+
+@keyframes profileDrop {
+    from { opacity: 0; transform: translateY(-14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes profileRise {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes profileAvatarPulse {
+    0%, 100% { box-shadow: 0 14px 35px rgba(101, 59, 171, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+    50% { box-shadow: 0 16px 40px rgba(101, 59, 171, 0.44), 0 0 24px rgba(177, 138, 248, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+}
+
+@keyframes profileIconFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 @media (max-width: 850px) {
