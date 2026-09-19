@@ -18,14 +18,14 @@ messaging.onBackgroundMessage((payload) => {
     const options = {
         body: payload.notification?.body || "Mở website để xem chi tiết.",
         icon: "/favicon.ico",
-        data: { url: payload.data?.url || "/notifications.html" }
+        data: { url: payload.data?.url || "/features/notifications/notifications.html" }
     };
     self.registration.showNotification(title, options);
 });
 
 self.addEventListener("notificationclick", (event) => {
     event.notification.close();
-    const targetUrl = new URL(event.notification.data?.url || "/notifications.html", self.location.origin).href;
+    const targetUrl = new URL(event.notification.data?.url || "/features/notifications/notifications.html", self.location.origin).href;
     event.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
         for (const client of clientList) {
             if (client.url.startsWith(self.location.origin) && "focus" in client) {

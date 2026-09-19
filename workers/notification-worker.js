@@ -189,11 +189,11 @@ async function sendFcmMessage(projectId, token, title, message, accessToken) {
           token,
           notification: { title, body: message },
           data: {
-            url: "https://a5-k68-website.pages.dev/notifications.html"
+            url: "https://a5-k68-website.pages.dev/features/notifications/notifications.html"
           },
           webpush: {
             fcmOptions: {
-              link: "https://a5-k68-website.pages.dev/notifications.html"
+              link: "https://a5-k68-website.pages.dev/features/notifications/notifications.html"
             }
           }
         }

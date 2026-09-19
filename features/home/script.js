@@ -1,21 +1,21 @@
 const classData = {
     "10A5": {
-        memoryImage: "image/5-9.jpg",
+        memoryImage: "/assets/images/5-9.jpg",
         memoryAlt: "Khai giảng 10A5",
         year: "Trần Phú • 2025",
         moments: [
-            { image: "image/2-9.jpg", title: "Đi xem Mưa Đỏ", details: ["📅 2/9/2025", "📍CGV Vincom Móng Cái", "🎯Đi xem phim tập thể"], link: "https://www.facebook.com/share/p/1T6QBshDWL/" },
-            { image: "image/5-9.jpg", title: "Khai Giảng", details: ["📅 5/9/2025", "📍Sân Trường THPT Trần Phú", "🎯Ngày đầu tiên bước chân vào cấp 3 của bọn mình"], link: "https://www.facebook.com/share/p/18B8eFrHcF/" },
-            { image: "image/Mid-autumn.jpg", title: "Trung Thu", details: ["📅 6/10/2025", "📍Nhà cô Miêu", "🎯Ăn Trung Thu"], link: "https://www.facebook.com/share/p/176uMHcpKa/" },
-            { image: "image/20-10-girl.jpg", title: "20/10 của các bạn nữ 10A5", details: ["📅 20/10/2025", "📍Lớp 10A5", "🎯Tổ chức cho cô và các bạn nữ ngày phụ nữ Việt Nam"], link: "https://www.facebook.com/share/p/1Bp7wY4itt/" },
-            { image: "image/20-10-boy.jpg", title: "Các bạn nam cầm hoa tặng các bạn nữ 20/10", details: ["📅 20/10/2025", "📍Lớp 10A5", "🎯Tặng hoa cho các bạn nữ"], link: "https://www.facebook.com/share/p/1Bp7wY4itt/" },
-            { image: "image/Chinese-new-year.jpg", title: "Tết Bính Ngọ 2026", details: ["📅 13/02/2025", "📍Sân Trường THPT Trần Phú", "🎯Chụp ảnh Tết 2026-tiễn bạn sì nếch🐍"], link: "https://www.facebook.com/share/p/18JxVehBTx/" },
-            { image: "image/8-3.jpg", title: "Ngày Quốc Tế Phụ Nữ", details: ["📅 08/03/2026", "📍Lớp 10A5", "🎯Chúc các bạn nữ lớp 10A5 nhân ngày 8/3"], link: "https://www.facebook.com/share/p/18CstkvDCy/" },
-            { image: "image/hoi-thanh-nien-khoe-2026.jpg", title: "Hội Thanh Niên Khỏe 2026", details: ["📅 14/03/2026", "📍Sân Trường THPT Trần Phú", "🎯Tham gia Hội Thanh Niên Khỏe 2026"], link: "https://www.facebook.com/share/p/14w7LASZb8M/" },
+            { image: "/assets/images/2-9.jpg", title: "Đi xem Mưa Đỏ", details: ["📅 2/9/2025", "📍CGV Vincom Móng Cái", "🎯Đi xem phim tập thể"], link: "https://www.facebook.com/share/p/1T6QBshDWL/" },
+            { image: "/assets/images/5-9.jpg", title: "Khai Giảng", details: ["📅 5/9/2025", "📍Sân Trường THPT Trần Phú", "🎯Ngày đầu tiên bước chân vào cấp 3 của bọn mình"], link: "https://www.facebook.com/share/p/18B8eFrHcF/" },
+            { image: "/assets/images/Mid-autumn.jpg", title: "Trung Thu", details: ["📅 6/10/2025", "📍Nhà cô Miêu", "🎯Ăn Trung Thu"], link: "https://www.facebook.com/share/p/176uMHcpKa/" },
+            { image: "/assets/images/20-10-girl.jpg", title: "20/10 của các bạn nữ 10A5", details: ["📅 20/10/2025", "📍Lớp 10A5", "🎯Tổ chức cho cô và các bạn nữ ngày phụ nữ Việt Nam"], link: "https://www.facebook.com/share/p/1Bp7wY4itt/" },
+            { image: "/assets/images/20-10-boy.jpg", title: "Các bạn nam cầm hoa tặng các bạn nữ 20/10", details: ["📅 20/10/2025", "📍Lớp 10A5", "🎯Tặng hoa cho các bạn nữ"], link: "https://www.facebook.com/share/p/1Bp7wY4itt/" },
+            { image: "/assets/images/Chinese-new-year.jpg", title: "Tết Bính Ngọ 2026", details: ["📅 13/02/2025", "📍Sân Trường THPT Trần Phú", "🎯Chụp ảnh Tết 2026-tiễn bạn sì nếch🐍"], link: "https://www.facebook.com/share/p/18JxVehBTx/" },
+            { image: "/assets/images/8-3.jpg", title: "Ngày Quốc Tế Phụ Nữ", details: ["📅 08/03/2026", "📍Lớp 10A5", "🎯Chúc các bạn nữ lớp 10A5 nhân ngày 8/3"], link: "https://www.facebook.com/share/p/18CstkvDCy/" },
+            { image: "/assets/images/hoi-thanh-nien-khoe-2026.jpg", title: "Hội Thanh Niên Khỏe 2026", details: ["📅 14/03/2026", "📍Sân Trường THPT Trần Phú", "🎯Tham gia Hội Thanh Niên Khỏe 2026"], link: "https://www.facebook.com/share/p/14w7LASZb8M/" },
         ]
     },
     "11A5": {
-        memoryImage: "image/11A5.jpg",
+        memoryImage: "/assets/images/11A5.jpg",
         memoryAlt: "Memory lớp 11A5",
         year: "Trần Phú • 2026",
         moments: [

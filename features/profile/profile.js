@@ -4,7 +4,7 @@ import { onAuthStateChanged, signOut } from
 import { ref, get } from
     "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-import { classAuth, classDb } from "./class-firebase.js";
+import { classAuth, classDb } from "../../shared/scripts/class-firebase.js";
 
 const profileAvatar = document.getElementById("profileAvatar");
 const profileName = document.getElementById("profileName");
@@ -95,7 +95,7 @@ function renderProfile(user, profile) {
 
 onAuthStateChanged(classAuth, async (user) => {
     if (!user) {
-        window.location.href = "./class-login.html";
+        window.location.href = "../auth/class-login.html";
         return;
     }
 
@@ -142,7 +142,7 @@ logoutButton.addEventListener("click", async () => {
 
     try {
         await signOut(classAuth);
-        window.location.href = "./class-login.html";
+        window.location.href = "../auth/class-login.html";
     } catch (error) {
         console.error("Logout error:", error);
 

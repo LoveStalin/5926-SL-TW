@@ -1,4 +1,4 @@
-import { classAuth, classDb } from "./class-firebase.js";
+import { classAuth, classDb } from "../../shared/scripts/class-firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { ref, get, set, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
@@ -33,7 +33,12 @@ function showStatus(message, type = "") {
 
 function renderNotifications(data) {
     list.innerHTML = "";
-    const items = Object.entries(data || {}).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+    const items = Object.entries(data || {}).sort((a, b) => {
+        const pinnedOrder = Number(b[1].pinned === true)
+            - Number(a[1].pinned === true);
+
+        return pinnedOrder || (b[1].createdAt || 0) - (a[1].createdAt || 0);
+    });
 
     notificationCount.textContent = items.length
         ? `${items.length} thông báo`
@@ -171,41 +176,90 @@ async function manageNotification(notificationId, action, pinned) {
     }
 }
 
-async function enablePush(user) {
+async function enablePush(user, askPermission = false) {
     if (!("Notification" in window) || !("serviceWorker" in navigator)) {
         permissionText.textContent = "Trình duyệt này không hỗ trợ thông báo web.";
-        return;
+        return false;
     }
+
     const supported = await isSupported();
+
     if (!supported) {
-        permissionText.textContent = "Firebase Messaging chưa được hỗ trợ trên trình duyệt này.";
-        return;
+        permissionText.textContent =
+            "Firebase Messaging chưa được hỗ trợ trên trình duyệt này.";
+        return false;
     }
-    const permission = await Notification.requestPermission();
+
+    let permission = Notification.permission;
+
+    // Chỉ xin quyền khi người dùng thực sự bấm nút
+    if (permission === "default" && askPermission) {
+        permission = await Notification.requestPermission();
+    }
+
     if (permission !== "granted") {
-        permissionText.textContent = "Quyền thông báo chưa được cấp.";
-        return;
+        if (permission === "denied") {
+            permissionText.textContent =
+                "Thông báo đang bị chặn trong cài đặt trình duyệt.";
+        } else {
+            permissionText.textContent =
+                "Bấm 'Bật thông báo' để nhận thông báo từ A5-K68.";
+        }
+
+        return false;
     }
-    const registration = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
+
+    // Permission đã được cấp → không hỏi lại
+    const registration = await navigator.serviceWorker.register(
+        "/firebase-messaging-sw.js"
+    );
+
     const messaging = getMessaging(app);
-    const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
-    if (token) {
-        await set(ref(classDb, `users/${user.uid}/fcmTokens/${encodeURIComponent(token)}`), { token, createdAt: Date.now(), userAgent: navigator.userAgent });
-        permissionText.textContent = "Đã bật thông báo trên máy này ✅";
-        enableButton.textContent = "Đã bật";
-        enableButton.disabled = true;
+
+    const token = await getToken(messaging, {
+        vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: registration
+    });
+
+    if (!token) {
+        throw new Error("Firebase không cấp được FCM token.");
     }
+
+    await set(
+        ref(
+            classDb,
+            `users/${user.uid}/fcmTokens/${encodeURIComponent(token)}`
+        ),
+        {
+            token,
+            createdAt: Date.now(),
+            userAgent: navigator.userAgent
+        }
+    );
+
+    permissionText.textContent = "Đã bật thông báo trên máy này ✅";
+    enableButton.textContent = "Đã bật";
+    enableButton.disabled = true;
+
     onMessage(messaging, (payload) => {
-        const title = payload.notification?.title || "A5-K68 có thông báo mới";
-        const body = payload.notification?.body || "Mở trang thông báo để xem chi tiết.";
+        const title =
+            payload.notification?.title ||
+            "A5-K68 có thông báo mới";
+
+        const body =
+            payload.notification?.body ||
+            "Mở trang thông báo để xem chi tiết.";
+
         showStatus(`${title}: ${body}`, "success");
         loadNotifications();
     });
+
+    return true;
 }
 
 onAuthStateChanged(classAuth, async (user) => {
     if (!user) {
-        window.location.href = "./class-login.html";
+        window.location.href = "../auth/class-login.html";
         return;
     }
     try {
@@ -218,13 +272,21 @@ onAuthStateChanged(classAuth, async (user) => {
             && ["admin", "teacher"].includes(ownProfile?.role);
 
         await loadNotifications();
-        enableButton.addEventListener("click", () => enablePush(user).catch(error => showStatus("Không thể bật thông báo: " + error.message, "error")), { once: true });
-    } catch (error) {
-        showStatus("Không thể tải thông báo: " + error.message, "error");
-    }
+
+if (Notification.permission === "granted") {
+    await enablePush(user);
+} else {
+    enableButton.addEventListener("click", () => enablePush(user).catch(error => showStatus("Không thể bật thông báo: " + error.message, "error")));
+}
+
+} catch (error) {
+
+showStatus("Không thể tải thông báo: " + error.message, "error");
+
+}
 });
 
 logoutButton.addEventListener("click", async () => {
     await signOut(classAuth);
-    window.location.href = "./class-login.html";
+    window.location.href = "../auth/class-login.html";
 });

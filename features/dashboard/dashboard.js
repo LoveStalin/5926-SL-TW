@@ -1,7 +1,7 @@
 import {
     classAuth,
     classDb
-} from "./class-firebase.js";
+} from "../../shared/scripts/class-firebase.js";
 
 import {
     onAuthStateChanged,
@@ -63,7 +63,7 @@ window.setInterval(updateDashboardClock, 1000);
 
 onAuthStateChanged(classAuth, async (user) => {
     if (!user) {
-        window.location.href = "./class-login.html";
+        window.location.href = "../auth/class-login.html";
         return;
     }
 
@@ -79,7 +79,7 @@ onAuthStateChanged(classAuth, async (user) => {
                 "Tài khoản chưa có hồ sơ trong hệ thống."
             );
 
-            window.location.href = "./class-login.html";
+            window.location.href = "../auth/class-login.html";
             return;
         }
 
@@ -92,7 +92,7 @@ onAuthStateChanged(classAuth, async (user) => {
                 "Tài khoản này đang bị khóa hoặc chưa được kích hoạt."
             );
 
-            window.location.href = "./class-login.html";
+            window.location.href = "../auth/class-login.html";
             return;
         }
 
@@ -153,7 +153,7 @@ logoutButton.addEventListener("click", async () => {
     try {
         await signOut(classAuth);
 
-        window.location.href = "./class-login.html";
+        window.location.href = "../auth/class-login.html";
 
     } catch (error) {
         console.error(

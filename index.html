@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A5-K68</title>
-    <link rel="icon" type="image/png" href="image/logo.png">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="theme.css" />
+    <link rel="stylesheet" href="features/home/style.css" />
+    <link rel="stylesheet" href="shared/styles/theme.css" />
 </head>
 
 <body>
@@ -19,7 +19,7 @@
 
     <header class="navbar">
         <div class="brand">
-            <img src="image/logo.png" class="logo" alt="A5-K68 logo">
+            <img src="assets/images/logo.png" class="logo" alt="A5-K68 logo">
             <span>A5-K68</span>
         </div>
 
@@ -32,10 +32,10 @@
             </div>
 
             <div id="sideMenu" class="side-menu">
-                <a href="seatingchart.html" class="menu-btn">Seating Chart</a>
+                <a href="features/seatmap/seatingchart.html" class="menu-btn">Seating Chart</a>
                 <a href="#gallery" class="menu-btn">Moments</a>
                 <a href="#footer" class="menu-btn">Contact</a>
-                <a href="class-login.html" class="menu-btn">Class Account</a>
+                <a href="features/auth/class-login.html" class="menu-btn">Class Account</a>
             </div>
         </div>
     </header>
@@ -58,8 +58,8 @@
                 </p>
                 <div class="hero-actions">
                     <a href="#gallery" class="primary-btn">Xem khoảnh khắc</a>
-                    <a href="seatingchart.html" class="secondary-btn">Sơ đồ lớp</a>
-                    <a href="./class-login.html" class="tertiary-btn">Class Account</a>
+                    <a href="features/seatmap/seatingchart.html" class="secondary-btn">Sơ đồ lớp</a>
+                    <a href="features/auth/class-login.html" class="tertiary-btn">Class Account</a>
                 </div>
 
                 <div class="stats">
@@ -80,7 +80,7 @@
 
             <div class="hero-visual">
                 <div class="floating-card card-main">
-                    <img id="mainMemoryImage" src="image/5-9.jpg" alt="Khai giảng 10A5">
+                    <img id="mainMemoryImage" src="assets/images/5-9.jpg" alt="Khai giảng 10A5">
                     <div class="class-switcher" role="group" aria-label="Chọn lớp">
                         <span class="switcher-label">Memory của lớp</span>
                         <button class="class-option is-active" type="button" data-class="10A5">10A5</button>
@@ -132,8 +132,8 @@
             <p>Copyright © All rights reserved | Project 5926 by ITers A5-K68.</p>
         </div>
     </footer>
-    <script src="theme.js"></script>
-    <script src="script.js"></script>
+    <script src="shared/scripts/theme.js"></script>
+    <script src="features/home/script.js"></script>
 </body>
 
 
