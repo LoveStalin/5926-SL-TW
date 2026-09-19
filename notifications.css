@@ -103,6 +103,10 @@ body:has(.notifications-container) {
 .notification-item time { color: var(--notification-faint); }
 .notification-item h2 { margin: 0 0 6px; color: var(--notification-text); font-size: 16px; letter-spacing: -.25px; line-height: 1.45; }
 .notification-item p { margin: 0; color: var(--notification-muted); font-size: 12px; line-height: 1.7; white-space: pre-wrap; }
+.notification-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+.notification-action-button { padding: 6px 9px; border: 1px solid var(--notification-border); border-radius: 8px; color: var(--notification-muted); background: var(--notification-surface-soft); cursor: pointer; font: inherit; font-size: 10px; font-weight: 700; transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease; }
+.notification-action-button:hover { border-color: rgba(189, 148, 246, .45); color: var(--notification-text); background: var(--notification-input); transform: translateY(-1px); }
+.notification-action-button--danger:hover { border-color: rgba(255, 132, 150, .42); color: #ff9cab; background: rgba(224, 83, 109, .1); }
 .empty-state { padding: 38px 20px; border: 1px dashed var(--notification-border); border-radius: 18px; color: var(--notification-muted); background: var(--notification-surface-soft); text-align: center; font-size: 13px; }
 .notifications-container > .status-text { margin: 17px 2px 0; color: var(--notification-muted); font-size: 12px; }
 .notifications-container > .status-text.error { color: #ff91a1; }

@@ -259,15 +259,57 @@ export default {
       const users = await firebaseRequest(databaseUrl, "users", accessToken);
       const ownProfile = users?.[firebaseUser.localId];
 
-      if (ownProfile?.active !== true || ownProfile?.role !== "admin") {
-        return json({ success: false, error: "Tài khoản không có quyền gửi thông báo." }, 403, origin);
-      }
-
       let body;
       try {
         body = await request.json();
       } catch {
         return json({ success: false, error: "Body request không phải JSON hợp lệ." }, 400, origin);
+      }
+
+      const action = String(body.action || "send");
+      const canManageNotifications = ownProfile?.active === true
+        && ["admin", "teacher"].includes(ownProfile?.role);
+
+      if (action === "set-pinned" || action === "delete-notification") {
+        if (!canManageNotifications) {
+          return json({ success: false, error: "Tài khoản không có quyền quản lý thông báo." }, 403, origin);
+        }
+
+        const notificationId = String(body.notificationId || "").trim();
+
+        if (!/^[A-Za-z0-9-]+$/.test(notificationId)) {
+          return json({ success: false, error: "Mã thông báo không hợp lệ." }, 400, origin);
+        }
+
+        const notificationPath = `notifications/${notificationId}`;
+
+        if (action === "delete-notification") {
+          await firebaseRequest(databaseUrl, notificationPath, accessToken, {
+            method: "DELETE"
+          });
+
+          return json({ success: true, action, notificationId }, 200, origin);
+        }
+
+        await firebaseRequest(databaseUrl, notificationPath, accessToken, {
+          method: "PATCH",
+          body: JSON.stringify({ pinned: body.pinned === true })
+        });
+
+        return json({
+          success: true,
+          action,
+          notificationId,
+          pinned: body.pinned === true
+        }, 200, origin);
+      }
+
+      if (action !== "send") {
+        return json({ success: false, error: "Thao tác không được hỗ trợ." }, 400, origin);
+      }
+
+      if (!canManageNotifications) {
+        return json({ success: false, error: "Tài khoản không có quyền gửi thông báo." }, 403, origin);
       }
 
       const title = String(body.title || "").trim();
