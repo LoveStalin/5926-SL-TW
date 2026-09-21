@@ -276,7 +276,7 @@ onAuthStateChanged(classAuth, async (user) => {
 if (Notification.permission === "granted") {
     await enablePush(user);
 } else {
-    enableButton.addEventListener("click", () => enablePush(user).catch(error => showStatus("Không thể bật thông báo: " + error.message, "error")));
+    enableButton.addEventListener("click", () => enablePush(user, true).catch(error => showStatus("Không thể bật thông báo: " + error.message, "error")));
 }
 
 } catch (error) {
