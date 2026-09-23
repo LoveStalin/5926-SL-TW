@@ -2,6 +2,7 @@ import {
     classAuth,
     classDb
 } from "../../shared/scripts/class-firebase.js";
+import { startPresence } from "../../shared/scripts/presence.js";
 
 import {
     onAuthStateChanged,
@@ -29,6 +30,15 @@ const logoutButton = document.getElementById("logoutButton");
 const greetingLabel = document.getElementById("greetingLabel");
 const currentTime = document.getElementById("currentTime");
 const currentDate = document.getElementById("currentDate");
+const academicPeriod = document.getElementById("academicPeriod");
+
+startPresence(classAuth, classDb);
+
+function getAcademicPeriod(month) {
+    if (month >= 9 && month <= 12) return "Học kỳ I";
+    if (month >= 1 && month <= 6) return "Học kỳ II";
+    return "Nghỉ hè";
+}
 
 function getTimeGreeting(hour) {
     if (hour >= 5 && hour < 12) return "Chào buổi sáng";
@@ -55,6 +65,7 @@ function updateDashboardClock() {
     currentTime.textContent = timeFormatter.format(now);
     currentDate.textContent = dateFormatter.format(now);
     greetingLabel.textContent = getTimeGreeting(now.getHours());
+    academicPeriod.textContent = getAcademicPeriod(now.getMonth() + 1);
 }
 
 updateDashboardClock();
