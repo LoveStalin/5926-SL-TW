@@ -42,15 +42,22 @@ export function startPresence(auth, database) {
 
             const currentStatusRef = statusRef;
 
-            await onDisconnect(currentStatusRef).set({
-                connected: false,
-                lastSeen: serverTimestamp()
-            });
+            try {
+                await onDisconnect(currentStatusRef).set({
+                    connected: false,
+                    lastSeen: serverTimestamp()
+                });
 
-            await set(currentStatusRef, {
-                connected: true,
-                lastSeen: serverTimestamp()
-            });
+                await set(currentStatusRef, {
+                    connected: true,
+                    lastSeen: serverTimestamp()
+                });
+            } catch (error) {
+                console.error(
+                    "Không thể cập nhật presence. Hãy kiểm tra Firebase Realtime Database Rules.",
+                    error
+                );
+            }
         });
     });
 }
