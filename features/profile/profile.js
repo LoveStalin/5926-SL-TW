@@ -5,6 +5,7 @@ import { ref, get } from
     "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 import { classAuth, classDb } from "../../shared/scripts/class-firebase.js";
+import { startPresence } from "../../shared/scripts/presence.js";
 
 const profileAvatar = document.getElementById("profileAvatar");
 const profileName = document.getElementById("profileName");
@@ -19,6 +20,8 @@ const accessDescription = document.getElementById("accessDescription");
 
 const logoutButton = document.getElementById("logoutButton");
 const statusText = document.getElementById("status");
+
+startPresence(classAuth, classDb);
 
 function setStatus(message, isError = false) {
     statusText.textContent = message;
