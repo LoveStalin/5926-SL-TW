@@ -1,4 +1,5 @@
 import { classAuth, classDb } from "../../shared/scripts/class-firebase.js";
+import { startPresence } from "../../shared/scripts/presence.js";
 
 import {
     onAuthStateChanged,
@@ -6,8 +7,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
-    ref,
-    get
+    get,
+    onValue,
+    ref
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const WORKER_URL =
@@ -39,6 +41,9 @@ const notificationPreviewPin = document.getElementById("notificationPreviewPin")
 
 let users = [];
 let currentAdmin = null;
+let presence = {};
+
+startPresence(classAuth, classDb);
 
 function setStatus(message, isError = false) {
     statusText.textContent = message;
@@ -77,6 +82,11 @@ function roleLabel(role) {
     };
 
     return roles[role] || role || "Chưa cập nhật";
+}
+
+function isUserOnline(user) {
+    return Object.values(presence[user.uid] || {})
+        .some(connection => connection.connected === true);
 }
 
 function renderStats() {
@@ -137,7 +147,7 @@ function renderUsers(keyword = "") {
             const name = user.displayName || "Class User";
             const email = user.email || "Không có email";
             const role = user.role || "unknown";
-            const isActive = user.active === true;
+            const isOnline = isUserOnline(user);
 
             row.innerHTML = `
                 <div class="user-main">
@@ -150,8 +160,8 @@ function renderUsers(keyword = "") {
 
                 <span class="user-role"></span>
 
-                <span class="user-status ${isActive ? "" : "disabled"}">
-                    ${isActive ? "Đang hoạt động" : "Tạm ẩn"}
+                <span class="user-status ${isOnline ? "" : "offline"}">
+                    ${isOnline ? "Đang online" : "Đang offline"}
                 </span>
             `;
 
@@ -162,6 +172,11 @@ function renderUsers(keyword = "") {
             usersList.appendChild(row);
         });
 }
+
+onValue(ref(classDb, "presence"), snapshot => {
+    presence = snapshot.val() || {};
+    renderUsers(searchInput ? searchInput.value : "");
+});
 
 async function loadUsers() {
     const snapshot = await get(ref(classDb, "users"));

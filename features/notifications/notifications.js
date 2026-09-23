@@ -1,4 +1,5 @@
 import { classAuth, classDb } from "../../shared/scripts/class-firebase.js";
+import { startPresence } from "../../shared/scripts/presence.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { ref, get, set, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
@@ -15,6 +16,8 @@ const notificationCount = document.getElementById("notificationCount");
 
 let currentUser = null;
 let canManageNotifications = false;
+
+startPresence(classAuth, classDb);
 
 const app = initializeApp({
     apiKey: "AIzaSyASwLRIHvF9qZQx8GRsC63kadfZIskKfOc",

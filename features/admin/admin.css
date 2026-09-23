@@ -135,7 +135,7 @@ button, input { font: inherit; }
 .user-role, .user-status { padding: 6px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; }
 .user-role { color: #d8c0ff; background: rgba(155,107,234,.16); }
 .user-status { color: #70e4b8; background: rgba(112,228,184,.09); }
-.user-status.disabled { color: #ff9eaa; background: rgba(255,100,120,.09); }
+.user-status.offline { color: #b7a9c5; background: rgba(183,169,197,.1); }
 .loading-state, .empty-state { padding: 30px; text-align: center; color: #9888a7; font-size: 13px; }
 .status-text { margin-top: 20px; color: #93849f; font-size: 12px; }
 .status-text.error { color: #ff8c9b; }
