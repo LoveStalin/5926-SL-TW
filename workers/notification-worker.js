@@ -82,8 +82,7 @@ async function createGoogleAccessToken(serviceAccount) {
   }));
   const claim = stringToBase64Url(JSON.stringify({
     iss: serviceAccount.client_email,
-    // Realtime Database REST yêu cầu cả hai scope này khi xác thực bằng
-    // service account. Thiếu `userinfo.email` sẽ khiến access token bị 401.
+    // Realtime Database REST yêu cầu cả hai scope này khi xác thực bằng service account. Thiếu `userinfo.email` sẽ khiến access token bị 401.
     scope: [
       "https://www.googleapis.com/auth/firebase.database",
       "https://www.googleapis.com/auth/userinfo.email",
