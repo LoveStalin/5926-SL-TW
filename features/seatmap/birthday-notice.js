@@ -24,7 +24,7 @@
 
     const messages = birthdays.map(student => {
         const [day, month] = student.dob.split("/");
-        return `🎂 ${monthNames[currentMonth - 1]} là sinh nhật của ${student.displayName} (${day}/${month})`;
+        return `🎂 ${monthNames[currentMonth - 1]} là sinh nhật của ${student.displayName} (${day}-${month})`;
     });
 
     ticker.textContent = messages.length
