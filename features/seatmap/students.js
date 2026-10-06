@@ -43,4 +43,5 @@ const students = {
     "minhanh": { displayName: "Minh Anh", img: "/assets/images/minhanh.jpg", fullName: "Vũ Thị Minh Anh", dob: "23/11/2010" },
     "xuanthanh": { displayName: "Xuân Thành", img: "/assets/images/xt.jpg", fullName: "Nguyễn Xuân Thành", dob: "01/11/2010" },
     "haanh": { displayName: "Hà Anh", img: "/assets/images/haanh.jpg", fullName: "Đinh Hà Anh", dob: "14/06/2010" },
+    "maingan": { displayName: "Mai Ngân", img: "/assets/images/maingan.jpg", fullName: "Mai Bảo Ngân", dob: "**/**/2010" }
 }
