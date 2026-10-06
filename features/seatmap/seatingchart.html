@@ -33,6 +33,14 @@
     <button id="loginBtn">Login</button>
     <button id="logoutBtn">Logout</button>
     <div id="welcome-card"></div>
+
+    <aside class="birthday-notice" aria-label="Thông báo sinh nhật">
+        <div class="birthday-notice-label">🎂 SINH NHẬT THÁNG</div>
+        <div class="birthday-marquee">
+            <div id="birthdayTicker" class="birthday-ticker"></div>
+        </div>
+    </aside>
+
     <h1 class="print-title">Sơ đồ chỗ ngồi A5-K68</h1>
     <div class="seatmap" id="seatmap"></div>
     <div class="seatmap-actions">
@@ -43,6 +51,7 @@
     </div>
     <script src="../../shared/scripts/theme.js"></script>
     <script src="students.js"></script>
+    <script src="birthday-notice.js"></script>
     <script type="module" src="seatmap.js"></script>
     <script type="module" src="render.js"></script>
     <script type="module" src="firebase.js"></script>
