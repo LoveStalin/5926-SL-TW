@@ -22,12 +22,22 @@
             return dayA - dayB;
         });
 
-    const messages = birthdays.map(student => {
+    const birthdayText = birthdays.map(student => {
         const [day, month] = student.dob.split("/");
-        return `🎂 ${monthNames[currentMonth - 1]} là sinh nhật của ${student.displayName} (${day}-${month})`;
+        return `${student.displayName} (${day}/${month})`;
     });
 
-    ticker.textContent = messages.length
-        ? messages.join("   •   ")
-        : `${monthNames[currentMonth - 1]} không có sinh nhật được ghi nhận`;
+    let message = "";
+    if (birthdayText.length === 1) {
+        message = `${monthNames[currentMonth - 1]} là sinh nhật của ${birthdayText[0]}.`;
+    } else if (birthdayText.length === 2) {
+        message = `${monthNames[currentMonth - 1]} là sinh nhật của ${birthdayText[0]} và ${birthdayText[1]}.`;
+    } else if (birthdayText.length > 2) {
+        const last = birthdayText.pop();
+        message = `${monthNames[currentMonth - 1]} là sinh nhật của ${birthdayText.join(", ")} và ${last}.`;
+    } else {
+        message = `${monthNames[currentMonth - 1]} không có sinh nhật được ghi nhận.`;
+    }
+
+    ticker.textContent = message;
 })();
