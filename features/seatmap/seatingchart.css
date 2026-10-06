@@ -163,6 +163,70 @@ body::after {
     transform: translateY(1px);
 }
 
+/* Birthday notice */
+.birthday-notice {
+    position: absolute;
+    top: 106px;
+    right: 28px;
+    z-index: 900;
+    width: min(360px, calc(100% - 56px));
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 12px 28px rgba(65, 37, 116, 0.14);
+    overflow: hidden;
+}
+
+.birthday-notice-label {
+    margin-bottom: 5px;
+    color: #5a378e;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+
+.birthday-marquee {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.birthday-ticker {
+    display: inline-block;
+    padding-left: 100%;
+    color: #2e1f47;
+    font-size: 12px;
+    font-weight: 600;
+    will-change: transform;
+    animation: birthdayScroll 14s linear infinite;
+}
+
+@keyframes birthdayScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+html[data-theme="dark"] body:has(.birthday-notice) .birthday-notice {
+    background: rgba(35, 20, 58, 0.58);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+html[data-theme="dark"] body:has(.birthday-notice) .birthday-notice-label,
+html[data-theme="dark"] body:has(.birthday-notice) .birthday-ticker {
+    color: #f7f2ff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .birthday-ticker {
+        padding-left: 0;
+        animation: none;
+    }
+}
+
 /* Side menu */
 .side-menu {
     position: fixed;
