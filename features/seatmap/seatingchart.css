@@ -962,3 +962,10 @@ html[data-theme="dark"] body:has(.birthday-notice) .birthday-ticker {
         height: 104px;
     }
 }
+
+/* Keep the default appointment message visible instead of scrolling off-screen. */
+.appointment-ticker.is-empty {
+    padding-left: 0;
+    white-space: normal;
+    animation: none;
+}
