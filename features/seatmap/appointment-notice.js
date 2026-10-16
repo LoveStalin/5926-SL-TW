@@ -73,8 +73,8 @@ import { auth } from "./firebase.js";
         const decisionNumber = `${day}${month}`;
         const studentName = student.fullName;
         ticker.textContent =
-            `Theo Quyết định số ${decisionNumber} của A5-K68, học sinh ${studentName}, ` +
-            `được bổ nhiệm chức vụ ${notice.role}. Chúc ${studentName} nhiệm kỳ mới tốt đẹp!`;
+            `Theo Quyết định số ${decisionNumber}/A5-K68, đồng chí ${studentName}, ` +
+            `được bổ nhiệm chức vụ ${notice.role}. Chúc ${studentName} nhiệm kỳ mới thành công tốt đẹp!`;
 
         ticker.classList.remove("is-empty");
         ticker.style.paddingLeft = "100%";
