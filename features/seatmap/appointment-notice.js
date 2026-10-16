@@ -71,7 +71,7 @@ import { auth } from "./firebase.js";
         }
 
         const decisionNumber = `${day}${month}`;
-        const studentName = student.displayName;
+        const studentName = student.fullName;
         ticker.textContent =
             `Theo Quyết định số ${decisionNumber} của A5-K68, học sinh ${studentName}, ` +
             `được bổ nhiệm chức vụ ${notice.role}. Chúc ${studentName} nhiệm kỳ mới tốt đẹp!`;
@@ -94,9 +94,6 @@ import { auth } from "./firebase.js";
         renderEmptyState();
     });
 
-    // Listen to the existing teacher role-assignment UI without changing render.js.
-    // The click handler in render.js updates the student's role; this timeout runs
-    // after that handler so the latest role map can be saved.
     document.addEventListener("click", (event) => {
         const button = event.target instanceof Element
             ? event.target.closest("#assignRoleBtn")
