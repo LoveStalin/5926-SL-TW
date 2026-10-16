@@ -63,7 +63,8 @@ import { auth } from "./firebase.js";
             return;
         }
 
-        const [day, month] = String(notice.decisionDate || "").split("/");
+        const dateParts = String(notice.decisionDate || "").trim().split(/[/-]/);
+        const [day, month] = dateParts;
         if (!day || !month) {
             renderEmptyState();
             return;
@@ -132,10 +133,8 @@ import { auth } from "./firebase.js";
             if (previousRole === selectedRole) return;
 
             const createdAt = Date.now();
-            const decisionDate = new Intl.DateTimeFormat("vi-VN", {
-                day: "2-digit",
-                month: "2-digit"
-            }).format(new Date(createdAt));
+            const now = new Date(createdAt);
+            const decisionDate = `${String(now.getDate()).padStart(2, "0")}/${String(now.getMonth() + 1).padStart(2, "0")}`;
 
             const roleMap = {};
             Object.entries(students).forEach(([id, student]) => {
