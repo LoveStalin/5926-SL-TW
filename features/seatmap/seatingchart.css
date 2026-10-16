@@ -179,6 +179,79 @@ body::after {
     box-shadow: 0 12px 28px rgba(65, 37, 116, 0.14);
     overflow: hidden;
 }
+.appointment-notice {
+    position: absolute;
+    top: 106px;
+    right: 404px;
+    z-index: 900;
+    width: min(360px, calc(100% - 420px));
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 12px 28px rgba(65, 37, 116, 0.14);
+    overflow: hidden;
+}
+
+.appointment-notice-label {
+    margin-bottom: 5px;
+    color: #5a378e;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+
+.appointment-marquee {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.appointment-ticker {
+    display: inline-block;
+    padding-left: 100%;
+    color: #2e1f47;
+    font-size: 12px;
+    font-weight: 600;
+    will-change: transform;
+    animation: appointmentScroll 20s linear infinite;
+}
+
+@keyframes appointmentScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+html[data-theme="dark"] .appointment-notice {
+    background: rgba(35, 20, 58, 0.58);
+}
+html[data-theme="dark"] .appointment-notice-label,
+html[data-theme="dark"] .appointment-ticker {
+    color:#f7f2ff;
+}
+
+/*Responsive for Mobile*/
+@media (max-width: 900px) {
+    .appointment-notice {
+        top: 106px;
+        left: 12px;
+        right: auto;
+        width:min(360px, calc(100% - 24px));
+    }
+
+    .birthday-notice {
+        top: 190px;
+        right: 12px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .appointment-ticker {
+        padding-left: 0;
+        animation: none;
+    }
+}
 
 .birthday-notice-label {
     margin-bottom: 5px;
