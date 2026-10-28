@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
@@ -35,10 +35,10 @@
             </div>
 
             <div id="sideMenu" class="side-menu">
-                <a href="features/seatmap/seatingchart.html" class="menu-btn">Seating Chart</a>
-                <a href="#gallery" class="menu-btn">Moments</a>
-                <a href="#footer" class="menu-btn">Contact</a>
-                <a href="features/auth/class-login.html" class="menu-btn">Class Account</a>
+                <a href="features/seatmap/seatingchart.html" class="menu-btn" data-i18n="menuSeats">Sơ đồ lớp</a>
+                <a href="#gallery" class="menu-btn" data-i18n="menuMoments">Khoảnh khắc</a>
+                <a href="#footer" class="menu-btn" data-i18n="menuContact">Liên hệ</a>
+                <a href="features/auth/class-login.html" class="menu-btn" data-i18n="menuAccount">Tài khoản lớp</a>
             </div>
         </div>
     </header>
@@ -54,29 +54,29 @@
                 <span class="sparkle sparkle-six">·</span>
             </div>
             <div class="hero-copy">
-                <span class="eyebrow" id="classEyebrow">Class memory • 10A5</span>
-                <h1 class="glow">Welcome to A5-K68</h1>
-                <p class="hero-text">
+                <span class="eyebrow" id="classEyebrow">Kỷ niệm lớp • 10A5</span>
+                <h1 class="glow" data-i18n="welcome">Chào mừng đến với A5-K68</h1>
+                <p class="hero-text" data-i18n="heroText">
                     Xin chào mọi người, chúng mình là Eternal Tiger - Biệt đội Hổ báo🐯. “Eternal Tiger” là những chú hổ bất diệt với tinh thần mạnh mẽ, mãnh liệt, bất khuất, kiên cường!💪💪💪. Đây là lời chào đầu tiên của A5 tới mọi người
                 </p>
                 <div class="hero-actions">
-                    <a href="#gallery" class="primary-btn">Xem khoảnh khắc</a>
-                    <a href="features/seatmap/seatingchart.html" class="secondary-btn">Sơ đồ lớp</a>
-                    <a href="features/auth/class-login.html" class="tertiary-btn">Class Account</a>
+                    <a href="#gallery" class="primary-btn" data-i18n="viewMoments">Xem khoảnh khắc</a>
+                    <a href="features/seatmap/seatingchart.html" class="secondary-btn" data-i18n="viewSeats">Sơ đồ lớp</a>
+                    <a href="features/auth/class-login.html" class="tertiary-btn" data-i18n="classAccount">Tài khoản lớp</a>
                 </div>
 
                 <div class="stats">
                     <div class="stat-item">
                         <strong>8+</strong>
-                        <span>mốc đáng nhớ</span>
+                        <span data-i18n="milestones">mốc đáng nhớ</span>
                     </div>
                     <div class="stat-item">
                         <strong>1</strong>
-                        <span>tập thể gắn kết</span>
+                        <span data-i18n="community">tập thể gắn kết</span>
                     </div>
                     <div class="stat-item">
                         <strong>∞</strong>
-                        <span>kỷ niệm</span>
+                        <span data-i18n="memories">kỷ niệm</span>
                     </div>
                 </div>
             </div>
@@ -84,8 +84,8 @@
             <div class="hero-visual">
                 <div class="floating-card card-main">
                     <img id="mainMemoryImage" src="assets/images/5-9.jpg" alt="Khai giảng 10A5">
-                    <div class="class-switcher" role="group" aria-label="Chọn lớp">
-                        <span class="switcher-label">Memory của lớp</span>
+                    <div class="class-switcher" role="group" aria-label="Chọn lớp" data-i18n-aria="chooseClass">
+                        <span class="switcher-label" data-i18n="classMemory">Kỷ niệm lớp</span>
                         <button class="class-option is-active" type="button" data-class="10A5">10A5</button>
                         <button class="class-option" type="button" data-class="11A5">11A5</button>
                     </div>
@@ -101,7 +101,7 @@
 
     <section id="gallery" class="gallery">
         <div class="section-header">
-            <span class="eyebrow light">Our Moments</span>
+                <span class="eyebrow light" data-i18n="ourMoments">Khoảnh khắc của chúng mình</span>
             <h2 id="galleryTitle">Những khoảnh khắc đẹp của 10A5 ✨</h2>
         </div>
 
@@ -111,22 +111,22 @@
     <footer id="footer" class="footer">
         <div class="footer-container">
             <div class="footer-column">
-                <h3>THÔNG TIN</h3>
+                <h3 data-i18n="info">THÔNG TIN</h3>
                 <p id="footerClassName">Lớp 10A5</p>
-                <p>Địa chỉ: Phòng 27 - Gần Trung tâm tầng 3 - Dãy 5 tầng - Trường THPT Trần Phú</p>
+                <p data-i18n="address">Địa chỉ: Phòng 27 - Gần Trung tâm tầng 3 - Dãy 5 tầng - Trường THPT Trần Phú</p>
                 <p>Email: null</p>
             </div>
 
             <div class="footer-column">
-                <h3>QUẢN LÝ</h3>
-                <p>Hiệp hội ITers A5-K68</p>
-                <p>Các "quan chức" trong hệ thống chính trị A5-K68</p>
-                <p>Hổ báo trường Trần Phú</p>
+                <h3 data-i18n="management">QUẢN LÝ</h3>
+                <p data-i18n="itClub">Hiệp hội ITers A5-K68</p>
+                <p data-i18n="classLeaders">Các "quan chức" trong hệ thống chính trị A5-K68</p>
+                <p data-i18n="tigers">Hổ báo trường Trần Phú</p>
             </div>
 
             <div class="footer-column">
-                <h3>LIÊN HỆ QUA CÔ CHỦ NHIỆM</h3>
-                <p>Zalo: 0378003888</p>
+                <h3 data-i18n="contactTeacher">LIÊN HỆ QUA CÔ CHỦ NHIỆM</h3>
+                <p data-i18n="zalo">Zalo: 0378003888</p>
                 <p>Email: cuonghaminhsang@gmail.com</p>
             </div>
         </div>
@@ -135,6 +135,11 @@
             <p>Copyright © All rights reserved | Project 5926 by ITers A5-K68.</p>
         </div>
     </footer>
+    <div class="language-switcher-wrap">
+        <button id="languageToggle" class="language-toggle" type="button" aria-label="Switch language to English">
+            <img id="languageFlag" src="assets/images/eng-flag.jpg" alt="English">
+        </button>
+    </div>
     <script src="shared/scripts/theme.js"></script>
     <script src="features/home/script.js"></script>
 </body>
