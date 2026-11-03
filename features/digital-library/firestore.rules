@@ -1,0 +1,17 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Nội dung đã xuất bản được đọc công khai.
+    // Client query bắt buộc lọc status == "published".
+    match /libraryItems/{itemId} {
+      allow get, list: if resource.data.status == "published";
+      allow create, update, delete: if false;
+    }
+
+    // Mặc định khóa toàn bộ dữ liệu còn lại.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
