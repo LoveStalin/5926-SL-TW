@@ -31,9 +31,17 @@ service cloud.firestore {
       // A user may create only their own basic student profile.
       // Teacher/admin roles must be assigned by a trusted operator in Console.
       allow create: if owns(userId)
+        && request.resource.data.keys().hasOnly([
+          "email", "displayName", "role", "accountStatus", "createdAt"
+        ])
+        && request.resource.data.keys().hasAll([
+          "email", "role", "accountStatus"
+        ])
         && request.resource.data.role == "student"
         && request.resource.data.accountStatus == "active"
-        && request.resource.data.email == request.auth.token.email;
+        && request.resource.data.email == request.auth.token.email
+        && (!("displayName" in request.resource.data)
+          || request.resource.data.displayName is string);
 
       allow update, delete: if false;
     }
