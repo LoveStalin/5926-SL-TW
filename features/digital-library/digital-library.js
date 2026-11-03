@@ -251,6 +251,17 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         }
 
         const profile = data.user;
+        if (data.needsAudienceSelection) {
+            audienceSelection.hidden = false;
+            publishPanel.hidden = true;
+            addDiagnostic("Firestore profile", "Chưa hoàn tất lựa chọn", "warn");
+            addDiagnostic("Role authorization", "Chờ chọn Guest/Student", "warn");
+            accountRole.textContent = "CHỌN VAI TRÒ";
+            accountRole.dataset.role = "unselected";
+            diagnosticsMessage.textContent = "Tài khoản đã xác minh. Hãy chọn Guest hoặc Student để hoàn tất hồ sơ.";
+            return;
+        }
+
         if (!profile || profile.uid !== user.uid ||
             String(profile.email || "").toLowerCase() !== String(user.email || "").toLowerCase()) {
             addDiagnostic("Firestore profile", "Dữ liệu không khớp", "error");
@@ -263,17 +274,6 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         addDiagnostic("Firestore profile", "Found · UID matched", "ok");
         addDiagnostic("Firestore email", "Matched Authentication", "ok");
         addDiagnostic("Account status", profile.accountStatus || "Unknown", profile.accountStatus === "active" ? "ok" : "error");
-        if (data.needsAudienceSelection) {
-            audienceSelection.hidden = false;
-            publishPanel.hidden = true;
-            addDiagnostic("Firestore profile", "Chưa hoàn tất lựa chọn", "warn");
-            addDiagnostic("Role authorization", "Chờ chọn Guest/Student", "warn");
-            accountRole.textContent = "CHỌN VAI TRÒ";
-            accountRole.dataset.role = "unselected";
-            diagnosticsMessage.textContent = "Tài khoản đã xác minh. Hãy chọn Guest hoặc Student để hoàn tất hồ sơ.";
-            return;
-        }
-
         audienceSelection.hidden = true;
         const roleLabels = {
             admin: "ADMIN",
