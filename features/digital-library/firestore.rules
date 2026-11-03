@@ -72,8 +72,19 @@ service cloud.firestore {
       allow get, list: if resource.data.status == "published" || isStaff();
       allow create: if isStaff()
         || (isProjectMember()
+          && request.resource.data.keys().hasOnly([
+            "title", "description", "type", "categoryId", "language",
+            "submittedBy", "submittedByName", "publishedBy", "status",
+            "fileStatus", "publishedAt"
+          ])
+          && request.resource.data.keys().hasAll([
+            "title", "type", "submittedBy", "publishedBy", "status",
+            "fileStatus", "publishedAt"
+          ])
           && request.resource.data.submittedBy == request.auth.uid
+          && request.resource.data.publishedBy == request.auth.uid
           && request.resource.data.status == "published"
+          && request.resource.data.fileStatus == "awaiting_upload"
           && request.resource.data.title is string
           && request.resource.data.title.size() >= 3
           && request.resource.data.title.size() <= 160
