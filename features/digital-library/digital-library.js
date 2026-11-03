@@ -33,7 +33,7 @@ const modeButtons = [...document.querySelectorAll("[data-mode]")];
 
 // Set this to the exact workers.dev URL after deploying the Worker.
 // Example format: https://a5-digital-library-api.<your-subdomain>.workers.dev
-const WORKER_API_BASE_URL = "";
+const WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
 
 let authMode = "login";
 let diagnosticsRun = 0;
