@@ -224,13 +224,27 @@ async function runQuery(collectionName, structuredQuery, token, env) {
         }));
 }
 
+function normalizeProfile(uid, email, data) {
+    const allowedRoles = ["student", "teacher", "admin"];
+    if (!allowedRoles.includes(data.role)) {
+        throw new HttpError(403, "Tài khoản chưa được cấp role hợp lệ.");
+    }
+    if (data.accountStatus !== "active") {
+        throw new HttpError(403, "Tài khoản thư viện đang bị khóa hoặc chưa được kích hoạt.");
+    }
+    return {
+        uid,
+        email,
+        displayName: typeof data.displayName === "string" ? data.displayName : email.split("@")[0],
+        role: data.role,
+        accountStatus: data.accountStatus
+    };
+}
+
 async function getOrCreateProfile(claims, token, env) {
     try {
         const profile = await getDocument("users", claims.sub, token, env);
-        if (profile.data.accountStatus !== "active") {
-            throw new HttpError(403, "Tài khoản thư viện đang bị khóa hoặc chưa được kích hoạt.");
-        }
-        return { uid: claims.sub, email: claims.email, ...profile.data };
+        return normalizeProfile(claims.sub, claims.email, profile.data);
     } catch (error) {
         if (!(error instanceof HttpError) || error.status !== 404) throw error;
     }
@@ -244,11 +258,13 @@ async function getOrCreateProfile(claims, token, env) {
     };
     try {
         await createDocument("users", claims.sub, newProfile, token, env);
+        return normalizeProfile(claims.sub, claims.email, newProfile);
     } catch (error) {
-        // Another request may have created the profile concurrently.
+        // If another request created the profile first, always read its trusted role.
         if (!(error instanceof HttpError) || error.status !== 409) throw error;
+        const existing = await getDocument("users", claims.sub, token, env);
+        return normalizeProfile(claims.sub, claims.email, existing.data);
     }
-    return { uid: claims.sub, ...newProfile };
 }
 
 function requireStaff(profile) {
@@ -522,6 +538,10 @@ async function handle(request, env) {
     const claims = await verifyFirebaseIdToken(request, env);
     const token = request.headers.get("authorization").replace(/^Bearer\s+/i, "");
     const profile = await getOrCreateProfile(claims, token, env);
+
+    if (method === "GET" && path === "/api/v1/me") {
+        return withHeaders(json({ user: profile }), cors);
+    }
 
     if (method === "POST" && path === "/api/v1/submissions") {
         return withHeaders(await createSubmission(request, claims, profile, token, env), cors);
