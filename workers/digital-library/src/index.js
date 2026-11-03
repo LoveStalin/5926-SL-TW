@@ -179,7 +179,7 @@ async function firestoreRequest(path, token, options = {}) {
     const response = await fetch(firestoreBase(options.env) + path, {
         method: options.method || "GET",
         headers: {
-            authorization: "Bearer " + token,
+            ...(token ? { authorization: "Bearer " + token } : {}),
             ...(options.body ? { "content-type": "application/json" } : {})
         },
         body: options.body ? JSON.stringify(options.body) : undefined
@@ -555,7 +555,10 @@ async function handle(request, env) {
     const path = url.pathname.replace(/\/+$/, "") || "/";
     const method = request.method;
 
-    if (method === "OPTIONS") return new Response(null, { status: 204 });
+    if (method === "OPTIONS") {
+        const preflightHeaders = corsHeaders(request, env);
+        return new Response(null, { status: 204, headers: preflightHeaders });
+    }
     if (method === "GET" && path === "/health") {
         return json({ ok: true, service: "a5-digital-library-api", version: 1 });
     }
