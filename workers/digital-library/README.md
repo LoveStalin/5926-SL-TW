@@ -56,3 +56,16 @@ Teacher/admin:
 ## Re-enabling R2
 
 When R2 is ready, restore the bucket binding, upload implementation and file-serving handler. Existing temporary submissions are marked `fileStatus: "awaiting_upload"`.
+
+## Account diagnostics in the website
+
+After deploying the Worker, copy its exact `workers.dev` URL and set
+`WORKER_API_BASE_URL` near the top of `features/digital-library/digital-library.js`.
+The account panel then checks:
+
+- Firebase Authentication session, verified email and UID.
+- Worker `GET /health` availability.
+- Authenticated `GET /api/v1/me` response.
+- Firestore profile UID/email match, account status and trusted role.
+
+The Worker rejects a profile when its stored Firestore email does not match the verified Firebase Authentication email. The browser displays the role returned by the Worker; it does not assign or promote roles itself. The health endpoint includes the configured CORS headers for the website origin.
