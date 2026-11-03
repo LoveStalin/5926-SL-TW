@@ -78,23 +78,27 @@
                 </div>
             </section>
 
-            <section id="audienceSelection" class="account-panel audience-selection" hidden aria-labelledby="audienceHeading">
-                <p class="eyebrow">PERSONALIZE YOUR LIBRARY</p>
-                <h2 id="audienceHeading">Bạn là:</h2>
-                <p class="muted">Chọn nhóm phù hợp để hoàn tất hồ sơ Digital Library.</p>
-                <div class="audience-options">
-                    <button class="audience-option" type="button" data-audience="guest">
-                        <span class="audience-icon" aria-hidden="true">🙎‍♂️</span>
-                        <strong>Khách tham quan · Guest</strong>
-                        <span>Khám phá và đọc tài liệu đã xuất bản.</span>
-                    </button>
-                    <button class="audience-option" type="button" data-audience="student">
-                        <span class="audience-icon" aria-hidden="true">🧑‍🎓</span>
-                        <strong>Học sinh · Student</strong>
-                        <span>Sử dụng thư viện cho việc học tập.</span>
-                    </button>
+            <section id="audienceSelection" class="audience-modal" hidden aria-labelledby="audienceHeading">
+                <div class="audience-dialog" role="dialog" aria-modal="true" aria-labelledby="audienceHeading">
+                    <p class="eyebrow">CHÀO MỪNG ĐẾN VỚI A5 DIGITAL LIBRARY</p>
+                    <h2 id="audienceHeading">Bạn đang là:</h2>
+                    <p class="audience-intro">Hãy chọn một nhóm để cá nhân hóa trải nghiệm thư viện của bạn.</p>
+                    <div class="audience-options">
+                        <button class="audience-option" type="button" data-audience="student">
+                            <span class="audience-icon" aria-hidden="true">🎓</span>
+                            <strong>Học sinh</strong>
+                            <span class="audience-subtitle">Student</span>
+                            <span>Sử dụng thư viện để học tập và khám phá tri thức.</span>
+                        </button>
+                        <button class="audience-option" type="button" data-audience="guest">
+                            <span class="audience-icon" aria-hidden="true">🙋</span>
+                            <strong>Khách tham quan</strong>
+                            <span class="audience-subtitle">Guest</span>
+                            <span>Tham quan và đọc những tài liệu đã xuất bản.</span>
+                        </button>
+                    </div>
+                    <p id="audienceStatus" class="form-status" role="status"></p>
                 </div>
-                <p id="audienceStatus" class="form-status" role="status"></p>
             </section>
 
             <section id="publishPanel" class="account-panel publish-panel" hidden aria-labelledby="publishHeading">
