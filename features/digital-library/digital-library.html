@@ -77,6 +77,48 @@
                     <button id="signOutButton" class="secondary-button" type="button">Đăng xuất</button>
                 </div>
             </section>
+
+            <section id="audienceSelection" class="account-panel audience-selection" hidden aria-labelledby="audienceHeading">
+                <p class="eyebrow">PERSONALIZE YOUR LIBRARY</p>
+                <h2 id="audienceHeading">Bạn là:</h2>
+                <p class="muted">Chọn nhóm phù hợp để hoàn tất hồ sơ Digital Library.</p>
+                <div class="audience-options">
+                    <button class="audience-option" type="button" data-audience="guest">
+                        <span class="audience-icon" aria-hidden="true">🙎‍♂️</span>
+                        <strong>Khách tham quan · Guest</strong>
+                        <span>Khám phá và đọc tài liệu đã xuất bản.</span>
+                    </button>
+                    <button class="audience-option" type="button" data-audience="student">
+                        <span class="audience-icon" aria-hidden="true">🧑‍🎓</span>
+                        <strong>Học sinh · Student</strong>
+                        <span>Sử dụng thư viện cho việc học tập.</span>
+                    </button>
+                </div>
+                <p id="audienceStatus" class="form-status" role="status"></p>
+            </section>
+
+            <section id="publishPanel" class="account-panel publish-panel" hidden aria-labelledby="publishHeading">
+                <p class="eyebrow">PROJECT CONTRIBUTOR</p>
+                <h2 id="publishHeading">Xuất bản tài liệu</h2>
+                <p class="muted">Project Member có thể xuất bản metadata trực tiếp. Tệp đính kèm sẽ được hỗ trợ khi R2 được cấu hình.</p>
+                <form id="publishForm" class="auth-card publish-form">
+                    <label for="publishTitle">Tên tài liệu</label>
+                    <input id="publishTitle" name="title" type="text" minlength="3" maxlength="160" required>
+                    <label for="publishDescription">Mô tả</label>
+                    <textarea id="publishDescription" name="description" rows="3" maxlength="3000"></textarea>
+                    <label for="publishType">Loại tài liệu</label>
+                    <select id="publishType" name="type" required>
+                        <option value="pdf">PDF</option>
+                        <option value="image">Hình ảnh</option>
+                        <option value="audio">Âm thanh</option>
+                        <option value="video">Video</option>
+                    </select>
+                    <label for="publishCategory">Mã danh mục (không bắt buộc)</label>
+                    <input id="publishCategory" name="categoryId" type="text" maxlength="80">
+                    <button id="publishSubmit" class="primary-button" type="submit">Xuất bản</button>
+                    <p id="publishStatus" class="form-status" role="status"></p>
+                </form>
+            </section>
         </section>
     </main>
 
