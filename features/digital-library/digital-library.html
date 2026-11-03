@@ -38,6 +38,7 @@
                 <h2 id="authHeading">Tham gia đóng góp</h2>
                 <p class="muted">Tạo tài khoản riêng cho Digital Library. Tài khoản này không liên kết với tài khoản lớp A5-K68.</p>
             </div>
+
             <form id="authForm" class="auth-card">
                 <div class="mode-switch">
                     <button type="button" class="mode-button active" data-mode="login">Đăng nhập</button>
@@ -50,10 +51,36 @@
                 <button id="authSubmit" class="primary-button" type="submit">Đăng nhập</button>
                 <p id="authStatus" class="form-status" role="status"></p>
             </form>
+
+            <section id="accountPanel" class="account-panel" aria-labelledby="accountPanelHeading" hidden>
+                <div class="account-panel-heading">
+                    <div>
+                        <p class="eyebrow">IDENTITY & CONNECTION CHECK</p>
+                        <h2 id="accountPanelHeading">Trạng thái tài khoản</h2>
+                    </div>
+                    <button id="refreshDiagnostics" class="secondary-button" type="button">Kiểm tra lại</button>
+                </div>
+
+                <div class="account-identity">
+                    <div class="account-avatar" aria-hidden="true">A5</div>
+                    <div class="account-identity-copy">
+                        <strong id="accountDisplayName">Đang tải...</strong>
+                        <span id="accountEmail">—</span>
+                    </div>
+                    <span id="accountRole" class="role-chip">ĐANG KIỂM TRA</span>
+                </div>
+
+                <div id="diagnosticsList" class="diagnostics-list" aria-live="polite"></div>
+                <p id="diagnosticsMessage" class="diagnostics-message" role="status"></p>
+
+                <div class="account-actions">
+                    <button id="signOutButton" class="secondary-button" type="button">Đăng xuất</button>
+                </div>
+            </section>
         </section>
     </main>
 
-    <footer> A5-K68 · Digital Library </footer>
+    <footer>A5-K68 · Digital Library</footer>
     <script type="module" src="./digital-library.js"></script>
 </body>
 </html>
