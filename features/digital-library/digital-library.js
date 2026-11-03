@@ -29,6 +29,13 @@ const diagnosticsList = document.getElementById("diagnosticsList");
 const diagnosticsMessage = document.getElementById("diagnosticsMessage");
 const refreshDiagnosticsButton = document.getElementById("refreshDiagnostics");
 const signOutButton = document.getElementById("signOutButton");
+const audienceSelection = document.getElementById("audienceSelection");
+const audienceStatus = document.getElementById("audienceStatus");
+const audienceButtons = [...document.querySelectorAll("[data-audience]")];
+const publishPanel = document.getElementById("publishPanel");
+const publishForm = document.getElementById("publishForm");
+const publishSubmit = document.getElementById("publishSubmit");
+const publishStatus = document.getElementById("publishStatus");
 const modeButtons = [...document.querySelectorAll("[data-mode]")];
 
 // Set this to the exact workers.dev URL after deploying the Worker.
@@ -93,6 +100,74 @@ function apiErrorMessage(status, message) {
     if (status >= 500) return message || "Worker/Firestore đang gặp lỗi máy chủ.";
     return message || "Không thể xác minh hồ sơ qua Worker.";
 }
+
+async function chooseAudience(audienceType) {
+    if (!["guest", "student"].includes(audienceType)) return;
+    audienceButtons.forEach(button => button.disabled = true);
+    audienceStatus.textContent = "Đang lưu lựa chọn...";
+    try {
+        const user = libraryAuth.currentUser;
+        if (!user) throw new Error("Vui lòng đăng nhập lại.");
+        const idToken = await user.getIdToken();
+        const response = await fetch(WORKER_API_BASE_URL.replace(/\/$/, "") + "/api/v1/me/audience", {
+            method: "POST",
+            headers: {
+                authorization: "Bearer " + idToken,
+                "content-type": "application/json",
+                accept: "application/json"
+            },
+            body: JSON.stringify({ audienceType })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Không thể lưu lựa chọn.");
+        audienceStatus.textContent = "Đã lưu lựa chọn. Đang cập nhật hồ sơ...";
+        await refreshAccountDiagnostics(user);
+    } catch (error) {
+        audienceStatus.textContent = error.message || "Có lỗi xảy ra. Hãy thử lại.";
+    } finally {
+        audienceButtons.forEach(button => button.disabled = false);
+    }
+}
+
+audienceButtons.forEach(button => {
+    button.addEventListener("click", () => chooseAudience(button.dataset.audience));
+});
+
+publishForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    publishSubmit.disabled = true;
+    publishStatus.textContent = "Đang xuất bản metadata...";
+    try {
+        const user = libraryAuth.currentUser;
+        if (!user) throw new Error("Phiên đăng nhập đã hết hạn.");
+        const idToken = await user.getIdToken();
+        const formData = new FormData(publishForm);
+        const response = await fetch(WORKER_API_BASE_URL.replace(/\/$/, "") + "/api/v1/library", {
+            method: "POST",
+            headers: {
+                authorization: "Bearer " + idToken,
+                "content-type": "application/json",
+                accept: "application/json"
+            },
+            body: JSON.stringify({
+                title: String(formData.get("title") || "").trim(),
+                description: String(formData.get("description") || "").trim(),
+                type: String(formData.get("type") || ""),
+                categoryId: String(formData.get("categoryId") || "").trim(),
+                language: "vi"
+            })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Không thể xuất bản tài liệu.");
+        publishStatus.textContent = "Đã xuất bản thông tin tài liệu thành công. ID: " + data.id + ". Tệp đính kèm sẽ được bổ sung khi R2 sẵn sàng.";
+        publishForm.reset();
+        await loadPublishedItems();
+    } catch (error) {
+        publishStatus.textContent = error.message || "Không thể xuất bản. Hãy thử lại.";
+    } finally {
+        publishSubmit.disabled = false;
+    }
+});
 
 async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
     if (!user) return;
@@ -188,12 +263,31 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         addDiagnostic("Firestore profile", "Found · UID matched", "ok");
         addDiagnostic("Firestore email", "Matched Authentication", "ok");
         addDiagnostic("Account status", profile.accountStatus || "Unknown", profile.accountStatus === "active" ? "ok" : "error");
-        const roleLabels = { admin: "ADMIN", teacher: "TEACHER", student: "STUDENT" };
+        if (data.needsAudienceSelection) {
+            audienceSelection.hidden = false;
+            publishPanel.hidden = true;
+            addDiagnostic("Firestore profile", "Chưa hoàn tất lựa chọn", "warn");
+            addDiagnostic("Role authorization", "Chờ chọn Guest/Student", "warn");
+            accountRole.textContent = "CHỌN VAI TRÒ";
+            accountRole.dataset.role = "unselected";
+            diagnosticsMessage.textContent = "Tài khoản đã xác minh. Hãy chọn Guest hoặc Student để hoàn tất hồ sơ.";
+            return;
+        }
+
+        audienceSelection.hidden = true;
+        const roleLabels = {
+            admin: "ADMIN",
+            teacher: "TEACHER",
+            project_member: "PROJECT MEMBER",
+            viewer: profile.audienceType === "guest" ? "GUEST · VIEWER" : "STUDENT · VIEWER",
+            student: "STUDENT · VIEWER"
+        };
         const roleLabel = roleLabels[profile.role] || "UNKNOWN";
         addDiagnostic("Role authorization", roleLabel, roleLabels[profile.role] ? "ok" : "error");
         accountDisplayName.textContent = profile.displayName || user.displayName || user.email;
         accountRole.textContent = roleLabel;
         accountRole.dataset.role = profile.role || "unknown";
+        publishPanel.hidden = profile.role !== "project_member";
         diagnosticsMessage.textContent = profile.accountStatus === "active"
             ? "Đã xác minh thành công: Firebase Authentication, Firestore profile và vai trò do Worker xác nhận."
             : "Đã đọc được hồ sơ nhưng tài khoản không ở trạng thái active.";
@@ -276,6 +370,8 @@ onAuthStateChanged(libraryAuth, user => {
         diagnosticsList.replaceChildren();
         diagnosticsMessage.textContent = "";
         accountRole.textContent = "SIGNED OUT";
+        audienceSelection.hidden = true;
+        publishPanel.hidden = true;
     }
 });
 
