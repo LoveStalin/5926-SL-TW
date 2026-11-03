@@ -4,12 +4,12 @@ const FIREBASE_JWKS_URL =
 let jwksCache = null;
 let jwksExpiresAt = 0;
 
-const MAX_BODY_SIZE = 105 * 1024 * 1024;
+const MAX_BODY_SIZE = 95 * 1024 * 1024;
 const FILE_LIMITS = {
     image: 10 * 1024 * 1024,
     pdf: 30 * 1024 * 1024,
     audio: 30 * 1024 * 1024,
-    video: 100 * 1024 * 1024
+    video: 90 * 1024 * 1024
 };
 
 const MIME_TYPES = {
