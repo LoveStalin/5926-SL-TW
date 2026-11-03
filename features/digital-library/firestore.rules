@@ -2,14 +2,86 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Nội dung đã xuất bản được đọc công khai.
-    // Client query bắt buộc lọc status == "published".
-    match /libraryItems/{itemId} {
-      allow get, list: if resource.data.status == "published";
-      allow create, update, delete: if false;
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // Mặc định khóa toàn bộ dữ liệu còn lại.
+    function owns(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function userProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function activeUser() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && userProfile().accountStatus == "active";
+    }
+
+    function isStaff() {
+      return activeUser() && userProfile().role in ["teacher", "admin"];
+    }
+
+    match /users/{userId} {
+      allow get: if owns(userId);
+      allow list: if false;
+
+      // A user may create only their own basic student profile.
+      // Teacher/admin roles must be assigned by a trusted operator in Console.
+      allow create: if owns(userId)
+        && request.resource.data.role == "student"
+        && request.resource.data.accountStatus == "active"
+        && request.resource.data.email == request.auth.token.email;
+
+      allow update, delete: if false;
+    }
+
+    match /submissions/{submissionId} {
+      allow create: if activeUser()
+        && request.resource.data.submittedBy == request.auth.uid
+        && request.resource.data.status == "pending"
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 3
+        && request.resource.data.title.size() <= 160
+        && request.resource.data.type in ["image", "pdf", "audio", "video"];
+
+      allow get, list: if activeUser()
+        && (resource.data.submittedBy == request.auth.uid || isStaff());
+
+      allow update: if isStaff();
+      allow delete: if false;
+    }
+
+    match /libraryItems/{itemId} {
+      allow get, list: if resource.data.status == "published" || isStaff();
+      allow create, update, delete: if isStaff();
+    }
+
+    match /moderationLogs/{logId} {
+      allow get, list, create: if isStaff();
+      allow update, delete: if false;
+    }
+
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create, update, delete: if isStaff();
+    }
+
+    match /siteConfig/{configId} {
+      allow get: if true;
+      allow list, create, update, delete: if isStaff();
+    }
+
+    match /bookReviews/{reviewId} {
+      allow get, list: if resource.data.status == "published";
+      allow create: if activeUser()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == "pending";
+      allow update, delete: if isStaff();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
