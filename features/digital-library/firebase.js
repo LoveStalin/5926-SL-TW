@@ -5,7 +5,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-aut
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "PASTE_FIREBASE_WEB_API_KEY_HERE",
+    apiKey: "AIzaSyD7bYdHCgP1VN47lZ51rtCbmJTPGNvdKYQ",
     authDomain: "a5-digital-library.firebaseapp.com",
     projectId: "a5-digital-library",
     storageBucket: "a5-digital-library.firebasestorage.app",
