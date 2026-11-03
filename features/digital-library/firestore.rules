@@ -24,22 +24,28 @@ service cloud.firestore {
       return activeUser() && userProfile().role in ["teacher", "admin"];
     }
 
+    function isProjectMember() {
+      return activeUser() && userProfile().role == "project_member";
+    }
+
     match /users/{userId} {
       allow get: if owns(userId);
       allow list: if false;
 
-      // A user may create only their own basic student profile.
-      // Teacher/admin roles must be assigned by a trusted operator in Console.
+      // Self-registration can create only a viewer profile with a user-selected audience.
+      // Elevated roles are provisioned only by a trusted admin in Firestore Console/API.
       allow create: if owns(userId)
         && request.resource.data.keys().hasOnly([
-          "email", "displayName", "role", "accountStatus", "createdAt"
+          "email", "displayName", "audienceType", "role", "accountStatus", "createdAt"
         ])
         && request.resource.data.keys().hasAll([
-          "email", "role", "accountStatus"
+          "email", "audienceType", "role", "accountStatus", "createdAt"
         ])
-        && request.resource.data.role == "student"
+        && request.resource.data.audienceType in ["guest", "student"]
+        && request.resource.data.role == "viewer"
         && request.resource.data.accountStatus == "active"
         && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt is timestamp
         && (!("displayName" in request.resource.data)
           || request.resource.data.displayName is string);
 
@@ -64,7 +70,15 @@ service cloud.firestore {
 
     match /libraryItems/{itemId} {
       allow get, list: if resource.data.status == "published" || isStaff();
-      allow create, update, delete: if isStaff();
+      allow create: if isStaff()
+        || (isProjectMember()
+          && request.resource.data.submittedBy == request.auth.uid
+          && request.resource.data.status == "published"
+          && request.resource.data.title is string
+          && request.resource.data.title.size() >= 3
+          && request.resource.data.title.size() <= 160
+          && request.resource.data.type in ["image", "pdf", "audio", "video"]);
+      allow update, delete: if isStaff();
     }
 
     match /moderationLogs/{logId} {
