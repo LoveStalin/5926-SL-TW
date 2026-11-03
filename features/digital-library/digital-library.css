@@ -57,3 +57,103 @@ footer { padding: 26px; border-top: 1px solid #ffffff18; color: #81778f; text-al
     .section-heading { align-items: flex-start; flex-direction: column; }
     .auth-section { grid-template-columns: 1fr; gap: 22px; padding: 64px 0; }
 }
+
+
+/* Account identity and live connection diagnostics */
+[hidden] { display: none !important; }
+.account-panel {
+    width: 100%;
+    max-width: 560px;
+    padding: 24px;
+    border: 1px solid #ffffff1c;
+    border-radius: 22px;
+    background: #1b1627;
+}
+.account-panel-heading, .account-identity, .account-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+.account-panel-heading { margin-bottom: 22px; }
+.account-panel-heading h2 { font-size: 25px; }
+.account-identity {
+    justify-content: flex-start;
+    padding: 16px;
+    border: 1px solid #ffffff18;
+    border-radius: 15px;
+    background: #ffffff08;
+}
+.account-avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    background: #d9b8ff;
+    color: #211432;
+    font-weight: 800;
+}
+.account-identity-copy { display: grid; min-width: 0; gap: 4px; flex: 1; }
+.account-identity-copy strong { overflow-wrap: anywhere; font-size: 14px; }
+.account-identity-copy span { overflow-wrap: anywhere; color: #b8afc8; font-size: 12px; }
+.role-chip {
+    padding: 6px 9px;
+    border: 1px solid #ffffff24;
+    border-radius: 999px;
+    color: #e5d5fa;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    white-space: nowrap;
+}
+.diagnostics-list { display: grid; gap: 0; margin-top: 18px; }
+.diagnostic-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 2px;
+    border-bottom: 1px solid #ffffff12;
+}
+.diagnostic-label { color: #c9c1d4; font-size: 12px; }
+.diagnostic-value {
+    max-width: 240px;
+    overflow-wrap: anywhere;
+    color: #f6f2ff;
+    font-size: 12px;
+    text-align: right;
+}
+.diagnostic-state { display: inline-flex; align-items: center; gap: 6px; }
+.diagnostic-state::before {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    content: "";
+}
+.diagnostic-state.ok { color: #8fe0b2; }
+.diagnostic-state.warn { color: #f2ca82; }
+.diagnostic-state.error { color: #ff9292; }
+.diagnostic-state.pending { color: #b8afc8; }
+.diagnostics-message { min-height: 18px; margin: 14px 0 0; color: #b8afc8; font-size: 12px; line-height: 1.6; }
+.secondary-button {
+    padding: 10px 13px;
+    border: 1px solid #ffffff26;
+    border-radius: 10px;
+    background: #ffffff0a;
+    color: #f6f2ff;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+.secondary-button:hover { background: #ffffff16; }
+.secondary-button:disabled { opacity: .55; cursor: wait; }
+.account-actions { justify-content: flex-end; margin-top: 18px; }
+@media (max-width: 700px) {
+    .account-panel { max-width: none; padding: 20px; }
+    .account-panel-heading { align-items: flex-start; }
+    .diagnostic-row { grid-template-columns: 1fr; gap: 6px; }
+    .diagnostic-value { max-width: none; text-align: left; }
+}
