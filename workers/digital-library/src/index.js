@@ -225,7 +225,7 @@ async function runQuery(collectionName, structuredQuery, token, env) {
 }
 
 function normalizeProfile(uid, email, data) {
-    const allowedRoles = ["student", "teacher", "admin"];
+    const allowedRoles = ["viewer", "project_member", "teacher", "admin", "student"];
     if (!allowedRoles.includes(data.role)) {
         throw new HttpError(403, "Tài khoản chưa được cấp role hợp lệ.");
     }
@@ -235,11 +235,17 @@ function normalizeProfile(uid, email, data) {
     if (data.accountStatus !== "active") {
         throw new HttpError(403, "Tài khoản thư viện đang bị khóa hoặc chưa được kích hoạt.");
     }
+    const legacyStudent = data.role === "student";
+    const audienceType = data.audienceType || (legacyStudent ? "student" : null);
+    if (data.role === "viewer" && !["guest", "student"].includes(audienceType)) {
+        throw new HttpError(403, "Hồ sơ viewer thiếu audienceType hợp lệ.");
+    }
     return {
         uid,
         email,
         displayName: typeof data.displayName === "string" ? data.displayName : email.split("@")[0],
-        role: data.role,
+        audienceType,
+        role: legacyStudent ? "viewer" : data.role,
         accountStatus: data.accountStatus
     };
 }
@@ -249,25 +255,25 @@ async function getOrCreateProfile(claims, token, env) {
         const profile = await getDocument("users", claims.sub, token, env);
         return normalizeProfile(claims.sub, claims.email, profile.data);
     } catch (error) {
-        if (!(error instanceof HttpError) || error.status !== 404) throw error;
+        if (error instanceof HttpError && error.status === 404) return null;
+        throw error;
     }
+}
 
-    const newProfile = {
+async function createAudienceProfile(claims, token, env, audienceType) {
+    if (!["guest", "student"].includes(audienceType)) {
+        throw new HttpError(400, "Lựa chọn phải là guest hoặc student.");
+    }
+    const profile = {
         email: claims.email,
         displayName: claims.name || claims.email.split("@")[0],
-        role: "student",
+        audienceType,
+        role: "viewer",
         accountStatus: "active",
         createdAt: { __timestamp: new Date().toISOString() }
     };
-    try {
-        await createDocument("users", claims.sub, newProfile, token, env);
-        return normalizeProfile(claims.sub, claims.email, newProfile);
-    } catch (error) {
-        // If another request created the profile first, always read its trusted role.
-        if (!(error instanceof HttpError) || error.status !== 409) throw error;
-        const existing = await getDocument("users", claims.sub, token, env);
-        return normalizeProfile(claims.sub, claims.email, existing.data);
-    }
+    await createDocument("users", claims.sub, profile, token, env);
+    return normalizeProfile(claims.sub, claims.email, profile);
 }
 
 function requireStaff(profile) {
@@ -284,6 +290,43 @@ function randomId() {
 function parseLimit(value, fallback = 20) {
     const number = Number(value);
     return Number.isInteger(number) ? Math.min(50, Math.max(1, number)) : fallback;
+}
+
+async function publishLibraryItem(request, claims, profile, token, env) {
+    if (!(request.headers.get("content-type") || "").toLowerCase().includes("application/json")) {
+        throw new HttpError(415, "Tạm thời chỉ nhận metadata JSON; upload tệp sẽ được bật khi R2 sẵn sàng.");
+    }
+    const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
+    const title = String(body.title || "").trim();
+    const description = String(body.description || "").trim();
+    const type = String(body.type || "").trim();
+    const categoryId = String(body.categoryId || "").trim();
+    const language = String(body.language || "vi").trim();
+    if (title.length < 3 || title.length > 160) throw new HttpError(400, "Tiêu đề phải dài từ 3 đến 160 ký tự.");
+    if (description.length > 3000) throw new HttpError(400, "Mô tả quá dài.");
+    if (!["image", "pdf", "audio", "video"].includes(type)) throw new HttpError(400, "Loại tài liệu không hợp lệ.");
+    if (categoryId.length > 80) throw new HttpError(400, "Mã danh mục quá dài.");
+    if (!/^[a-zA-Z]{2,10}(-[a-zA-Z0-9]{2,8})*$/.test(language)) throw new HttpError(400, "Mã ngôn ngữ không hợp lệ.");
+    const id = randomId();
+    await createDocument("libraryItems", id, {
+        title,
+        description,
+        type,
+        categoryId,
+        language,
+        submittedBy: claims.sub,
+        submittedByName: profile.displayName || claims.email,
+        publishedBy: claims.sub,
+        status: "published",
+        fileStatus: "awaiting_upload",
+        publishedAt: { __timestamp: new Date().toISOString() }
+    }, token, env);
+    return json({
+        id,
+        status: "published",
+        fileStatus: "awaiting_upload",
+        message: "Đã xuất bản metadata. Tệp sẽ được bổ sung khi R2 được cấu hình."
+    }, 201);
 }
 
 async function createSubmission(request, claims, profile, token, env) {
@@ -546,7 +589,25 @@ async function handle(request, env) {
     const profile = await getOrCreateProfile(claims, token, env);
 
     if (method === "GET" && path === "/api/v1/me") {
-        return withHeaders(json({ user: profile }), cors);
+        return withHeaders(json(profile
+            ? { user: profile }
+            : { user: null, needsAudienceSelection: true }), cors);
+    }
+
+    if (method === "POST" && path === "/api/v1/me/audience") {
+        if (profile) throw new HttpError(409, "Hồ sơ đã được thiết lập; không thể tự đổi nhóm người dùng.");
+        const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
+        const created = await createAudienceProfile(claims, token, env, body.audienceType);
+        return withHeaders(json({ user: created }, 201), cors);
+    }
+
+    if (!profile) throw new HttpError(409, "Hãy chọn Guest hoặc Student để hoàn tất hồ sơ.");
+
+    if (method === "POST" && path === "/api/v1/library") {
+        if (profile.role !== "project_member") {
+            throw new HttpError(403, "Chỉ Project Member mới được tự xuất bản tài liệu.");
+        }
+        return withHeaders(await publishLibraryItem(request, claims, profile, token, env), cors);
     }
 
     if (method === "POST" && path === "/api/v1/submissions") {
