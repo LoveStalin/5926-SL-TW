@@ -9,7 +9,6 @@ import {
     collection,
     getDocs,
     limit,
-    orderBy,
     query,
     where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -85,7 +84,6 @@ async function loadPublishedItems() {
         const publishedQuery = query(
             collection(libraryDb, "libraryItems"),
             where("status", "==", "published"),
-            orderBy("publishedAt", "desc"),
             limit(24)
         );
         const snapshot = await getDocs(publishedQuery);
@@ -96,7 +94,13 @@ async function loadPublishedItems() {
             return;
         }
 
-        snapshot.forEach(documentSnapshot => {
+        const documents = [...snapshot.docs].sort((a, b) => {
+            const aTime = a.data().publishedAt?.toMillis?.() || 0;
+            const bTime = b.data().publishedAt?.toMillis?.() || 0;
+            return bTime - aTime;
+        });
+
+        documents.forEach(documentSnapshot => {
             const item = documentSnapshot.data();
             const card = document.createElement("article");
             card.className = "book-card";
