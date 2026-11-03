@@ -5,7 +5,3 @@ compatibility_date = "2026-10-01"
 [vars]
 FIREBASE_PROJECT_ID = "a5-digital-library"
 ALLOWED_ORIGINS = "https://a5-k68-website.pages.dev"
-
-[[r2_buckets]]
-binding = "LIBRARY_BUCKET"
-bucket_name = "a5-digital-library"
