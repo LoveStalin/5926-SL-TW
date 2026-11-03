@@ -568,6 +568,13 @@ async function handle(request, env) {
         return listPublished(url, null, env).then(response => withHeaders(response, cors));
     }
 
+    const publicItemMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)$/);
+    if (method === "GET" && publicItemMatch) {
+        const item = await getPublishedItem(publicItemMatch[1], null, env);
+        const { assetKey, ...publicData } = item.data;
+        return withHeaders(json({ id: item.id, item: publicData }), cors);
+    }
+
     const publicFileMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/file$/);
     if (method === "GET" && publicFileMatch) {
         return withHeaders(await servePublishedFile(publicFileMatch[1], null, env), cors);
