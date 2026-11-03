@@ -4,20 +4,6 @@ const FIREBASE_JWKS_URL =
 let jwksCache = null;
 let jwksExpiresAt = 0;
 
-const MAX_BODY_SIZE = 95 * 1024 * 1024;
-const FILE_LIMITS = {
-    image: 10 * 1024 * 1024,
-    pdf: 30 * 1024 * 1024,
-    audio: 30 * 1024 * 1024,
-    video: 90 * 1024 * 1024
-};
-
-const MIME_TYPES = {
-    image: new Set(["image/jpeg", "image/png", "image/webp"]),
-    pdf: new Set(["application/pdf"]),
-    audio: new Set(["audio/mpeg", "audio/mp4", "audio/wav", "audio/ogg"]),
-    video: new Set(["video/mp4", "video/webm"])
-};
 
 class HttpError extends Error {
     constructor(status, message) {
@@ -275,71 +261,37 @@ function randomId() {
     return crypto.randomUUID().replace(/-/g, "");
 }
 
-function safeFileName(name) {
-    const cleaned = String(name || "upload")
-        .normalize("NFKD")
-        .replace(/[^\w.-]+/g, "_")
-        .replace(/_+/g, "_")
-        .slice(0, 100);
-    return cleaned || "upload";
-}
 
 function parseLimit(value, fallback = 20) {
     const number = Number(value);
     return Number.isInteger(number) ? Math.min(50, Math.max(1, number)) : fallback;
 }
 
-async function uploadSubmission(request, env, claims, profile, token) {
-    const contentLength = Number(request.headers.get("content-length") || 0);
-    if (contentLength > MAX_BODY_SIZE) throw new HttpError(413, "Yêu cầu tải lên vượt giới hạn.");
-
-    const form = await request.formData();
-    const title = String(form.get("title") || "").trim();
-    const description = String(form.get("description") || "").trim();
-    const type = String(form.get("type") || "").trim();
-    const categoryId = String(form.get("categoryId") || "").trim();
-    const language = String(form.get("language") || "vi").trim();
-    const file = form.get("file");
-
+async function createSubmission(request, claims, profile, token, env) {
+    if (!(request.headers.get("content-type") || "").toLowerCase().includes("application/json")) {
+        throw new HttpError(415, "Tạm thời chỉ nhận metadata JSON; upload tệp sẽ được bật lại khi cấu hình R2.");
+    }
+    const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
+    const title = String(body.title || "").trim();
+    const description = String(body.description || "").trim();
+    const type = String(body.type || "").trim();
+    const categoryId = String(body.categoryId || "").trim();
+    const language = String(body.language || "vi").trim();
     if (title.length < 3 || title.length > 160) throw new HttpError(400, "Tiêu đề phải dài từ 3 đến 160 ký tự.");
     if (description.length > 3000) throw new HttpError(400, "Mô tả quá dài.");
     if (!["image", "pdf", "audio", "video"].includes(type)) throw new HttpError(400, "Loại tài liệu không hợp lệ.");
-    if (!(file instanceof File) || file.size < 1) throw new HttpError(400, "Thiếu tệp cần tải lên.");
-    if (file.size > FILE_LIMITS[type]) throw new HttpError(413, "Tệp vượt giới hạn dung lượng cho loại " + type + ".");
-    if (!MIME_TYPES[type].has(file.type)) throw new HttpError(415, "Định dạng tệp không được hỗ trợ.");
-    if (!env.LIBRARY_BUCKET) throw new HttpError(503, "R2 bucket chưa được cấu hình.");
-
+    if (categoryId.length > 80) throw new HttpError(400, "Mã danh mục quá dài.");
+    if (!/^[a-zA-Z]{2,10}(-[a-zA-Z0-9]{2,8})*$/.test(language)) throw new HttpError(400, "Mã ngôn ngữ không hợp lệ.");
     const id = randomId();
-    const key = "submissions/" + claims.sub + "/" + id + "/" + safeFileName(file.name);
-    await env.LIBRARY_BUCKET.put(key, file.stream(), {
-        httpMetadata: { contentType: file.type },
-        customMetadata: { uploadedBy: claims.sub, submissionId: id }
-    });
-
-    const record = {
-        title,
-        description,
-        type,
-        categoryId,
-        language,
+    await createDocument("submissions", id, {
+        title, description, type, categoryId, language,
         submittedBy: claims.sub,
         submittedByName: profile.displayName || claims.email,
         status: "pending",
-        assetKey: key,
-        originalName: safeFileName(file.name),
-        mimeType: file.type,
-        size: file.size,
+        fileStatus: "awaiting_upload",
         submittedAt: { __timestamp: new Date().toISOString() }
-    };
-
-    try {
-        await createDocument("submissions", id, record, token, env);
-    } catch (error) {
-        await env.LIBRARY_BUCKET.delete(key);
-        throw error;
-    }
-
-    return json({ id, status: "pending", message: "Đã nhận bài gửi. Nội dung chờ giáo viên duyệt." }, 201);
+    }, token, env);
+    return json({ id, status: "pending", fileStatus: "awaiting_upload", message: "Đã nhận metadata. Tệp sẽ được bổ sung khi R2 được cấu hình." }, 201);
 }
 
 async function listPublished(url, token, env) {
@@ -388,16 +340,6 @@ async function getPublishedItem(id, token, env) {
     return item;
 }
 
-async function servePublishedFile(id, token, env) {
-    const item = await getPublishedItem(id, token, env);
-    const object = await env.LIBRARY_BUCKET.get(item.data.assetKey);
-    if (!object) throw new HttpError(404, "Tệp không còn tồn tại.");
-    const headers = new Headers();
-    object.writeHttpMetadata(headers);
-    headers.set("content-disposition", "inline; filename*=UTF-8''" + encodeURIComponent(item.data.originalName || "document"));
-    headers.set("cache-control", "public, max-age=300");
-    return new Response(object.body, { headers });
-}
 
 async function listMySubmissions(claims, token, env, url) {
     const submissions = await runQuery("submissions", {
@@ -447,10 +389,7 @@ async function approveSubmission(id, claims, token, env) {
         submittedByName: submission.data.submittedByName || "",
         approvedBy: claims.sub,
         status: "published",
-        assetKey: submission.data.assetKey,
-        originalName: submission.data.originalName,
-        mimeType: submission.data.mimeType,
-        size: submission.data.size,
+        fileStatus: "awaiting_upload",
         publishedAt: { __timestamp: now }
     };
 
@@ -577,7 +516,7 @@ async function handle(request, env) {
 
     const publicFileMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/file$/);
     if (method === "GET" && publicFileMatch) {
-        return withHeaders(await servePublishedFile(publicFileMatch[1], null, env), cors);
+        return withHeaders(json({ error: "Xem/tải tệp tạm thời chưa khả dụng; chờ cấu hình R2." }, 503), cors);
     }
 
     const claims = await verifyFirebaseIdToken(request, env);
@@ -585,7 +524,7 @@ async function handle(request, env) {
     const profile = await getOrCreateProfile(claims, token, env);
 
     if (method === "POST" && path === "/api/v1/submissions") {
-        return withHeaders(await uploadSubmission(request, env, claims, profile, token), cors);
+        return withHeaders(await createSubmission(request, claims, profile, token, env), cors);
     }
     if (method === "GET" && path === "/api/v1/my/submissions") {
         return withHeaders(await listMySubmissions(claims, token, env, url), cors);
