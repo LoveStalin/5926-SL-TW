@@ -15,7 +15,7 @@ This branch runs in **metadata-only mode** until R2 is available.
 
 1. Publish `features/digital-library/firestore.rules` to the `a5-digital-library` Firebase project.
 2. Check `ALLOWED_ORIGINS` in `wrangler.toml`. Add production origins exactly; do not use `*`.
-3. A newly verified account gets a basic `student` profile on its first protected API call. To provision an admin: first create the account in Firebase Authentication, copy its UID, then create `users/{UID}` in Firestore Console with fields `email` (string), `displayName` (string), `role: "admin"` (string), `accountStatus: "active"` (string), and `createdAt` (timestamp). Do this before the account makes its first protected API call. Existing student profiles can be promoted by changing `role` in Console. Assign `teacher` the same way. Never accept role values from registration or browser requests.
+3. A newly verified account chooses Guest or Student after the first login. The Worker then creates a `viewer` profile with `audienceType: "guest" | "student"`. To provision an admin: create the account in Firebase Authentication, copy its UID, then create `users/{UID}` in Firestore Console with `email`, `displayName`, `role: "admin"`, `accountStatus: "active"` and `createdAt`. Assign `teacher` or `project_member` only through trusted Admin provisioning/Firestore Console. Never accept elevated roles from registration or browser requests.
 4. Deploy from this directory:
    ```bash
    npx wrangler login
@@ -33,7 +33,9 @@ Public:
 
 Authenticated (Bearer Firebase ID token; verified email required):
 - `POST /api/v1/submissions` — JSON: `{"title":"...","description":"...","type":"pdf","categoryId":"...","language":"vi"}`. Creates a pending metadata-only submission.
-- `GET /api/v1/me` — returns the authenticated user's UID, email, display name, role and account status.
+- `GET /api/v1/me` — returns the authenticated user's profile, or `needsAudienceSelection: true` when Guest/Student has not yet been selected.
+- `POST /api/v1/me/audience` — creates the first viewer profile from `{"audienceType":"guest"|"student"}`; the choice cannot be changed by the user afterwards.
+- `POST /api/v1/library` — Project Member only; creates and immediately publishes a metadata-only library item.
 - `GET /api/v1/my/submissions`
 
 Teacher/admin:
@@ -46,9 +48,9 @@ Teacher/admin:
 
 - No R2 binding is required in this temporary mode.
 - Firestore rules deny client writes to published items and moderation logs.
-- New profiles are always created as `student`; self-created profile documents are restricted by Firestore Rules to the student role and a small allowlist of fields.
-- Admin/teacher roles are provisioned manually in Firestore Console against the Firebase Authentication UID. The Worker reads and validates the stored role on every protected request; it never trusts a role from the browser.
-- Teachers and admins can currently use the moderation endpoints. Role changes remain a trusted Console operation; there is no public role-management API.
+- New profiles are created only after an authenticated user chooses Guest or Student. Firestore Rules restrict self-created profiles to `role: "viewer"` and the `guest/student` audience allowlist.
+- Admin, teacher and project_member roles are provisioned only through trusted administration/Firestore Console against the Firebase Authentication UID. The Worker reads and validates the stored role on every protected request; it never trusts a role from the browser.
+- Project Members can create and publish metadata directly. Teacher/admin moderation endpoints remain separate. Role changes remain a trusted operation; there is no public role-management API.
 - The Worker uses the caller's Firebase ID token for Firestore REST calls, so Firestore Security Rules remain active.
 - Do not put service-account credentials or storage secrets in frontend code.
 - This Worker has not been deployed or live-tested.
