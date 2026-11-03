@@ -229,6 +229,9 @@ function normalizeProfile(uid, email, data) {
     if (!allowedRoles.includes(data.role)) {
         throw new HttpError(403, "Tài khoản chưa được cấp role hợp lệ.");
     }
+    if (typeof data.email !== "string" || data.email.trim().toLowerCase() !== email.trim().toLowerCase()) {
+        throw new HttpError(403, "Email trong Firestore không khớp với email Firebase Authentication.");
+    }
     if (data.accountStatus !== "active") {
         throw new HttpError(403, "Tài khoản thư viện đang bị khóa hoặc chưa được kích hoạt.");
     }
@@ -515,7 +518,10 @@ async function handle(request, env) {
         return new Response(null, { status: 204, headers: preflightHeaders });
     }
     if (method === "GET" && path === "/health") {
-        return json({ ok: true, service: "a5-digital-library-api", version: 1 });
+        return withHeaders(
+            json({ ok: true, service: "a5-digital-library-api", version: 1 }),
+            corsHeaders(request, env)
+        );
     }
 
     const cors = corsHeaders(request, env);
