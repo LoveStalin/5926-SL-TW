@@ -50,7 +50,7 @@ Teacher/admin:
 - Images: 10 MiB (JPEG, PNG, WebP)
 - PDF: 30 MiB
 - Audio: 30 MiB (MPEG, MP4, WAV, OGG)
-- Video: 100 MiB (MP4, WebM)
+- Video: 90 MiB (MP4, WebM) to leave room for multipart overhead within the Worker request limit
 
 ## Security notes
 
