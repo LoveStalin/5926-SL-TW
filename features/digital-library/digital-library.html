@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#171329">
+    <title>Digital Library | A5-K68</title>
+    <link rel="stylesheet" href="./digital-library.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="../../index.html"><span class="brand-mark">A5</span><span> DIGITAL LIBRARY</span></a>
+        <a class="back-link" href="../../index.html">← A5-K68</a>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero">
+            <p class="eyebrow">KHÔNG GIAN VĂN HÓA ĐỌC VÀ SÁNG TẠO SỐ</p>
+            <h1>Tri thức không có giới hạn.</h1>
+            <p class="hero-copy">Tự hào di sản Quảng Ninh – Tự tin hội nhập toàn cầu.</p>
+        </section>
+
+        <section class="library-section" aria-labelledby="libraryHeading">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">KHÁM PHÁ</p>
+                    <h2 id="libraryHeading">Tủ sách số</h2>
+                </div>
+                <span class="public-label">● Nội dung công khai</span>
+            </div>
+            <div id="libraryStatus" class="notice" role="status">Đang tải tài liệu...</div>
+            <div id="libraryGrid" class="library-grid"></div>
+        </section>
+
+        <section class="auth-section" aria-labelledby="authHeading">
+            <div>
+                <p class="eyebrow">TÀI KHOẢN THƯ VIỆN</p>
+                <h2 id="authHeading">Tham gia đóng góp</h2>
+                <p class="muted">Tạo tài khoản riêng cho Digital Library. Tài khoản này không liên kết với tài khoản lớp A5-K68.</p>
+            </div>
+            <form id="authForm" class="auth-card">
+                <div class="mode-switch">
+                    <button type="button" class="mode-button active" data-mode="login">Đăng nhập</button>
+                    <button type="button" class="mode-button" data-mode="register">Đăng ký</button>
+                </div>
+                <label for="authEmail">Email</label>
+                <input id="authEmail" type="email" autocomplete="email" placeholder="name@example.com" required>
+                <label for="authPassword">Mật khẩu</label>
+                <input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Tối thiểu 6 ký tự" required>
+                <button id="authSubmit" class="primary-button" type="submit">Đăng nhập</button>
+                <p id="authStatus" class="form-status" role="status"></p>
+            </form>
+        </section>
+    </main>
+
+    <footer> A5-K68 · Digital Library </footer>
+    <script type="module" src="./digital-library.js"></script>
+</body>
+</html>
