@@ -102,24 +102,37 @@
             </section>
 
             <section id="publishPanel" class="account-panel publish-panel" hidden aria-labelledby="publishHeading">
-                <p class="eyebrow">PROJECT CONTRIBUTOR</p>
-                <h2 id="publishHeading">Xuất bản tài liệu</h2>
-                <p class="muted">Project Member có thể xuất bản metadata trực tiếp. Tệp đính kèm sẽ được hỗ trợ khi R2 được cấu hình.</p>
+                <p class="eyebrow">LIBRARY MANAGEMENT</p>
+                <h2 id="publishHeading">Thêm sách / vở / sản phẩm</h2>
+                <p class="muted">Admin, Teacher và Project Member có thể tạo tài liệu và upload file trực tiếp. Khi mở bằng Live Server, file sẽ đi qua Worker local → Cloudflare local R2.</p>
                 <form id="publishForm" class="auth-card publish-form">
-                    <label for="publishTitle">Tên tài liệu</label>
-                    <input id="publishTitle" name="title" type="text" minlength="3" maxlength="160" required>
+                    <label for="publishTitle">Tên tài liệu / sản phẩm</label>
+                    <input id="publishTitle" name="title" type="text" minlength="3" maxlength="160" placeholder="Ví dụ: Lịch sử Quảng Ninh 1945–2025" required>
+
                     <label for="publishDescription">Mô tả</label>
-                    <textarea id="publishDescription" name="description" rows="3" maxlength="3000"></textarea>
-                    <label for="publishType">Loại tài liệu</label>
-                    <select id="publishType" name="type" required>
-                        <option value="pdf">PDF</option>
-                        <option value="image">Hình ảnh</option>
-                        <option value="audio">Âm thanh</option>
-                        <option value="video">Video</option>
+                    <textarea id="publishDescription" name="description" rows="3" maxlength="3000" placeholder="Mô tả ngắn về tài liệu..."></textarea>
+
+                    <label for="publishType">Loại nội dung</label>
+                    <select id="publishType" name="contentType" required>
+                        <option value="ebook">📖 Sách số (eBook)</option>
+                        <option value="document">📚 Tài liệu / vở</option>
+                        <option value="article">📝 Bài viết</option>
+                        <option value="video">🎬 Video</option>
+                        <option value="podcast">🎧 Podcast</option>
+                        <option value="audio">🔊 Âm thanh</option>
+                        <option value="postcard">🖼️ Bưu thiếp</option>
+                        <option value="artwork">🎨 Tác phẩm nghệ thuật</option>
+                        <option value="design">💻 Thiết kế</option>
+                        <option value="digital_product">📦 Sản phẩm số</option>
                     </select>
+
                     <label for="publishCategory">Mã danh mục (không bắt buộc)</label>
-                    <input id="publishCategory" name="categoryId" type="text" maxlength="80">
-                    <button id="publishSubmit" class="primary-button" type="submit">Xuất bản</button>
+                    <input id="publishCategory" name="categoryId" type="text" maxlength="80" placeholder="book, history, literature...">
+
+                    <label for="publishFile">File đính kèm <span class="muted">(PDF / MP4 / MP3 / ảnh...)</span></label>
+                    <input id="publishFile" name="file" type="file" accept=".pdf,.mp4,.webm,.mp3,.wav,.png,.jpg,.jpeg,.webp,.zip">
+
+                    <button id="publishSubmit" class="primary-button" type="submit">➕ Thêm và upload</button>
                     <p id="publishStatus" class="form-status" role="status"></p>
                 </form>
             </section>
