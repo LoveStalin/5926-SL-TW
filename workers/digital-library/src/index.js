@@ -292,108 +292,106 @@ function parseLimit(value, fallback = 20) {
     return Number.isInteger(number) ? Math.min(50, Math.max(1, number)) : fallback;
 }
 
-async function publishLibraryItem(request, claims, profile, token, env) {
-    if (!(request.headers.get("content-type") || "").toLowerCase().includes("application/json")) {
-        throw new HttpError(415, "Tạm thời chỉ nhận metadata JSON; upload tệp sẽ được bật khi R2 sẵn sàng.");
+const CONTENT_TYPES = ["ebook", "article", "video", "podcast", "postcard", "artwork", "design", "digital_product", "document", "audio"];
+const LEGACY_TYPE_BY_CONTENT = { ebook: "pdf", article: "pdf", video: "video", podcast: "audio", postcard: "image", artwork: "image", design: "image", digital_product: "document", document: "pdf", audio: "audio" };
+
+function normalizeStringArray(value, maxItems, maxLength) {
+    if (value === undefined) return [];
+    if (!Array.isArray(value) || value.length > maxItems) throw new HttpError(400, "Danh sách dữ liệu không hợp lệ.");
+    return value.map(item => String(item).trim()).filter(Boolean).slice(0, maxItems).map(item => item.slice(0, maxLength));
+}
+
+function normalizeSlug(value) {
+    return String(value || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 120);
+}
+
+function normalizeMetadata(value) {
+    if (value === undefined) return {};
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new HttpError(400, "metadata phải là object.");
+    const result = {};
+    for (const [key, item] of Object.entries(value).slice(0, 30)) {
+        const safeKey = String(key).replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 64);
+        if (!safeKey) continue;
+        if (["string", "number", "boolean"].includes(typeof item) || item === null) result[safeKey] = item;
     }
-    const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
+    return result;
+}
+
+function normalizeReader(value) {
+    if (value === undefined) return { enabled: false, defaultFormat: null };
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new HttpError(400, "reader phải là object.");
+    return { enabled: value.enabled === true, defaultFormat: value.defaultFormat ? String(value.defaultFormat).slice(0, 20) : null };
+}
+
+function normalizeContentInput(body) {
     const title = String(body.title || "").trim();
     const description = String(body.description || "").trim();
-    const type = String(body.type || "").trim();
+    const contentType = String(body.contentType || body.type || "").trim();
     const categoryId = String(body.categoryId || "").trim();
     const language = String(body.language || "vi").trim();
     if (title.length < 3 || title.length > 160) throw new HttpError(400, "Tiêu đề phải dài từ 3 đến 160 ký tự.");
     if (description.length > 3000) throw new HttpError(400, "Mô tả quá dài.");
-    if (!["image", "pdf", "audio", "video"].includes(type)) throw new HttpError(400, "Loại tài liệu không hợp lệ.");
+    if (!CONTENT_TYPES.includes(contentType)) throw new HttpError(400, "contentType không hợp lệ.");
     if (categoryId.length > 80) throw new HttpError(400, "Mã danh mục quá dài.");
     if (!/^[a-zA-Z]{2,10}(-[a-zA-Z0-9]{2,8})*$/.test(language)) throw new HttpError(400, "Mã ngôn ngữ không hợp lệ.");
+    const authors = normalizeStringArray(body.authors, 20, 160);
+    return { title, slug: normalizeSlug(body.slug || title), description, contentType, legacyType: LEGACY_TYPE_BY_CONTENT[contentType], categoryId, language, authors, tags: normalizeStringArray(body.tags, 30, 50), authorNamesNormalized: authors.map(name => name.toLowerCase()), metadata: normalizeMetadata(body.metadata), reader: normalizeReader(body.reader) };
+}
+
+function normalizeQrCode(value, itemId) {
+    const enabled = value === undefined ? true : value?.enabled === true;
+    return { enabled, targetPath: enabled ? "/library/" + itemId : null };
+}
+
+async function createLibraryItem(request, claims, profile, token, env) {
+    if (!(request.headers.get("content-type") || "").toLowerCase().includes("application/json")) throw new HttpError(415, "Tạm thời chỉ nhận metadata JSON; file upload sẽ được nối vào Storage Layer sau.");
+    const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
+    const content = normalizeContentInput(body);
     const id = randomId();
-    await createDocument("libraryItems", id, {
-        title,
-        description,
-        type,
-        categoryId,
-        language,
-        submittedBy: claims.sub,
-        submittedByName: profile.displayName || claims.email,
-        publishedBy: claims.sub,
-        status: "published",
-        fileStatus: "awaiting_upload",
-        publishedAt: { __timestamp: new Date().toISOString() }
-    }, token, env);
-    return json({
-        id,
-        status: "published",
-        fileStatus: "awaiting_upload",
-        message: "Đã xuất bản metadata. Tệp sẽ được bổ sung khi R2 được cấu hình."
-    }, 201);
+    const now = new Date().toISOString();
+    const qrCode = normalizeQrCode(body.qrCode, id);
+    await createDocument("libraryItems", id, { schemaVersion: 2, title: content.title, slug: content.slug, description: content.description, contentType: content.contentType, type: content.legacyType, authors: content.authors, authorNamesNormalized: content.authorNamesNormalized, categoryId: content.categoryId, tags: content.tags, language: content.language, metadata: content.metadata, reader: content.reader, qrCode, submittedBy: claims.sub, submittedByName: profile.displayName || claims.email, publishedBy: claims.sub, status: "published", fileStatus: "awaiting_upload", createdBy: claims.sub, createdAt: { __timestamp: now }, updatedAt: { __timestamp: now }, publishedAt: { __timestamp: now } }, token, env);
+    return json({ id, status: "published", fileStatus: "awaiting_upload", contentType: content.contentType, qrCode, message: "Đã tạo metadata. File sẽ được gắn qua Storage Layer." }, 201);
 }
 
 async function createSubmission(request, claims, profile, token, env) {
-    if (!(request.headers.get("content-type") || "").toLowerCase().includes("application/json")) {
-        throw new HttpError(415, "Tạm thời chỉ nhận metadata JSON; upload tệp sẽ được bật lại khi cấu hình R2.");
-    }
+    if (!(request.headers.get("content-type") || "").toLowerCase().includes("application/json")) throw new HttpError(415, "Tạm thời chỉ nhận metadata JSON; file upload sẽ được nối vào Storage Layer sau.");
     const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
-    const title = String(body.title || "").trim();
-    const description = String(body.description || "").trim();
-    const type = String(body.type || "").trim();
-    const categoryId = String(body.categoryId || "").trim();
-    const language = String(body.language || "vi").trim();
-    if (title.length < 3 || title.length > 160) throw new HttpError(400, "Tiêu đề phải dài từ 3 đến 160 ký tự.");
-    if (description.length > 3000) throw new HttpError(400, "Mô tả quá dài.");
-    if (!["image", "pdf", "audio", "video"].includes(type)) throw new HttpError(400, "Loại tài liệu không hợp lệ.");
-    if (categoryId.length > 80) throw new HttpError(400, "Mã danh mục quá dài.");
-    if (!/^[a-zA-Z]{2,10}(-[a-zA-Z0-9]{2,8})*$/.test(language)) throw new HttpError(400, "Mã ngôn ngữ không hợp lệ.");
+    const content = normalizeContentInput(body);
     const id = randomId();
-    await createDocument("submissions", id, {
-        title, description, type, categoryId, language,
-        submittedBy: claims.sub,
-        submittedByName: profile.displayName || claims.email,
-        status: "pending",
-        fileStatus: "awaiting_upload",
-        submittedAt: { __timestamp: new Date().toISOString() }
-    }, token, env);
-    return json({ id, status: "pending", fileStatus: "awaiting_upload", message: "Đã nhận metadata. Tệp sẽ được bổ sung khi R2 được cấu hình." }, 201);
+    const now = new Date().toISOString();
+    await createDocument("submissions", id, { schemaVersion: 2, title: content.title, slug: content.slug, description: content.description, contentType: content.contentType, type: content.legacyType, authors: content.authors, authorNamesNormalized: content.authorNamesNormalized, categoryId: content.categoryId, tags: content.tags, language: content.language, metadata: content.metadata, reader: content.reader, status: "pending", fileStatus: "awaiting_upload", submittedBy: claims.sub, submittedByName: profile.displayName || claims.email, submittedAt: { __timestamp: now } }, token, env);
+    return json({ id, status: "pending", fileStatus: "awaiting_upload", contentType: content.contentType, message: "Đã nhận metadata. File sẽ được gắn sau khi Storage Layer sẵn sàng." }, 201);
+}
+
+async function createAssetMetadata(request, itemId, claims, profile, token, env) {
+    const item = await getDocument("libraryItems", itemId, token, env);
+    const canWrite = ["project_member", "teacher", "admin"].includes(profile.role) || item.data.submittedBy === claims.sub;
+    if (!canWrite) throw new HttpError(403, "Không có quyền gắn asset cho tài liệu này.");
+    const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
+    const assetType = String(body.assetType || "").trim();
+    const format = String(body.format || "").trim().toLowerCase();
+    const storageProvider = String(body.storageProvider || "dev").trim();
+    const storageKey = String(body.storageKey || "").trim();
+    if (!["cover", "original", "preview", "thumbnail", "attachment"].includes(assetType)) throw new HttpError(400, "assetType không hợp lệ.");
+    if (!/^[a-z0-9.+-]{1,30}$/.test(format)) throw new HttpError(400, "format không hợp lệ.");
+    if (!["dev", "r2"].includes(storageProvider)) throw new HttpError(400, "storageProvider phải là dev hoặc r2.");
+    if (storageKey.length > 500) throw new HttpError(400, "storageKey quá dài.");
+    if (storageProvider === "r2" && !storageKey) throw new HttpError(400, "R2 asset phải có storageKey.");
+    const assetId = randomId();
+    const now = new Date().toISOString();
+    await createDocument("libraryItems/" + itemId + "/assets", assetId, { assetType, format, storageProvider, storageKey: storageKey || null, mimeType: String(body.mimeType || "").slice(0, 120), sizeBytes: Number.isSafeInteger(body.sizeBytes) && body.sizeBytes >= 0 ? body.sizeBytes : 0, checksum: String(body.checksum || "").slice(0, 128), isPrimary: body.isPrimary === true, access: body.access === "private" ? "private" : "public", createdAt: { __timestamp: now }, createdBy: claims.sub }, token, env);
+    await patchDocument("libraryItems", itemId, { fileStatus: "uploaded", updatedAt: { __timestamp: now } }, token, env);
+    return json({ id: assetId, itemId, storageProvider, message: storageProvider === "dev" ? "Đã lưu metadata asset ở chế độ DEV; file bytes chưa được lưu." : "Đã lưu metadata asset cho R2." }, 201);
 }
 
 async function listPublished(url, token, env) {
-    const filters = [{
-        fieldFilter: {
-            field: { fieldPath: "status" },
-            op: "EQUAL",
-            value: { stringValue: "published" }
-        }
-    }];
+    const items = await runQuery("libraryItems", { where: { fieldFilter: { field: { fieldPath: "status" }, op: "EQUAL", value: { stringValue: "published" } } }, limit: parseLimit(url.searchParams.get("limit"), 50) }, token || "", env);
     const categoryId = url.searchParams.get("categoryId");
-    if (categoryId) {
-        filters.push({
-            fieldFilter: {
-                field: { fieldPath: "categoryId" },
-                op: "EQUAL",
-                value: { stringValue: categoryId }
-            }
-        });
-    }
-    const type = url.searchParams.get("type");
-    if (type) {
-        filters.push({
-            fieldFilter: {
-                field: { fieldPath: "type" },
-                op: "EQUAL",
-                value: { stringValue: type }
-            }
-        });
-    }
-
-    const where = filters.length === 1
-        ? filters[0]
-        : { compositeFilter: { op: "AND", filters } };
-
-    const items = await runQuery("libraryItems", {
-        where,
-        limit: parseLimit(url.searchParams.get("limit"), 24)
-    }, token || "", env);
-    return json({ items });
+    const contentType = url.searchParams.get("contentType") || url.searchParams.get("type");
+    const tag = url.searchParams.get("tag");
+    const filtered = items.filter(item => (!categoryId || item.categoryId === categoryId) && (!contentType || item.contentType === contentType || (!item.contentType && item.type === contentType) || (contentType === "ebook" && item.type === "pdf") || (contentType === "podcast" && item.type === "audio") || (contentType === "postcard" && item.type === "image")) && (!tag || (Array.isArray(item.tags) && item.tags.includes(tag))));
+    return json({ items: filtered });
 }
 
 async function getPublishedItem(id, token, env) {
@@ -402,8 +400,17 @@ async function getPublishedItem(id, token, env) {
     return item;
 }
 
-
 async function listMySubmissions(claims, token, env, url) {
+    const submissions = await runQuery("submissions", { where: { fieldFilter: { field: { fieldPath: "submittedBy" }, op: "EQUAL", value: { stringValue: claims.sub } } }, limit: parseLimit(url.searchParams.get("limit"), 30) }, token, env);
+    return json({ submissions });
+}
+
+async function listPendingSubmissions(token, env, url) {
+    const status = url.searchParams.get("status") || "pending";
+    if (!["pending", "approved", "rejected"].includes(status)) throw new HttpError(400, "Trạng thái lọc không hợp lệ.");
+    const submissions = await runQuery("submissions", { where: { fieldFilter: { field: { fieldPath: "status" }, op: "EQUAL", value: { stringValue: status } }, limit: parseLimit(url.searchParams.get("limit"), 30) }, token, env);
+    return json({ submissions });
+}async function listMySubmissions(claims, token, env, url) {
     const submissions = await runQuery("submissions", {
         where: {
             fieldFilter: {
@@ -438,51 +445,20 @@ async function listPendingSubmissions(token, env, url) {
 async function approveSubmission(id, claims, token, env) {
     const submission = await getDocument("submissions", id, token, env);
     if (submission.data.status !== "pending") throw new HttpError(409, "Bài gửi không còn ở trạng thái chờ duyệt.");
-
     const libraryItemId = randomId();
     const now = new Date().toISOString();
-    const publishedItem = {
-        title: submission.data.title,
-        description: submission.data.description || "",
-        type: submission.data.type,
-        categoryId: submission.data.categoryId || "",
-        language: submission.data.language || "vi",
-        submittedBy: submission.data.submittedBy,
-        submittedByName: submission.data.submittedByName || "",
-        approvedBy: claims.sub,
-        status: "published",
-        fileStatus: "awaiting_upload",
-        publishedAt: { __timestamp: now }
-    };
-
+    const contentType = submission.data.contentType || ({ pdf: "ebook", audio: "podcast", image: "postcard", video: "video" }[submission.data.type] || "document");
+    const publishedItem = { schemaVersion: 2, title: submission.data.title, slug: submission.data.slug || normalizeSlug(submission.data.title), description: submission.data.description || "", contentType, type: submission.data.type || LEGACY_TYPE_BY_CONTENT[contentType], authors: submission.data.authors || [], authorNamesNormalized: submission.data.authorNamesNormalized || [], categoryId: submission.data.categoryId || "", tags: submission.data.tags || [], language: submission.data.language || "vi", metadata: submission.data.metadata || {}, reader: submission.data.reader || { enabled: false, defaultFormat: null }, qrCode: { enabled: true, targetPath: "/library/" + libraryItemId }, submittedBy: submission.data.submittedBy, submittedByName: submission.data.submittedByName || "", approvedBy: claims.sub, status: "published", fileStatus: "awaiting_upload", createdBy: submission.data.submittedBy, createdAt: submission.data.submittedAt || { __timestamp: now }, updatedAt: { __timestamp: now }, publishedAt: { __timestamp: now } };
     await createDocument("libraryItems", libraryItemId, publishedItem, token, env);
     try {
-        await patchDocument("submissions", id, {
-            status: "approved",
-            libraryItemId,
-            reviewedBy: claims.sub,
-            reviewedAt: { __timestamp: now }
-        }, token, env);
+        await patchDocument("submissions", id, { status: "approved", libraryItemId, reviewedBy: claims.sub, reviewedAt: { __timestamp: now } }, token, env);
     } catch (error) {
-        // Avoid leaving a public item if the submission update failed.
-        await fetch(firestoreBase(env) + "/libraryItems/" + libraryItemId, {
-            method: "DELETE",
-            headers: { authorization: "Bearer " + token }
-        });
+        await fetch(firestoreBase(env) + "/libraryItems/" + libraryItemId, { method: "DELETE", headers: { authorization: "Bearer " + token } });
         throw error;
     }
-
-    await createDocument("moderationLogs", randomId(), {
-        action: "approve",
-        submissionId: id,
-        libraryItemId,
-        actorUid: claims.sub,
-        createdAt: { __timestamp: now }
-    }, token, env);
-
-    return json({ id, libraryItemId, status: "published" });
+    await createDocument("moderationLogs", randomId(), { action: "approve", submissionId: id, libraryItemId, actorUid: claims.sub, createdAt: { __timestamp: now } }, token, env);
+    return json({ id, libraryItemId, status: "published", contentType });
 }
-
 async function rejectSubmission(id, request, claims, token, env) {
     const submission = await getDocument("submissions", id, token, env);
     if (submission.data.status !== "pending") throw new HttpError(409, "Bài gửi không còn ở trạng thái chờ duyệt.");
@@ -634,6 +610,10 @@ async function handle(request, env) {
         return withHeaders(await rejectSubmission(rejectMatch[1], request, claims, token, env), cors);
     }
 
+    const assetMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/assets$/);
+    if (method === "POST" && assetMatch) {
+        return withHeaders(await createAssetMetadata(request, assetMatch[1], claims, profile, token, env), cors);
+    }
     const archiveMatch = path.match(/^\/api\/v1\/admin\/library\/([a-zA-Z0-9_-]+)\/archive$/);
     if (method === "POST" && archiveMatch) {
         requireStaff(profile);
