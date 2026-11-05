@@ -40,7 +40,11 @@ const modeButtons = [...document.querySelectorAll("[data-mode]")];
 
 // Set this to the exact workers.dev URL after deploying the Worker.
 // Example format: https://a5-digital-library-api.<your-subdomain>.workers.dev
-const WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
+const PRODUCTION_WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
+const WORKER_API_BASE_URL =
+    /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname)
+        ? "http://127.0.0.1:8787"
+        : PRODUCTION_WORKER_API_BASE_URL;
 
 let authMode = "login";
 let diagnosticsRun = 0;
@@ -136,12 +140,20 @@ audienceButtons.forEach(button => {
 publishForm.addEventListener("submit", async event => {
     event.preventDefault();
     publishSubmit.disabled = true;
-    publishStatus.textContent = "Đang xuất bản metadata...";
+
     try {
         const user = libraryAuth.currentUser;
         if (!user) throw new Error("Phiên đăng nhập đã hết hạn.");
+
         const idToken = await user.getIdToken();
         const formData = new FormData(publishForm);
+        const file = formData.get("file");
+
+        if (file instanceof File && file.size > 100 * 1024 * 1024) {
+            throw new Error("File vượt quá 100 MB. Hãy dùng file test nhỏ hơn.");
+        }
+
+        publishStatus.textContent = "① Đang tạo metadata...";
         const response = await fetch(WORKER_API_BASE_URL.replace(/\/$/, "") + "/api/v1/library", {
             method: "POST",
             headers: {
@@ -152,18 +164,55 @@ publishForm.addEventListener("submit", async event => {
             body: JSON.stringify({
                 title: String(formData.get("title") || "").trim(),
                 description: String(formData.get("description") || "").trim(),
-                type: String(formData.get("type") || ""),
+                contentType: String(formData.get("contentType") || ""),
                 categoryId: String(formData.get("categoryId") || "").trim(),
                 language: "vi"
             })
         });
+
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || "Không thể xuất bản tài liệu.");
-        publishStatus.textContent = "Đã xuất bản thông tin tài liệu thành công. ID: " + data.id + ". Tệp đính kèm sẽ được bổ sung khi R2 sẵn sàng.";
+        if (!response.ok) throw new Error(data.error || "Không thể tạo tài liệu.");
+
+        if (file instanceof File && file.size > 0) {
+            const format = String(file.name.split(".").pop() || "bin")
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "")
+                .slice(0, 20) || "bin";
+
+            publishStatus.textContent = "② Đang upload " + file.name + " (" + Math.ceil(file.size / 1024 / 1024) + " MB) vào Storage...";
+
+            const uploadResponse = await fetch(
+                WORKER_API_BASE_URL.replace(/\/$/, "") +
+                "/api/v1/library/" + encodeURIComponent(data.id) +
+                "/upload?assetType=original&format=" + encodeURIComponent(format) + "&isPrimary=true",
+                {
+                    method: "PUT",
+                    headers: {
+                        authorization: "Bearer " + idToken,
+                        "content-type": file.type || "application/octet-stream",
+                        "x-file-name": file.name
+                    },
+                    body: file
+                }
+            );
+
+            const uploadData = await uploadResponse.json().catch(() => ({}));
+            if (!uploadResponse.ok) {
+                throw new Error("Metadata đã tạo nhưng upload thất bại: " + (uploadData.error || "Storage không nhận file."));
+            }
+
+            publishStatus.textContent =
+                "✅ Đã thêm tài liệu và upload thành công. Asset " +
+                uploadData.id + " · " + uploadData.sizeBytes + " bytes.";
+        } else {
+            publishStatus.textContent =
+                "✅ Đã thêm tài liệu. Chưa có file — trạng thái Storage: awaiting_upload.";
+        }
+
         publishForm.reset();
         await loadPublishedItems();
     } catch (error) {
-        publishStatus.textContent = error.message || "Không thể xuất bản. Hãy thử lại.";
+        publishStatus.textContent = error.message || "Không thể thêm tài liệu. Hãy thử lại.";
     } finally {
         publishSubmit.disabled = false;
     }
@@ -287,7 +336,7 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         accountDisplayName.textContent = profile.displayName || user.displayName || user.email;
         accountRole.textContent = roleLabel;
         accountRole.dataset.role = profile.role || "unknown";
-        publishPanel.hidden = profile.role !== "project_member";
+        publishPanel.hidden = !["project_member", "teacher", "admin"].includes(profile.role);
         diagnosticsMessage.textContent = profile.accountStatus === "active"
             ? "Đã xác minh thành công: Firebase Authentication, Firestore profile và vai trò do Worker xác nhận."
             : "Đã đọc được hồ sơ nhưng tài khoản không ở trạng thái active.";
