@@ -1,6 +1,6 @@
 # Digital Library — DEV Storage
 
-This Worker uses a local R2 simulation during development. Cloudflare documents that Wrangler's default local R2 bindings store objects on the developer machine under the project's `.wrangler/state` directory and do not touch production R2. citeturn241931search1turn241931search3
+This Worker uses a local R2 simulation during development. Cloudflare documents that Wrangler's default local R2 bindings store objects on the developer machine under the project's `.wrangler/state` directory and do not touch production R2.n241931search1turn241931search3
 
 ## Start
 
@@ -39,7 +39,7 @@ Then open:
 http://localhost:8787/api/v1/library/ITEM_ID/file
 ```
 
-The same API shape will be used with real R2 later; only the storage binding/provider changes. R2 also supports ranged reads, which is important for browser video playback and large-file delivery. citeturn325516search0turn325516search3
+The upload endpoint streams the request body directly into the storage binding instead of buffering the whole file in JavaScript. This is important for large video/PDF files. The same API shape will be used with real R2 later; only the storage binding/provider changes. R2 also supports ranged reads, which is important for browser video playback and large-file delivery.n325516search0turn325516search3
 
 ## Important
 

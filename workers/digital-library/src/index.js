@@ -402,40 +402,43 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
     }
 
     const bucket = requireStorage(env);
+    const maxBytes = Number(env.DIGITAL_LIBRARY_MAX_UPLOAD_BYTES || 100 * 1024 * 1024);
     const contentLength = Number(request.headers.get("content-length") || 0);
-    const maxBytes = 256 * 1024 * 1024;
-    if (contentLength && contentLength > maxBytes) {
-        throw new HttpError(413, "File DEV tối đa 256 MB cho mỗi lần upload.");
+    if (!contentLength) {
+        throw new HttpError(411, "Upload file phải có Content-Length.");
+    }
+    if (contentLength > maxBytes) {
+        throw new HttpError(413, "File vượt quá giới hạn upload hiện tại.");
+    }
+    if (!request.body) {
+        throw new HttpError(400, "Thiếu request body.");
     }
 
-    const form = await request.formData();
-    const file = form.get("file");
-    if (!(file instanceof File)) {
-        throw new HttpError(400, "Thiếu field file trong multipart/form-data.");
-    }
-    if (file.size > maxBytes) {
-        throw new HttpError(413, "File DEV tối đa 256 MB cho mỗi lần upload.");
-    }
-
-    const assetType = String(form.get("assetType") || "original").trim();
+    const url = new URL(request.url);
+    const assetType = String(url.searchParams.get("assetType") || "original").trim();
+    const format = String(url.searchParams.get("format") || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 20);
+    const fileName = String(request.headers.get("x-file-name") || "").trim().slice(0, 200);
     if (!["cover", "original", "preview", "thumbnail", "attachment"].includes(assetType)) {
         throw new HttpError(400, "assetType không hợp lệ.");
     }
+    if (!format) {
+        throw new HttpError(400, "Thiếu format, ví dụ pdf hoặc mp4.");
+    }
 
-    const format = normalizeUploadFormat(file, form.get("format"));
     const assetId = randomId();
     const storageKey = buildStorageKey(itemId, assetId, format);
     const storageProvider = env.DIGITAL_LIBRARY_STORAGE_PROVIDER || "dev";
+    const mimeType = request.headers.get("content-type") || "application/octet-stream";
 
-    await bucket.put(storageKey, file.stream(), {
+    await bucket.put(storageKey, request.body, {
         httpMetadata: {
-            contentType: file.type || "application/octet-stream",
+            contentType: mimeType,
             contentDisposition: "inline"
         },
         customMetadata: {
             itemId,
             assetId,
-            originalName: String(file.name || "").slice(0, 200)
+            originalName: fileName
         }
     });
 
@@ -446,11 +449,11 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
             format,
             storageProvider,
             storageKey,
-            mimeType: file.type || "application/octet-stream",
-            sizeBytes: file.size,
+            mimeType,
+            sizeBytes: contentLength,
             checksum: "",
-            isPrimary: form.get("isPrimary") !== "false",
-            access: form.get("access") === "private" ? "private" : "public",
+            isPrimary: url.searchParams.get("isPrimary") !== "false",
+            access: url.searchParams.get("access") === "private" ? "private" : "public",
             createdAt: { __timestamp: now },
             createdBy: claims.sub
         }, token, env);
@@ -471,8 +474,8 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
         format,
         storageProvider,
         storageKey,
-        sizeBytes: file.size,
-        mimeType: file.type || "application/octet-stream",
+        sizeBytes: contentLength,
+        mimeType,
         status: "uploaded"
     }, 201);
 }
@@ -666,7 +669,7 @@ function corsHeaders(request, env) {
     }
 
     const headers = {
-        "access-control-allow-methods": "GET, POST, OPTIONS",
+        "access-control-allow-methods": "GET, POST, PUT, OPTIONS",
         "access-control-allow-headers": "Authorization, Content-Type",
         "access-control-max-age": "86400",
         "vary": "Origin"
@@ -759,7 +762,7 @@ async function handle(request, env) {
     }
 
     const uploadMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/upload$/);
-    if (method === "POST" && uploadMatch) {
+    if (method === "PUT" && uploadMatch) {
         return withHeaders(await uploadLibraryAsset(request, uploadMatch[1], claims, profile, token, env), cors);
     }
 
