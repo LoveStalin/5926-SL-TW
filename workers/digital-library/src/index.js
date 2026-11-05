@@ -731,8 +731,8 @@ async function handle(request, env) {
     if (!profile) throw new HttpError(409, "Hãy chọn Guest hoặc Student để hoàn tất hồ sơ.");
 
     if (method === "POST" && path === "/api/v1/library") {
-        if (profile.role !== "project_member") {
-            throw new HttpError(403, "Chỉ Project Member mới được tự xuất bản tài liệu.");
+        if (!["project_member", "teacher", "admin"].includes(profile.role)) {
+            throw new HttpError(403, "Chỉ Project Member, giáo viên hoặc admin mới được thêm tài liệu.");
         }
         return withHeaders(await createLibraryItem(request, claims, profile, token, env), cors);
     }
