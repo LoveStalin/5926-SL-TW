@@ -381,7 +381,6 @@ async function createAssetMetadata(request, itemId, claims, profile, token, env)
     const assetId = randomId();
     const now = new Date().toISOString();
     await createDocument("libraryItems/" + itemId + "/assets", assetId, { assetType, format, storageProvider, storageKey: storageKey || null, mimeType: String(body.mimeType || "").slice(0, 120), sizeBytes: Number.isSafeInteger(body.sizeBytes) && body.sizeBytes >= 0 ? body.sizeBytes : 0, checksum: String(body.checksum || "").slice(0, 128), isPrimary: body.isPrimary === true, access: body.access === "private" ? "private" : "public", createdAt: { __timestamp: now }, createdBy: claims.sub }, token, env);
-    await patchDocument("libraryItems", itemId, { fileStatus: "uploaded", updatedAt: { __timestamp: now } }, token, env);
     return json({ id: assetId, itemId, storageProvider, message: storageProvider === "dev" ? "Đã lưu metadata asset ở chế độ DEV; file bytes chưa được lưu." : "Đã lưu metadata asset cho R2." }, 201);
 }
 
