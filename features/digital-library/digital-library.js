@@ -42,7 +42,7 @@ const modeButtons = [...document.querySelectorAll("[data-mode]")];
 // Example format: https://a5-digital-library-api.<your-subdomain>.workers.dev
 const PRODUCTION_WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
 const WORKER_API_BASE_URL =
-    /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname)
+    /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
         ? "http://127.0.0.1:8787"
         : PRODUCTION_WORKER_API_BASE_URL;
 
