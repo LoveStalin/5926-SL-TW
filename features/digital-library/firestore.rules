@@ -2,166 +2,130 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
-
-    function owns(userId) {
-      return signedIn() && request.auth.uid == userId;
-    }
-
-    function profilePath(uid) {
-      return /databases/$(database)/documents/users/$(uid);
-    }
-
-    function hasProfile() {
-      return signedIn() && exists(profilePath(request.auth.uid));
-    }
-
-    function myProfile() {
-      return get(profilePath(request.auth.uid)).data;
-    }
-
-    function activeUser() {
-      return hasProfile() && myProfile().accountStatus == "active";
-    }
-
-    function isViewer() {
-      return activeUser() && myProfile().role in ["viewer", "student"];
-    }
-
-    function isProjectMember() {
-      return activeUser() && myProfile().role == "project_member";
-    }
-
-    function isStaff() {
-      return activeUser() && myProfile().role in ["teacher", "admin"];
-    }
+    function signedIn() { return request.auth != null; }
+    function owns(userId) { return signedIn() && request.auth.uid == userId; }
+    function profilePath(uid) { return /databases/$(database)/documents/users/$(uid); }
+    function hasProfile() { return signedIn() && exists(profilePath(request.auth.uid)); }
+    function myProfile() { return get(profilePath(request.auth.uid)).data; }
+    function activeUser() { return hasProfile() && myProfile().accountStatus == "active"; }
+    function isProjectMember() { return activeUser() && myProfile().role == "project_member"; }
+    function isStaff() { return activeUser() && myProfile().role in ["teacher", "admin"]; }
 
     function validTitle(data) {
-      return data.title is string
-        && data.title.size() >= 3
-        && data.title.size() <= 160;
+      return data.title is string && data.title.size() >= 3 && data.title.size() <= 160;
     }
 
-    function validType(data) {
-      return data.type in ["image", "pdf", "audio", "video"];
+    function validContentType(data) {
+      return data.contentType in [
+        "ebook", "article", "video", "podcast", "postcard",
+        "artwork", "design", "digital_product", "document", "audio"
+      ];
     }
 
-    // User profiles: users may read only their own profile.
-    // Self-created profiles are strictly limited to Guest/Student viewer roles.
-    // No client can update roles or account status.
+    function validLegacyType(data) {
+      return !("type" in data) || data.type in ["image", "pdf", "audio", "video", "document"];
+    }
+
+    function validLibraryItem(data) {
+      return validTitle(data)
+        && validContentType(data)
+        && validLegacyType(data)
+        && data.status in ["published", "archived"]
+        && data.fileStatus in ["awaiting_upload", "uploaded"]
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && data.publishedAt is timestamp
+        && data.qrCode is map
+        && data.qrCode.enabled is bool
+        && data.qrCode.targetPath is string;
+    }
+
     match /users/{userId} {
       allow get: if owns(userId);
       allow list: if false;
-
       allow create: if owns(userId)
-        && request.resource.data.keys().hasOnly([
-          "email", "displayName", "audienceType", "role",
-          "accountStatus", "createdAt"
-        ])
-        && request.resource.data.keys().hasAll([
-          "email", "audienceType", "role", "accountStatus", "createdAt"
-        ])
+        && request.resource.data.keys().hasOnly(["email", "displayName", "audienceType", "role", "accountStatus", "createdAt"])
+        && request.resource.data.keys().hasAll(["email", "audienceType", "role", "accountStatus", "createdAt"])
         && request.resource.data.email is string
         && request.resource.data.email == request.auth.token.email
         && request.resource.data.audienceType in ["guest", "student"]
         && request.resource.data.role == "viewer"
         && request.resource.data.accountStatus == "active"
         && request.resource.data.createdAt is timestamp
-        && (!("displayName" in request.resource.data)
-          || request.resource.data.displayName is string);
-
+        && (!("displayName" in request.resource.data) || request.resource.data.displayName is string);
       allow update, delete: if false;
     }
 
-    // A verified active account may submit metadata for moderation.
     match /submissions/{submissionId} {
       allow create: if activeUser()
-        && myProfile().role in ["viewer", "student", "project_member", "teacher", "admin"]
         && request.resource.data.keys().hasOnly([
-          "title", "description", "type", "categoryId", "language",
-          "submittedBy", "submittedByName", "status", "fileStatus", "submittedAt"
+          "schemaVersion", "title", "slug", "description", "contentType", "type",
+          "authors", "authorNamesNormalized", "categoryId", "tags", "language",
+          "metadata", "reader", "status", "fileStatus", "submittedBy", "submittedByName", "submittedAt"
         ])
         && request.resource.data.keys().hasAll([
-          "title", "type", "submittedBy", "status", "fileStatus", "submittedAt"
+          "schemaVersion", "title", "contentType", "status", "fileStatus", "submittedBy", "submittedAt"
         ])
+        && request.resource.data.schemaVersion == 2
         && request.resource.data.submittedBy == request.auth.uid
         && request.resource.data.status == "pending"
         && request.resource.data.fileStatus == "awaiting_upload"
         && validTitle(request.resource.data)
-        && validType(request.resource.data)
-        && request.resource.data.submittedAt is timestamp
-        && (!("description" in request.resource.data)
-          || request.resource.data.description is string)
-        && (!("categoryId" in request.resource.data)
-          || request.resource.data.categoryId is string)
-        && (!("language" in request.resource.data)
-          || request.resource.data.language is string)
-        && (!("submittedByName" in request.resource.data)
-          || request.resource.data.submittedByName is string);
-
-      allow get, list: if activeUser()
-        && (resource.data.submittedBy == request.auth.uid || isStaff());
-
+        && validContentType(request.resource.data)
+        && validLegacyType(request.resource.data)
+        && request.resource.data.submittedAt is timestamp;
+      allow get, list: if activeUser() && (resource.data.submittedBy == request.auth.uid || isStaff());
       allow update: if isStaff()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "status", "libraryItemId", "reviewedBy", "reviewedAt", "reviewNote"
-        ]);
-
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "libraryItemId", "reviewedBy", "reviewedAt", "reviewNote"]);
       allow delete: if false;
     }
 
-    // Published metadata is public. Only staff can moderate; Project Members
-    // may create already-published metadata, but cannot edit or delete it.
     match /libraryItems/{itemId} {
       allow get, list: if resource.data.status == "published" || isStaff();
-
       allow create: if isStaff()
         || (isProjectMember()
           && request.resource.data.keys().hasOnly([
-            "title", "description", "type", "categoryId", "language",
-            "submittedBy", "submittedByName", "publishedBy",
-            "status", "fileStatus", "publishedAt"
+            "schemaVersion", "title", "slug", "description", "contentType", "type",
+            "authors", "authorNamesNormalized", "categoryId", "tags", "language",
+            "metadata", "reader", "qrCode", "submittedBy", "submittedByName",
+            "publishedBy", "status", "fileStatus", "createdBy", "createdAt", "updatedAt", "publishedAt"
           ])
           && request.resource.data.keys().hasAll([
-            "title", "type", "submittedBy", "publishedBy",
-            "status", "fileStatus", "publishedAt"
+            "schemaVersion", "title", "contentType", "status", "fileStatus",
+            "submittedBy", "publishedBy", "createdBy", "createdAt", "updatedAt", "publishedAt", "qrCode"
           ])
+          && request.resource.data.schemaVersion == 2
           && request.resource.data.submittedBy == request.auth.uid
           && request.resource.data.publishedBy == request.auth.uid
-          && request.resource.data.status == "published"
-          && request.resource.data.fileStatus == "awaiting_upload"
-          && validTitle(request.resource.data)
-          && validType(request.resource.data)
-          && request.resource.data.publishedAt is timestamp
-          && (!("description" in request.resource.data)
-            || request.resource.data.description is string)
-          && (!("categoryId" in request.resource.data)
-            || request.resource.data.categoryId is string)
-          && (!("language" in request.resource.data)
-            || request.resource.data.language is string)
-          && (!("submittedByName" in request.resource.data)
-            || request.resource.data.submittedByName is string));
-
+          && request.resource.data.createdBy == request.auth.uid
+          && validLibraryItem(request.resource.data));
       allow update: if isStaff()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "status", "archivedBy", "archivedAt"
-        ]);
-
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "archivedBy", "archivedAt", "updatedAt", "fileStatus"]);
       allow delete: if isStaff();
+    }
+
+    match /libraryItems/{itemId}/assets/{assetId} {
+      allow get, list: if get(/databases/$(database)/documents/libraryItems/$(itemId)).data.status == "published" || isStaff();
+      allow create: if isStaff()
+        || (isProjectMember()
+          && request.resource.data.keys().hasOnly([
+            "assetType", "format", "storageProvider", "storageKey", "mimeType",
+            "sizeBytes", "checksum", "isPrimary", "access", "createdAt", "createdBy"
+          ])
+          && request.resource.data.keys().hasAll(["assetType", "format", "storageProvider", "createdAt", "createdBy"])
+          && request.resource.data.assetType in ["cover", "original", "preview", "thumbnail", "attachment"]
+          && request.resource.data.format is string
+          && request.resource.data.storageProvider in ["dev", "r2"]
+          && request.resource.data.createdBy == request.auth.uid
+          && request.resource.data.createdAt is timestamp);
+      allow update, delete: if isStaff();
     }
 
     match /moderationLogs/{logId} {
       allow get, list: if isStaff();
       allow create: if isStaff()
-        && request.resource.data.keys().hasOnly([
-          "action", "submissionId", "libraryItemId", "actorUid",
-          "reason", "createdAt"
-        ])
-        && request.resource.data.keys().hasAll([
-          "action", "actorUid", "createdAt"
-        ])
+        && request.resource.data.keys().hasOnly(["action", "submissionId", "libraryItemId", "actorUid", "reason", "createdAt"])
+        && request.resource.data.keys().hasAll(["action", "actorUid", "createdAt"])
         && request.resource.data.action in ["approve", "reject", "archive"]
         && request.resource.data.actorUid == request.auth.uid
         && request.resource.data.createdAt is timestamp;
@@ -180,13 +144,10 @@ service cloud.firestore {
 
     match /bookReviews/{reviewId} {
       allow get, list: if resource.data.status == "published";
-      allow create: if activeUser()
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.status == "pending";
+      allow create: if activeUser() && request.resource.data.userId == request.auth.uid && request.resource.data.status == "pending";
       allow update, delete: if isStaff();
     }
 
-    // Deny every collection not explicitly listed above.
     match /{document=**} {
       allow read, write: if false;
     }
