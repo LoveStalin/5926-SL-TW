@@ -364,6 +364,165 @@ async function createSubmission(request, claims, profile, token, env) {
     return json({ id, status: "pending", fileStatus: "awaiting_upload", contentType: content.contentType, message: "Đã nhận metadata. File sẽ được gắn sau khi Storage Layer sẵn sàng." }, 201);
 }
 
+async function listSubcollection(parentPath, collectionName, token, env, pageSize = 100) {
+    const path = "/" + parentPath + "/" + collectionName + "?pageSize=" + pageSize;
+    const result = await firestoreRequest(path, token, { env });
+    return (result.documents || []).map(document => ({
+        id: document.name.split("/").pop(),
+        ...decodeFields(document.fields)
+    }));
+}
+
+function requireStorage(env) {
+    if (!env.DIGITAL_LIBRARY_BUCKET) {
+        throw new HttpError(503, "Storage chưa được bind. Hãy chạy Worker bằng wrangler.dev.toml để dùng DEV storage.");
+    }
+    return env.DIGITAL_LIBRARY_BUCKET;
+}
+
+function normalizeUploadFormat(file, requestedFormat) {
+    const explicit = String(requestedFormat || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+    if (explicit) return explicit.slice(0, 20);
+    const fromName = String(file.name || "").split(".").pop().toLowerCase().replace(/[^a-z0-9]+/g, "");
+    return fromName.slice(0, 20) || "bin";
+}
+
+function buildStorageKey(itemId, assetId, format) {
+    return "library/" + itemId + "/" + assetId + "." + format;
+}
+
+async function uploadLibraryAsset(request, itemId, claims, profile, token, env) {
+    if (!["project_member", "teacher", "admin"].includes(profile.role)) {
+        throw new HttpError(403, "Chỉ Project Member, giáo viên hoặc admin mới được upload file.");
+    }
+
+    const item = await getDocument("libraryItems", itemId, token, env);
+    if (!["published", "archived"].includes(item.data.status)) {
+        throw new HttpError(404, "Không tìm thấy tài liệu hợp lệ.");
+    }
+
+    const bucket = requireStorage(env);
+    const contentLength = Number(request.headers.get("content-length") || 0);
+    const maxBytes = 256 * 1024 * 1024;
+    if (contentLength && contentLength > maxBytes) {
+        throw new HttpError(413, "File DEV tối đa 256 MB cho mỗi lần upload.");
+    }
+
+    const form = await request.formData();
+    const file = form.get("file");
+    if (!(file instanceof File)) {
+        throw new HttpError(400, "Thiếu field file trong multipart/form-data.");
+    }
+    if (file.size > maxBytes) {
+        throw new HttpError(413, "File DEV tối đa 256 MB cho mỗi lần upload.");
+    }
+
+    const assetType = String(form.get("assetType") || "original").trim();
+    if (!["cover", "original", "preview", "thumbnail", "attachment"].includes(assetType)) {
+        throw new HttpError(400, "assetType không hợp lệ.");
+    }
+
+    const format = normalizeUploadFormat(file, form.get("format"));
+    const assetId = randomId();
+    const storageKey = buildStorageKey(itemId, assetId, format);
+    const storageProvider = env.DIGITAL_LIBRARY_STORAGE_PROVIDER || "dev";
+
+    await bucket.put(storageKey, file.stream(), {
+        httpMetadata: {
+            contentType: file.type || "application/octet-stream",
+            contentDisposition: "inline"
+        },
+        customMetadata: {
+            itemId,
+            assetId,
+            originalName: String(file.name || "").slice(0, 200)
+        }
+    });
+
+    const now = new Date().toISOString();
+    try {
+        await createDocument("libraryItems/" + itemId + "/assets", assetId, {
+            assetType,
+            format,
+            storageProvider,
+            storageKey,
+            mimeType: file.type || "application/octet-stream",
+            sizeBytes: file.size,
+            checksum: "",
+            isPrimary: form.get("isPrimary") !== "false",
+            access: form.get("access") === "private" ? "private" : "public",
+            createdAt: { __timestamp: now },
+            createdBy: claims.sub
+        }, token, env);
+
+        await patchDocument("libraryItems", itemId, {
+            fileStatus: "uploaded",
+            updatedAt: { __timestamp: now }
+        }, token, env);
+    } catch (error) {
+        await bucket.delete(storageKey);
+        throw error;
+    }
+
+    return json({
+        id: assetId,
+        itemId,
+        assetType,
+        format,
+        storageProvider,
+        storageKey,
+        sizeBytes: file.size,
+        mimeType: file.type || "application/octet-stream",
+        status: "uploaded"
+    }, 201);
+}
+
+async function getPrimaryLibraryAsset(itemId, token, env) {
+    const assets = await listSubcollection("libraryItems/" + itemId, "assets", token, env);
+    return assets.find(asset => asset.isPrimary === true)
+        || assets.find(asset => asset.assetType === "original")
+        || assets[0]
+        || null;
+}
+
+async function serveLibraryAsset(request, itemId, token, env) {
+    const item = await getDocument("libraryItems", itemId, token || "", env);
+    if (item.data.status !== "published") {
+        throw new HttpError(404, "Không tìm thấy tài liệu đã xuất bản.");
+    }
+
+    const asset = await getPrimaryLibraryAsset(itemId, token || "", env);
+    if (!asset || !asset.storageKey) {
+        throw new HttpError(404, "Tài liệu chưa có file.");
+    }
+
+    const bucket = requireStorage(env);
+    const object = await bucket.get(asset.storageKey, {
+        onlyIf: request.headers,
+        range: request.headers
+    });
+    if (!object) throw new HttpError(404, "File không tồn tại trong Storage.");
+
+    const headers = new Headers();
+    object.writeHttpMetadata(headers);
+    headers.set("etag", object.httpEtag);
+    headers.set("cache-control", "public, max-age=3600");
+    headers.set("accept-ranges", "bytes");
+    headers.set("x-content-type-options", "nosniff");
+
+    if (object.range) {
+        const range = object.range;
+        const start = range.offset;
+        const end = range.offset + range.length - 1;
+        headers.set("content-range", "bytes " + start + "-" + end + "/" + object.size);
+        headers.set("content-length", String(range.length));
+        return new Response(object.body, { status: 206, headers });
+    }
+
+    headers.set("content-length", String(object.size));
+    return new Response(object.body, { status: 200, headers });
+}
+
 async function createAssetMetadata(request, itemId, claims, profile, token, env) {
     const item = await getDocument("libraryItems", itemId, token, env);
     const canWrite = ["project_member", "teacher", "admin"].includes(profile.role) || item.data.submittedBy === claims.sub;
@@ -400,16 +559,6 @@ async function getPublishedItem(id, token, env) {
 }
 
 async function listMySubmissions(claims, token, env, url) {
-    const submissions = await runQuery("submissions", { where: { fieldFilter: { field: { fieldPath: "submittedBy" }, op: "EQUAL", value: { stringValue: claims.sub } } }, limit: parseLimit(url.searchParams.get("limit"), 30) }, token, env);
-    return json({ submissions });
-}
-
-async function listPendingSubmissions(token, env, url) {
-    const status = url.searchParams.get("status") || "pending";
-    if (!["pending", "approved", "rejected"].includes(status)) throw new HttpError(400, "Trạng thái lọc không hợp lệ.");
-    const submissions = await runQuery("submissions", { where: { fieldFilter: { field: { fieldPath: "status" }, op: "EQUAL", value: { stringValue: status } }, limit: parseLimit(url.searchParams.get("limit"), 30) }, token, env);
-    return json({ submissions });
-}async function listMySubmissions(claims, token, env, url) {
     const submissions = await runQuery("submissions", {
         where: {
             fieldFilter: {
@@ -556,7 +705,7 @@ async function handle(request, env) {
 
     const publicFileMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/file$/);
     if (method === "GET" && publicFileMatch) {
-        return withHeaders(json({ error: "Xem/tải tệp tạm thời chưa khả dụng; chờ cấu hình R2." }, 503), cors);
+        return withHeaders(await serveLibraryAsset(request, publicFileMatch[1], null, env), cors);
     }
 
     const claims = await verifyFirebaseIdToken(request, env);
@@ -582,7 +731,7 @@ async function handle(request, env) {
         if (profile.role !== "project_member") {
             throw new HttpError(403, "Chỉ Project Member mới được tự xuất bản tài liệu.");
         }
-        return withHeaders(await publishLibraryItem(request, claims, profile, token, env), cors);
+        return withHeaders(await createLibraryItem(request, claims, profile, token, env), cors);
     }
 
     if (method === "POST" && path === "/api/v1/submissions") {
@@ -607,6 +756,11 @@ async function handle(request, env) {
     if (method === "POST" && rejectMatch) {
         requireStaff(profile);
         return withHeaders(await rejectSubmission(rejectMatch[1], request, claims, token, env), cors);
+    }
+
+    const uploadMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/upload$/);
+    if (method === "POST" && uploadMatch) {
+        return withHeaders(await uploadLibraryAsset(request, uploadMatch[1], claims, profile, token, env), cors);
     }
 
     const assetMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/assets$/);
