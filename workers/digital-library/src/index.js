@@ -497,7 +497,14 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
     const url = new URL(request.url);
     const assetType = String(url.searchParams.get("assetType") || "original").trim();
     const format = String(url.searchParams.get("format") || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 20);
-    const fileName = String(request.headers.get("x-file-name") || "").trim().slice(0, 200);
+    const encodedFileName = String(request.headers.get("x-file-name") || "").trim();
+    let fileName = encodedFileName;
+    try {
+        fileName = decodeURIComponent(encodedFileName);
+    } catch {
+        // Keep the raw header value if an older client sent a non-encoded filename.
+    }
+    fileName = fileName.slice(0, 200);
     if (!["cover", "original", "preview", "thumbnail", "attachment"].includes(assetType)) {
         throw new HttpError(400, "assetType không hợp lệ.");
     }

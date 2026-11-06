@@ -190,7 +190,7 @@ publishForm.addEventListener("submit", async event => {
                     headers: {
                         authorization: "Bearer " + idToken,
                         "content-type": file.type || "application/octet-stream",
-                        "x-file-name": file.name
+                        "x-file-name": encodeURIComponent(file.name)
                     },
                     body: file
                 }
