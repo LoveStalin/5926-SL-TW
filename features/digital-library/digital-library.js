@@ -242,14 +242,15 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
     }
 
     if (!WORKER_API_BASE_URL || !/^https?:\/\//i.test(WORKER_API_BASE_URL)) {
-        addDiagnostic("Cloudflare Worker", "Chưa cấu hình URL", "warn");
-        addDiagnostic("Firestore profile", "Chưa thể kiểm tra", "warn");
-        addDiagnostic("Role authorization", "Chưa thể kiểm tra", "warn");
-        diagnosticsMessage.textContent = "Firebase Authentication đã nhận tài khoản. Sau khi deploy Worker, thêm URL workers.dev vào WORKER_API_BASE_URL trong digital-library.js để xác minh Firestore và vai trò.";
-        accountRole.textContent = "CHƯA XÁC MINH";
-        refreshDiagnosticsButton.disabled = false;
-        return;
-    }
+    addDiagnostic("Cloudflare Worker", "Chưa cấu hình URL", "warn");
+    addDiagnostic("Firestore profile", "Chưa thể kiểm tra", "warn");
+    addDiagnostic("Role authorization", "Chưa thể kiểm tra", "warn");
+    diagnosticsMessage.textContent =
+        "Chưa có URL Worker hợp lệ. Kiểm tra WORKER_API_BASE_URL trong digital-library.js.";
+    accountRole.textContent = "CHƯA XÁC MINH";
+    refreshDiagnosticsButton.disabled = false;
+    return;
+}
 
     let workerOnline = false;
     try {
