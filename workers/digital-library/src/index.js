@@ -537,13 +537,13 @@ async function createAssetMetadata(request, itemId, claims, profile, token, env)
     const storageKey = String(body.storageKey || "").trim();
     if (!["cover", "original", "preview", "thumbnail", "attachment"].includes(assetType)) throw new HttpError(400, "assetType không hợp lệ.");
     if (!/^[a-z0-9.+-]{1,30}$/.test(format)) throw new HttpError(400, "format không hợp lệ.");
-    if (!["dev", "r2"].includes(storageProvider)) throw new HttpError(400, "storageProvider phải là dev hoặc r2.");
+    if (!["dev", "b2"].includes(storageProvider)) throw new HttpError(400, "storageProvider phải là dev hoặc b2.");
     if (storageKey.length > 500) throw new HttpError(400, "storageKey quá dài.");
-    if (storageProvider === "r2" && !storageKey) throw new HttpError(400, "R2 asset phải có storageKey.");
+    if (storageProvider === "b2" && !storageKey) throw new HttpError(400, "B2 asset phải có storageKey.");
     const assetId = randomId();
     const now = new Date().toISOString();
     await createDocument("libraryItems/" + itemId + "/assets", assetId, { assetType, format, storageProvider, storageKey: storageKey || null, mimeType: String(body.mimeType || "").slice(0, 120), sizeBytes: Number.isSafeInteger(body.sizeBytes) && body.sizeBytes >= 0 ? body.sizeBytes : 0, checksum: String(body.checksum || "").slice(0, 128), isPrimary: body.isPrimary === true, access: body.access === "private" ? "private" : "public", createdAt: { __timestamp: now }, createdBy: claims.sub }, token, env);
-    return json({ id: assetId, itemId, storageProvider, message: storageProvider === "dev" ? "Đã lưu metadata asset ở chế độ DEV; file bytes chưa được lưu." : "Đã lưu metadata asset cho R2." }, 201);
+    return json({ id: assetId, itemId, storageProvider, message: storageProvider === "dev" ? "Đã lưu metadata asset ở chế độ DEV; file bytes chưa được lưu." : "Đã lưu metadata asset cho B2." }, 201);
 }
 
 async function listPublished(url, token, env) {
