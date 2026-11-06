@@ -1,3 +1,5 @@
+import { AwsClient } from "aws4fetch";
+
 const FIREBASE_JWKS_URL =
     "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com";
 
@@ -373,11 +375,89 @@ async function listSubcollection(parentPath, collectionName, token, env, pageSiz
     }));
 }
 
-function requireStorage(env) {
+function getStorageProvider(env) {
+    const provider = String(env.DIGITAL_LIBRARY_STORAGE_PROVIDER || "dev").trim().toLowerCase();
+    if (!["dev", "b2"].includes(provider)) {
+        throw new HttpError(503, "Storage provider không hợp lệ.");
+    }
+    if (provider === "dev" && !env.DIGITAL_LIBRARY_BUCKET) {
+        throw new HttpError(503, "DEV storage chưa được bind. Hãy chạy Worker bằng wrangler.dev.toml.");
+    }
+    if (provider === "b2" && (!env.B2_ENDPOINT || !env.B2_BUCKET || !env.B2_KEY_ID || !env.B2_APPLICATION_KEY)) {
+        throw new HttpError(503, "Backblaze B2 chưa được cấu hình đầy đủ.");
+    }
+    return provider;
+}
+
+function requireR2(env) {
     if (!env.DIGITAL_LIBRARY_BUCKET) {
-        throw new HttpError(503, "Storage chưa được bind. Hãy chạy Worker bằng wrangler.dev.toml để dùng DEV storage.");
+        throw new HttpError(503, "DEV storage chưa được bind. Hãy chạy Worker bằng wrangler.dev.toml.");
     }
     return env.DIGITAL_LIBRARY_BUCKET;
+}
+
+function b2ObjectUrl(env, storageKey) {
+    const endpoint = String(env.B2_ENDPOINT || "").replace(/\/+$/, "");
+    const bucket = encodeURIComponent(String(env.B2_BUCKET || ""));
+    const key = String(storageKey || "").split("/").map(encodeURIComponent).join("/");
+    return endpoint + "/" + bucket + "/" + key;
+}
+
+function b2Client(env) {
+    const endpoint = new URL(env.B2_ENDPOINT);
+    const region = endpoint.hostname.split(".")[1];
+    return new AwsClient({
+        accessKeyId: env.B2_KEY_ID,
+        secretAccessKey: env.B2_APPLICATION_KEY,
+        service: "s3",
+        region,
+        retries: 2
+    });
+}
+
+async function b2PutObject(request, env, storageKey, mimeType, itemId, assetId, fileName, contentLength) {
+    const body = await request.arrayBuffer();
+    const response = await b2Client(env).fetch(b2ObjectUrl(env, storageKey), {
+        method: "PUT",
+        headers: {
+            "content-type": mimeType,
+            "content-length": String(contentLength),
+            "content-disposition": "inline",
+            "x-amz-meta-itemid": itemId,
+            "x-amz-meta-assetid": assetId,
+            "x-amz-meta-originalname": fileName
+        },
+        body
+    });
+    if (!response.ok) {
+        const detail = await response.text().catch(() => "");
+        throw new HttpError(502, "Backblaze B2 upload thất bại" + (detail ? ": " + detail.slice(0, 500) : "."));
+    }
+}
+
+async function b2DeleteObject(env, storageKey) {
+    const response = await b2Client(env).fetch(b2ObjectUrl(env, storageKey), {
+        method: "DELETE"
+    });
+    if (!response.ok && response.status !== 404) {
+        const detail = await response.text().catch(() => "");
+        throw new HttpError(502, "Backblaze B2 delete thất bại" + (detail ? ": " + detail.slice(0, 500) : "."));
+    }
+}
+
+async function b2GetObject(request, env, storageKey) {
+    const headers = new Headers();
+    const range = request.headers.get("range");
+    const ifNoneMatch = request.headers.get("if-none-match");
+    const ifModifiedSince = request.headers.get("if-modified-since");
+    if (range) headers.set("range", range);
+    if (ifNoneMatch) headers.set("if-none-match", ifNoneMatch);
+    if (ifModifiedSince) headers.set("if-modified-since", ifModifiedSince);
+
+    return b2Client(env).fetch(b2ObjectUrl(env, storageKey), {
+        method: "GET",
+        headers
+    });
 }
 
 function normalizeUploadFormat(file, requestedFormat) {
@@ -401,8 +481,8 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
         throw new HttpError(404, "Không tìm thấy tài liệu hợp lệ.");
     }
 
-    const bucket = requireStorage(env);
-    const maxBytes = Number(env.DIGITAL_LIBRARY_MAX_UPLOAD_BYTES || 100 * 1024 * 1024);
+    const storageProvider = getStorageProvider(env);
+    const maxBytes = Number(env.DIGITAL_LIBRARY_MAX_UPLOAD_BYTES || 50 * 1024 * 1024);
     const contentLength = Number(request.headers.get("content-length") || 0);
     if (!contentLength) {
         throw new HttpError(411, "Upload file phải có Content-Length.");
@@ -427,20 +507,24 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
 
     const assetId = randomId();
     const storageKey = buildStorageKey(itemId, assetId, format);
-    const storageProvider = env.DIGITAL_LIBRARY_STORAGE_PROVIDER || "dev";
     const mimeType = request.headers.get("content-type") || "application/octet-stream";
 
-    await bucket.put(storageKey, request.body, {
-        httpMetadata: {
-            contentType: mimeType,
-            contentDisposition: "inline"
-        },
-        customMetadata: {
-            itemId,
-            assetId,
-            originalName: fileName
-        }
-    });
+    if (storageProvider === "dev") {
+        const bucket = requireR2(env);
+        await bucket.put(storageKey, request.body, {
+            httpMetadata: {
+                contentType: mimeType,
+                contentDisposition: "inline"
+            },
+            customMetadata: {
+                itemId,
+                assetId,
+                originalName: fileName
+            }
+        });
+    } else {
+        await b2PutObject(request, env, storageKey, mimeType, itemId, assetId, fileName, contentLength);
+    }
 
     const now = new Date().toISOString();
     try {
@@ -463,7 +547,11 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
             updatedAt: { __timestamp: now }
         }, token, env);
     } catch (error) {
-        await bucket.delete(storageKey);
+        if (storageProvider === "dev") {
+            await requireR2(env).delete(storageKey);
+        } else {
+            await b2DeleteObject(env, storageKey);
+        }
         throw error;
     }
 
@@ -499,7 +587,28 @@ async function serveLibraryAsset(request, itemId, token, env) {
         throw new HttpError(404, "Tài liệu chưa có file.");
     }
 
-    const bucket = requireStorage(env);
+    const storageProvider = String(asset.storageProvider || env.DIGITAL_LIBRARY_STORAGE_PROVIDER || "dev").trim().toLowerCase();
+
+    if (storageProvider === "b2") {
+        const response = await b2GetObject(request, env, asset.storageKey);
+        if (response.status === 404) throw new HttpError(404, "File không tồn tại trong Storage.");
+        if (!response.ok && response.status !== 304 && response.status !== 206) {
+            const detail = await response.text().catch(() => "");
+            throw new HttpError(response.status >= 500 ? 502 : response.status, "Backblaze B2 không thể đọc file." + (detail ? " " + detail.slice(0, 300) : ""));
+        }
+
+        const headers = new Headers(response.headers);
+        headers.set("cache-control", "public, max-age=3600");
+        headers.set("accept-ranges", "bytes");
+        headers.set("x-content-type-options", "nosniff");
+        return new Response(response.body, { status: response.status, headers });
+    }
+
+    if (storageProvider !== "dev") {
+        throw new HttpError(503, "Storage provider của asset không được hỗ trợ.");
+    }
+
+    const bucket = requireR2(env);
     const object = await bucket.get(asset.storageKey, {
         onlyIf: request.headers,
         range: request.headers
@@ -533,7 +642,7 @@ async function createAssetMetadata(request, itemId, claims, profile, token, env)
     const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
     const assetType = String(body.assetType || "").trim();
     const format = String(body.format || "").trim().toLowerCase();
-    const storageProvider = String(body.storageProvider || "dev").trim();
+    const storageProvider = String(body.storageProvider || env.DIGITAL_LIBRARY_STORAGE_PROVIDER || "dev").trim();
     const storageKey = String(body.storageKey || "").trim();
     if (!["cover", "original", "preview", "thumbnail", "attachment"].includes(assetType)) throw new HttpError(400, "assetType không hợp lệ.");
     if (!/^[a-z0-9.+-]{1,30}$/.test(format)) throw new HttpError(400, "format không hợp lệ.");
