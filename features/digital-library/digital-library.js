@@ -241,7 +241,7 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         return;
     }
 
-    if (!WORKER_API_BASE_URL || !/^https:\/\//i.test(WORKER_API_BASE_URL)) {
+    if (!WORKER_API_BASE_URL || !/^https?:\/\//i.test(WORKER_API_BASE_URL)) {
         addDiagnostic("Cloudflare Worker", "Chưa cấu hình URL", "warn");
         addDiagnostic("Firestore profile", "Chưa thể kiểm tra", "warn");
         addDiagnostic("Role authorization", "Chưa thể kiểm tra", "warn");
