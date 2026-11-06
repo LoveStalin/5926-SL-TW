@@ -1,0 +1,14 @@
+{
+  "name": "digital-library",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker backend for the separate Firebase project `a5-digital-library`.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "dependencies": {
+    "aws4fetch": "^1.0.20"
+  }
+}

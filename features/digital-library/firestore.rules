@@ -144,7 +144,7 @@ service cloud.firestore {
           ])
           && request.resource.data.assetType in ["cover", "original", "preview", "thumbnail", "attachment"]
           && request.resource.data.format is string
-          && request.resource.data.storageProvider in ["dev", "r2"]
+          && request.resource.data.storageProvider in ["dev", "b2"]
           && request.resource.data.storageKey is string
           && request.resource.data.createdBy == request.auth.uid
           && request.resource.data.createdAt is timestamp);
