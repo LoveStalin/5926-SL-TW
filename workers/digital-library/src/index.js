@@ -752,6 +752,46 @@ async function rejectSubmission(id, request, claims, token, env) {
     return json({ id, status: "rejected" });
 }
 
+async function deleteLibraryItem(id, claims, token, env) {
+    const item = await getDocument("libraryItems", id, token, env);
+    const assets = await listSubcollection("libraryItems/" + id, "assets", token, env);
+
+    for (const asset of assets) {
+        if (!asset.storageKey) continue;
+        const provider = String(asset.storageProvider || env.DIGITAL_LIBRARY_STORAGE_PROVIDER || "dev").trim().toLowerCase();
+        if (provider === "b2") {
+            await b2DeleteObject(env, asset.storageKey);
+        } else if (provider === "dev") {
+            await requireR2(env).delete(asset.storageKey);
+        } else {
+            throw new HttpError(503, "Storage provider của asset không được hỗ trợ.");
+        }
+    }
+
+    for (const asset of assets) {
+        await firestoreRequest(
+            "/libraryItems/" + encodeURIComponent(id) + "/assets/" + encodeURIComponent(asset.id),
+            token,
+            { env, method: "DELETE" }
+        );
+    }
+
+    await firestoreRequest(
+        "/libraryItems/" + encodeURIComponent(id),
+        token,
+        { env, method: "DELETE" }
+    );
+
+    await createDocument("moderationLogs", randomId(), {
+        action: "delete",
+        libraryItemId: id,
+        actorUid: claims.sub,
+        createdAt: { __timestamp: new Date().toISOString() }
+    }, token, env);
+
+    return json({ id, status: "deleted" });
+}
+
 async function archiveLibraryItem(id, claims, token, env) {
     const item = await getDocument("libraryItems", id, token, env);
     if (item.data.status !== "published") throw new HttpError(409, "Tài liệu không ở trạng thái đã xuất bản.");
@@ -785,7 +825,7 @@ function corsHeaders(request, env) {
     }
 
     const headers = {
-        "access-control-allow-methods": "GET, POST, PUT, OPTIONS",
+        "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
         "access-control-allow-headers": "Authorization, Content-Type, X-File-Name",
         "access-control-max-age": "86400",
         "vary": "Origin"
@@ -886,6 +926,12 @@ async function handle(request, env) {
     if (method === "POST" && assetMatch) {
         return withHeaders(await createAssetMetadata(request, assetMatch[1], claims, profile, token, env), cors);
     }
+    const deleteMatch = path.match(/^\/api\/v1\/admin\/library\/([a-zA-Z0-9_-]+)$/);
+    if (method === "DELETE" && deleteMatch) {
+        requireStaff(profile);
+        return withHeaders(await deleteLibraryItem(deleteMatch[1], claims, token, env), cors);
+    }
+
     const archiveMatch = path.match(/^\/api\/v1\/admin\/library\/([a-zA-Z0-9_-]+)\/archive$/);
     if (method === "POST" && archiveMatch) {
         requireStaff(profile);
