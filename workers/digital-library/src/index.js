@@ -786,7 +786,7 @@ function corsHeaders(request, env) {
 
     const headers = {
         "access-control-allow-methods": "GET, POST, PUT, OPTIONS",
-        "access-control-allow-headers": "Authorization, Content-Type",
+        "access-control-allow-headers": "Authorization, Content-Type, X-File-Name",
         "access-control-max-age": "86400",
         "vary": "Origin"
     };
