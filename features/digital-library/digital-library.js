@@ -482,6 +482,62 @@ async function loadPublishedItems() {
             description.textContent = item.description || "Chưa có mô tả.";
 
             card.append(type, title, description);
+
+            if (["admin", "teacher"].includes(accountRole.dataset.role)) {
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "delete-book-button";
+                deleteButton.setAttribute("aria-label", "Xóa tài liệu");
+                deleteButton.title = "Xóa tài liệu";
+                deleteButton.innerHTML = "🗑️";
+
+                deleteButton.addEventListener("click", async event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const confirmed = window.confirm(
+                        "Xóa tài liệu này?\\n\\n" +
+                        (item.title || "Tài liệu") +
+                        "\\n\\nFile và dữ liệu của tài liệu sẽ bị xóa khỏi thư viện."
+                    );
+                    if (!confirmed) return;
+
+                    deleteButton.disabled = true;
+                    deleteButton.textContent = "…";
+
+                    try {
+                        const user = libraryAuth.currentUser;
+                        if (!user) throw new Error("Phiên đăng nhập đã hết. Hãy đăng nhập lại.");
+
+                        const idToken = await user.getIdToken();
+                        const response = await fetch(
+                            WORKER_API_BASE_URL.replace(/\\/$/, "") +
+                            "/api/v1/admin/library/" + encodeURIComponent(documentSnapshot.id),
+                            {
+                                method: "DELETE",
+                                headers: {
+                                    authorization: "Bearer " + idToken
+                                }
+                            }
+                        );
+
+                        const body = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            throw new Error(body.error || body.message || "Không thể xóa tài liệu.");
+                        }
+
+                        await loadPublishedItems();
+                    } catch (error) {
+                        console.error("Digital Library delete:", error);
+                        alert("Không thể xóa tài liệu.\\n\\n" + (error.message || "Lỗi không xác định."));
+                        deleteButton.disabled = false;
+                        deleteButton.innerHTML = "🗑️";
+                    }
+                });
+
+                card.append(deleteButton);
+            }
+
             libraryGrid.append(card);
         });
         libraryStatus.textContent = `Đang hiển thị ${snapshot.size} tài liệu đã xuất bản.`;
