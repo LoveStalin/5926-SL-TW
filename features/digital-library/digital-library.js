@@ -451,6 +451,26 @@ async function loadPublishedItems() {
             const card = document.createElement("article");
             card.className = "book-card";
 
+            const fileUrl =
+                WORKER_API_BASE_URL.replace(/\/$/, "") +
+                "/api/v1/library/" + encodeURIComponent(documentSnapshot.id) + "/file";
+
+            if (item.fileStatus === "uploaded") {
+                card.classList.add("is-clickable");
+                card.tabIndex = 0;
+                card.setAttribute("role", "link");
+                card.setAttribute("aria-label", "Mở tài liệu: " + (item.title || "Tài liệu"));
+                card.addEventListener("click", () => {
+                    window.open(fileUrl, "_blank", "noopener,noreferrer");
+                });
+                card.addEventListener("keydown", event => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        window.open(fileUrl, "_blank", "noopener,noreferrer");
+                    }
+                });
+            }
+
             const type = document.createElement("span");
             type.className = "book-type";
             type.textContent = item.type || "Tài liệu";
