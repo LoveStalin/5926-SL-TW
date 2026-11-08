@@ -34,7 +34,12 @@ h2 { margin: 8px 0 0; font-size: clamp(25px, 4vw, 34px); letter-spacing: -.04em;
 .public-label { color: #a9e6c3; font-size: 12px; white-space: nowrap; }
 .notice { margin-top: 26px; color: #b8afc8; font-size: 14px; }
 .library-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 22px; }
-.book-card { padding: 20px; min-height: 160px; border: 1px solid #ffffff17; border-radius: 18px; background: #1c1729; }
+.book-card { position: relative; padding: 20px; min-height: 160px; border: 1px solid #ffffff17; border-radius: 18px; background: #1c1729; }
+.book-card.is-clickable { cursor: pointer; }
+.book-card.is-clickable:hover { border-color: #c8a5f455; transform: translateY(-1px); }
+.delete-book-button { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid #ff5c5c55; border-radius: 10px; background: #7f1d1d; color: #fff; font-size: 17px; cursor: pointer; z-index: 2; }
+.delete-book-button:hover { background: #b91c1c; border-color: #ff7777; }
+.delete-book-button:disabled { opacity: .55; cursor: wait; }
 .book-type { color: #c8a5f4; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .book-card h3 { margin: 14px 0 8px; font-size: 17px; }
 .book-card p { margin: 0; color: #b8afc8; font-size: 13px; line-height: 1.65; }
