@@ -338,6 +338,8 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         accountRole.textContent = roleLabel;
         accountRole.dataset.role = profile.role || "unknown";
         publishPanel.hidden = !["project_member", "teacher", "admin"].includes(profile.role);
+        await loadPublishedItems();
+
         diagnosticsMessage.textContent = profile.accountStatus === "active"
             ? "Đã xác minh thành công: Firebase Authentication, Firestore profile và vai trò do Worker xác nhận."
             : "Đã đọc được hồ sơ nhưng tài khoản không ở trạng thái active.";
@@ -400,6 +402,8 @@ signOutButton.addEventListener("click", async () => {
     signOutButton.disabled = true;
     try {
         await signOut(libraryAuth);
+        accountRole.dataset.role = "unknown";
+        await loadPublishedItems();
         authStatus.textContent = "Đã đăng xuất.";
     } catch (error) {
         diagnosticsMessage.textContent = "Không thể đăng xuất. Hãy thử lại.";
