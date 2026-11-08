@@ -515,7 +515,7 @@ async function loadPublishedItems() {
 
                         const idToken = await user.getIdToken();
                         const response = await fetch(
-                            WORKER_API_BASE_URL.replace(/\\/$/, "") +
+                            WORKER_API_BASE_URL.replace(/\\/$/ "") +
                             "/api/v1/admin/library/" + encodeURIComponent(documentSnapshot.id),
                             {
                                 method: "DELETE",
