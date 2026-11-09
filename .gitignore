@@ -1,4 +1,5 @@
 .env
+.dev.vars
 *.env.wrangler/
 # Node.js dependencies
 node_modules/
