@@ -242,9 +242,11 @@ service cloud.firestore {
         && request.resource.data.updatedAt is timestamp
       );
 
-      // Destructive library deletion must go through the Worker so B2/R2
-      // objects are removed before the Firestore records are removed.
-      allow delete: if false;
+      // The Worker performs the storage cleanup before this Firestore delete.
+      // Because the Worker currently forwards the user's Firebase ID token,
+      // Firestore cannot distinguish that Worker request from a direct staff
+      // client request at the rules layer.
+      allow delete: if isStaff();
     }
 
     match /libraryItems/{itemId}/assets/{assetId} {
@@ -259,9 +261,9 @@ service cloud.firestore {
           && validAsset(request.resource.data, itemId, assetId)
           && request.resource.data.createdBy == request.auth.uid);
 
-      // Asset mutation/deletion is intentionally Worker-only at the application layer.
-      // Direct Firestore deletion could leave an orphaned object in B2.
-      allow update, delete: if false;
+      // The Worker performs the corresponding B2/R2 operation before deleting
+      // the Firestore asset record.
+      allow update, delete: if isStaff();
     }
 
     match /moderationLogs/{logId} {
