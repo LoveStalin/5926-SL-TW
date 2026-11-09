@@ -481,6 +481,16 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
         throw new HttpError(404, "Không tìm thấy tài liệu hợp lệ.");
     }
 
+    // Project members may upload only to items they created/submitted.
+    // Staff can manage any library item.
+    if (
+        profile.role === "project_member"
+        && item.data.createdBy !== claims.sub
+        && item.data.submittedBy !== claims.sub
+    ) {
+        throw new HttpError(403, "Project Member chỉ được upload file cho tài liệu do chính mình tạo.");
+    }
+
     const storageProvider = getStorageProvider(env);
     const maxBytes = Number(env.DIGITAL_LIBRARY_MAX_UPLOAD_BYTES || 50 * 1024 * 1024);
     const contentLength = Number(request.headers.get("content-length") || 0);
