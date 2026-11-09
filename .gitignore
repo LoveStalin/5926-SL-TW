@@ -1,5 +1,8 @@
 .env
 *.env.wrangler/
+# Node.js dependencies
+node_modules/
+
 # Cloudflare Wrangler local state/cache
 workers/digital-library/wrangler/
 workers/digital-library/.wrangler/
