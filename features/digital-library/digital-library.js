@@ -41,10 +41,13 @@ const modeButtons = [...document.querySelectorAll("[data-mode]")];
 // Set this to the exact workers.dev URL after deploying the Worker.
 // Example format: https://a5-digital-library-api.<your-subdomain>.workers.dev
 const PRODUCTION_WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
+const FORCE_PRODUCTION_WORKER =
+    new URLSearchParams(window.location.search).get("api") === "production";
 const WORKER_API_BASE_URL =
-    /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
-        ? "http://127.0.0.1:8787"
-        : PRODUCTION_WORKER_API_BASE_URL;
+    FORCE_PRODUCTION_WORKER ||
+    !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+        ? PRODUCTION_WORKER_API_BASE_URL
+        : "http://127.0.0.1:8787";
 
 let authMode = "login";
 let diagnosticsRun = 0;
