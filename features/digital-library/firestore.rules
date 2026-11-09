@@ -197,34 +197,50 @@ service cloud.firestore {
     match /libraryItems/{itemId} {
       allow get, list: if resource.data.status == "published" || isStaff();
 
-      allow create: if isStaff()
+      allow create: if (
+        isStaff()
         && validLibraryItem(request.resource.data)
+        && request.resource.data.submittedBy == request.auth.uid
         && request.resource.data.publishedBy == request.auth.uid
         && request.resource.data.createdBy == request.auth.uid
-        || (isProjectMember()
-          && validLibraryItem(request.resource.data)
-          && request.resource.data.submittedBy == request.auth.uid
-          && request.resource.data.publishedBy == request.auth.uid
-          && request.resource.data.createdBy == request.auth.uid);
+      ) || (
+        isProjectMember()
+        && validLibraryItem(request.resource.data)
+        && request.resource.data.submittedBy == request.auth.uid
+        && request.resource.data.publishedBy == request.auth.uid
+        && request.resource.data.createdBy == request.auth.uid
+      );
 
-      allow update: if isStaff()
+      allow update: if (
+        isStaff()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "status", "archivedBy", "archivedAt", "updatedAt", "fileStatus"
         ])
         && request.resource.data.status in ["published", "archived"]
         && request.resource.data.fileStatus in ["awaiting_upload", "uploaded"]
         && request.resource.data.updatedAt is timestamp
-        && (request.resource.data.status == resource.data.status
-          || (request.resource.data.status == "archived"
+        && (
+          (
+            request.resource.data.status == resource.data.status
+            && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+              "archivedBy", "archivedAt"
+            ])
+          )
+          || (
+            request.resource.data.status == "archived"
             && request.resource.data.archivedBy == request.auth.uid
-            && request.resource.data.archivedAt is timestamp))
-        || (isProjectMember()
-          && resource.data.createdBy == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            "fileStatus", "updatedAt"
-          ])
-          && request.resource.data.fileStatus == "uploaded"
-          && request.resource.data.updatedAt is timestamp);
+            && request.resource.data.archivedAt is timestamp
+          )
+        )
+      ) || (
+        isProjectMember()
+        && resource.data.createdBy == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "fileStatus", "updatedAt"
+        ])
+        && request.resource.data.fileStatus == "uploaded"
+        && request.resource.data.updatedAt is timestamp
+      );
 
       // Destructive library deletion must go through the Worker so B2/R2
       // objects are removed before the Firestore records are removed.
