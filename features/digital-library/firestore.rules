@@ -2,17 +2,42 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function owns(userId) { return signedIn() && request.auth.uid == userId; }
-    function profilePath(uid) { return /databases/$(database)/documents/users/$(uid); }
-    function hasProfile() { return signedIn() && exists(profilePath(request.auth.uid)); }
-    function myProfile() { return get(profilePath(request.auth.uid)).data; }
-    function activeUser() { return hasProfile() && myProfile().accountStatus == "active"; }
-    function isProjectMember() { return activeUser() && myProfile().role == "project_member"; }
-    function isStaff() { return activeUser() && myProfile().role in ["teacher", "admin"]; }
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function profilePath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function hasProfile() {
+      return signedIn() && exists(profilePath(request.auth.uid));
+    }
+
+    function myProfile() {
+      return get(profilePath(request.auth.uid)).data;
+    }
+
+    function activeUser() {
+      return hasProfile() && myProfile().accountStatus == "active";
+    }
+
+    function isProjectMember() {
+      return activeUser() && myProfile().role == "project_member";
+    }
+
+    function isStaff() {
+      return activeUser() && myProfile().role in ["teacher", "admin"];
+    }
 
     function validTitle(data) {
-      return data.title is string && data.title.size() >= 3 && data.title.size() <= 160;
+      return data.title is string
+        && data.title.size() >= 3
+        && data.title.size() <= 160;
     }
 
     function validContentType(data) {
@@ -23,21 +48,91 @@ service cloud.firestore {
     }
 
     function validLegacyType(data) {
-      return !("type" in data) || data.type in ["image", "pdf", "audio", "video", "document"];
+      return !("type" in data)
+        || data.type in ["image", "pdf", "audio", "video", "document"];
+    }
+
+    function validLibraryItemFields(data) {
+      return data.keys().hasOnly([
+          "schemaVersion", "title", "slug", "description", "contentType", "type",
+          "authors", "authorNamesNormalized", "categoryId", "tags", "language",
+          "metadata", "reader", "qrCode", "submittedBy", "submittedByName",
+          "publishedBy", "approvedBy", "status", "fileStatus", "createdBy",
+          "createdAt", "updatedAt", "publishedAt"
+        ])
+        && data.keys().hasAll([
+          "schemaVersion", "title", "contentType", "status", "fileStatus",
+          "submittedBy", "publishedBy", "createdBy", "createdAt",
+          "updatedAt", "publishedAt", "qrCode"
+        ]);
     }
 
     function validLibraryItem(data) {
-      return validTitle(data)
+      return validLibraryItemFields(data)
+        && data.schemaVersion is int
+        && data.schemaVersion == 2
+        && validTitle(data)
         && validContentType(data)
         && validLegacyType(data)
+        && data.slug is string
+        && data.slug.size() <= 120
+        && data.description is string
+        && data.description.size() <= 3000
+        && data.authors is list
+        && data.authorNamesNormalized is list
+        && data.categoryId is string
+        && data.categoryId.size() <= 80
+        && data.tags is list
+        && data.language is string
+        && data.language.size() >= 2
+        && data.language.size() <= 19
+        && data.metadata is map
+        && data.reader is map
+        && data.qrCode is map
+        && data.qrCode.enabled is bool
+        && (data.qrCode.targetPath == null || data.qrCode.targetPath is string)
+        && data.submittedBy is string
+        && data.submittedByName is string
+        && data.publishedBy is string
+        && data.createdBy is string
         && data.status in ["published", "archived"]
         && data.fileStatus in ["awaiting_upload", "uploaded"]
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
         && data.publishedAt is timestamp
-        && data.qrCode is map
-        && data.qrCode.enabled is bool
-        && data.qrCode.targetPath is string;
+        && (!("approvedBy" in data) || data.approvedBy is string);
+    }
+
+    function validAssetFields(data) {
+      return data.keys().hasOnly([
+          "assetType", "format", "storageProvider", "storageKey",
+          "mimeType", "sizeBytes", "checksum", "isPrimary",
+          "access", "createdAt", "createdBy"
+        ])
+        && data.keys().hasAll([
+          "assetType", "format", "storageProvider", "storageKey",
+          "createdAt", "createdBy"
+        ]);
+    }
+
+    function validAsset(data, itemId, assetId) {
+      return validAssetFields(data)
+        && data.assetType in ["cover", "original", "preview", "thumbnail", "attachment"]
+        && data.format is string
+        && data.format.size() >= 1
+        && data.format.size() <= 20
+        && data.storageProvider in ["dev", "b2"]
+        && data.storageKey is string
+        && data.storageKey.size() >= 1
+        && data.storageKey.size() <= 500
+        && data.storageKey.matches("library/" + itemId + "/" + assetId + "\\.[a-z0-9]{1,20}")
+        && data.createdAt is timestamp
+        && data.createdBy is string
+        && (!("mimeType" in data) || data.mimeType is string)
+        && (!("sizeBytes" in data) || (data.sizeBytes is int && data.sizeBytes >= 0))
+        && (!("checksum" in data) || data.checksum is string)
+        && (!("isPrimary" in data) || data.isPrimary is bool)
+        && (!("access" in data) || data.access in ["public", "private"]);
     }
 
     match /users/{userId} {
@@ -67,10 +162,12 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
           "schemaVersion", "title", "slug", "description", "contentType", "type",
           "authors", "authorNamesNormalized", "categoryId", "tags", "language",
-          "metadata", "reader", "status", "fileStatus", "submittedBy", "submittedByName", "submittedAt"
+          "metadata", "reader", "status", "fileStatus", "submittedBy",
+          "submittedByName", "submittedAt"
         ])
         && request.resource.data.keys().hasAll([
-          "schemaVersion", "title", "contentType", "status", "fileStatus", "submittedBy", "submittedAt"
+          "schemaVersion", "title", "contentType", "status", "fileStatus",
+          "submittedBy", "submittedAt"
         ])
         && request.resource.data.schemaVersion == 2
         && request.resource.data.submittedBy == request.auth.uid
@@ -87,7 +184,12 @@ service cloud.firestore {
       allow update: if isStaff()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "status", "libraryItemId", "reviewedBy", "reviewedAt", "reviewNote"
-        ]);
+        ])
+        && request.resource.data.status in ["pending", "approved", "rejected"]
+        && (!("libraryItemId" in request.resource.data) || request.resource.data.libraryItemId is string)
+        && (!("reviewedBy" in request.resource.data) || request.resource.data.reviewedBy == request.auth.uid)
+        && (!("reviewedAt" in request.resource.data) || request.resource.data.reviewedAt is timestamp)
+        && (!("reviewNote" in request.resource.data) || request.resource.data.reviewNote is string);
 
       allow delete: if false;
     }
@@ -96,35 +198,37 @@ service cloud.firestore {
       allow get, list: if resource.data.status == "published" || isStaff();
 
       allow create: if isStaff()
+        && validLibraryItem(request.resource.data)
+        && request.resource.data.publishedBy == request.auth.uid
+        && request.resource.data.createdBy == request.auth.uid
         || (isProjectMember()
-          && request.resource.data.keys().hasOnly([
-            "schemaVersion", "title", "slug", "description", "contentType", "type",
-            "authors", "authorNamesNormalized", "categoryId", "tags", "language",
-            "metadata", "reader", "qrCode", "submittedBy", "submittedByName",
-            "publishedBy", "status", "fileStatus", "createdBy", "createdAt",
-            "updatedAt", "publishedAt"
-          ])
-          && request.resource.data.keys().hasAll([
-            "schemaVersion", "title", "contentType", "status", "fileStatus",
-            "submittedBy", "publishedBy", "createdBy", "createdAt",
-            "updatedAt", "publishedAt", "qrCode"
-          ])
-          && request.resource.data.schemaVersion == 2
+          && validLibraryItem(request.resource.data)
           && request.resource.data.submittedBy == request.auth.uid
           && request.resource.data.publishedBy == request.auth.uid
-          && request.resource.data.createdBy == request.auth.uid
-          && validLibraryItem(request.resource.data));
+          && request.resource.data.createdBy == request.auth.uid);
 
       allow update: if isStaff()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "status", "archivedBy", "archivedAt", "updatedAt", "fileStatus"
         ])
+        && request.resource.data.status in ["published", "archived"]
+        && request.resource.data.fileStatus in ["awaiting_upload", "uploaded"]
+        && request.resource.data.updatedAt is timestamp
+        && (request.resource.data.status == resource.data.status
+          || (request.resource.data.status == "archived"
+            && request.resource.data.archivedBy == request.auth.uid
+            && request.resource.data.archivedAt is timestamp))
         || (isProjectMember()
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["fileStatus", "updatedAt"])
+          && resource.data.createdBy == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            "fileStatus", "updatedAt"
+          ])
           && request.resource.data.fileStatus == "uploaded"
           && request.resource.data.updatedAt is timestamp);
 
-      allow delete: if isStaff();
+      // Destructive library deletion must go through the Worker so B2/R2
+      // objects are removed before the Firestore records are removed.
+      allow delete: if false;
     }
 
     match /libraryItems/{itemId}/assets/{assetId} {
@@ -133,35 +237,34 @@ service cloud.firestore {
         || isStaff();
 
       allow create: if isStaff()
+        && validAsset(request.resource.data, itemId, assetId)
         || (isProjectMember()
-          && request.resource.data.keys().hasOnly([
-            "assetType", "format", "storageProvider", "storageKey",
-            "mimeType", "sizeBytes", "checksum", "isPrimary",
-            "access", "createdAt", "createdBy"
-          ])
-          && request.resource.data.keys().hasAll([
-            "assetType", "format", "storageProvider", "storageKey", "createdAt", "createdBy"
-          ])
-          && request.resource.data.assetType in ["cover", "original", "preview", "thumbnail", "attachment"]
-          && request.resource.data.format is string
-          && request.resource.data.storageProvider in ["dev", "b2"]
-          && request.resource.data.storageKey is string
-          && request.resource.data.createdBy == request.auth.uid
-          && request.resource.data.createdAt is timestamp);
+          && get(/databases/$(database)/documents/libraryItems/$(itemId)).data.createdBy == request.auth.uid
+          && validAsset(request.resource.data, itemId, assetId)
+          && request.resource.data.createdBy == request.auth.uid);
 
-      allow update, delete: if isStaff();
+      // Asset mutation/deletion is intentionally Worker-only at the application layer.
+      // Direct Firestore deletion could leave an orphaned object in B2.
+      allow update, delete: if false;
     }
 
     match /moderationLogs/{logId} {
       allow get, list: if isStaff();
+
       allow create: if isStaff()
         && request.resource.data.keys().hasOnly([
           "action", "submissionId", "libraryItemId", "actorUid", "reason", "createdAt"
         ])
-        && request.resource.data.keys().hasAll(["action", "actorUid", "createdAt"])
+        && request.resource.data.keys().hasAll([
+          "action", "actorUid", "createdAt"
+        ])
         && request.resource.data.action in ["approve", "reject", "archive", "delete"]
         && request.resource.data.actorUid == request.auth.uid
-        && request.resource.data.createdAt is timestamp;
+        && request.resource.data.createdAt is timestamp
+        && (!("submissionId" in request.resource.data) || request.resource.data.submissionId is string)
+        && (!("libraryItemId" in request.resource.data) || request.resource.data.libraryItemId is string)
+        && (!("reason" in request.resource.data) || request.resource.data.reason is string);
+
       allow update, delete: if false;
     }
 
@@ -177,10 +280,38 @@ service cloud.firestore {
 
     match /bookReviews/{reviewId} {
       allow get, list: if resource.data.status == "published";
+
       allow create: if activeUser()
+        && request.resource.data.keys().hasOnly([
+          "userId", "displayName", "rating", "content", "status", "createdAt", "updatedAt"
+        ])
+        && request.resource.data.keys().hasAll([
+          "userId", "rating", "content", "status", "createdAt"
+        ])
         && request.resource.data.userId == request.auth.uid
-        && request.resource.data.status == "pending";
-      allow update, delete: if isStaff();
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.content is string
+        && request.resource.data.content.size() <= 2000
+        && request.resource.data.status == "pending"
+        && request.resource.data.createdAt is timestamp
+        && (!("displayName" in request.resource.data) || request.resource.data.displayName is string)
+        && (!("updatedAt" in request.resource.data) || request.resource.data.updatedAt is timestamp);
+
+      allow update: if isStaff()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status", "content", "rating", "updatedAt"
+        ])
+        && request.resource.data.status in ["pending", "published", "rejected"]
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.content is string
+        && request.resource.data.content.size() <= 2000
+        && request.resource.data.updatedAt is timestamp;
+
+      allow delete: if false;
     }
 
     match /{document=**} {
