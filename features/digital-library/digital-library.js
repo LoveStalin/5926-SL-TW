@@ -53,21 +53,21 @@ const qrCopyButton = document.getElementById("qrCopyButton");
 const qrDownloadButton = document.getElementById("qrDownloadButton");
 
 const PUBLIC_LIBRARY_PATH = "/features/digital-library/digital-library.html";
-const PUBLIC_LIBRARY_URL =
-    /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname)
-        ? "http://192.168.1.104:5500" + PUBLIC_LIBRARY_PATH
-        : window.location.origin + PUBLIC_LIBRARY_PATH;
 
-// Set this to the exact workers.dev URL after deploying the Worker.
-// Example format: https://a5-digital-library-api.<your-subdomain>.workers.dev
+// QR codes are permanent public entry points.
+// Never put localhost or a LAN IP into the QR target: when a phone scans it,
+// "localhost" means the phone itself, not the development PC.
+const PUBLIC_LIBRARY_URL = "https://a5-k68-website.pages.dev" + PUBLIC_LIBRARY_PATH;
+
+// The production Worker is intentionally used from local development too.
+// This keeps the local frontend connected to the real Firestore + B2 backend.
+// Use ?api=local only when explicitly testing the local Wrangler Worker.
 const PRODUCTION_WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
-const FORCE_PRODUCTION_WORKER =
-    new URLSearchParams(window.location.search).get("api") === "production";
-const WORKER_API_BASE_URL =
-    FORCE_PRODUCTION_WORKER ||
-    !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
-        ? PRODUCTION_WORKER_API_BASE_URL
-        : "http://127.0.0.1:8787";
+const USE_LOCAL_WORKER =
+    new URLSearchParams(window.location.search).get("api") === "local";
+const WORKER_API_BASE_URL = USE_LOCAL_WORKER
+    ? "http://127.0.0.1:8787"
+    : PRODUCTION_WORKER_API_BASE_URL;
 
 let authMode = "login";
 let diagnosticsRun = 0;
