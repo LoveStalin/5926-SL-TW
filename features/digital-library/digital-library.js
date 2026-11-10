@@ -39,15 +39,18 @@ const publishSubmit = document.getElementById("publishSubmit");
 const publishStatus = document.getElementById("publishStatus");
 const modeButtons = [...document.querySelectorAll("[data-mode]")];
 
-const qrModal = document.getElementById("qrModal");
-const qrModalClose = document.getElementById("qrModalClose");
-const qrModalTitle = document.getElementById("qrModalTitle");
-const qrModalDescription = document.getElementById("qrModalDescription");
+const itemModal = document.getElementById("itemModal");
+const itemModalClose = document.getElementById("itemModalClose");
+const itemModalType = document.getElementById("itemModalType");
+const itemModalTitle = document.getElementById("itemModalTitle");
+const itemModalDescription = document.getElementById("itemModalDescription");
+const itemMetadata = document.getElementById("itemMetadata");
+const itemPreview = document.getElementById("itemPreview");
+const itemModalStatus = document.getElementById("itemModalStatus");
 const qrCanvas = document.getElementById("qrCanvas");
 const qrTargetUrl = document.getElementById("qrTargetUrl");
 const qrCopyButton = document.getElementById("qrCopyButton");
 const qrDownloadButton = document.getElementById("qrDownloadButton");
-const qrStatus = document.getElementById("qrStatus");
 
 const PUBLIC_LIBRARY_URL =
     "http://192.168.1.104:5500/features/digital-library/digital-library.html"; // Remember to change back to https://a5-k68-website.pages.dev/features/digital-library/digital-library.html.This is only for developer testing.
@@ -70,49 +73,228 @@ function buildLibraryItemUrl(itemId) {
     return PUBLIC_LIBRARY_URL + "?item=" + encodeURIComponent(itemId);
 }
 
-async function openQrModal(itemId, item) {
-    const targetUrl = buildLibraryItemUrl(itemId);
-    qrModalTitle.textContent = item.title || "Mã QR tài liệu";
-    qrModalDescription.textContent =
-        "Quét mã này để mở trang giới thiệu và truy cập tài liệu.";
-    qrTargetUrl.textContent = targetUrl;
-    qrStatus.textContent = "Đang tạo mã QR...";
-    qrModal.hidden = false;
+function formatBytes(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) return "—";
+    const units = ["B", "KB", "MB", "GB"];
+    let value = bytes;
+    let index = 0;
+    while (value >= 1024 && index < units.length - 1) {
+        value /= 1024;
+        index++;
+    }
+    return value >= 10 || index === 0 ? value.toFixed(0) + " " + units[index] : value.toFixed(1) + " " + units[index];
+}
+
+function formatDuration(seconds) {
+    if (!Number.isFinite(seconds) || seconds < 0) return "—";
+    const total = Math.round(seconds);
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const secs = total % 60;
+    if (hours > 0) return hours + " giờ " + minutes + " phút " + secs + " giây";
+    if (minutes > 0) return minutes + " phút " + secs + " giây";
+    return secs + " giây";
+}
+
+function formatRatio(width, height) {
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return "—";
+    const gcd = (a, b) => b ? gcd(b, a % b) : a;
+    const divisor = gcd(Math.round(width), Math.round(height));
+    return Math.round(width / divisor) + ":" + Math.round(height / divisor);
+}
+
+function assetUrl(itemId) {
+    return WORKER_API_BASE_URL.replace(/\/$/, "") +
+        "/api/v1/library/" + encodeURIComponent(itemId) + "/file";
+}
+
+function getPrimaryAsset(assets = []) {
+    return assets.find(asset => asset.isPrimary === true)
+        || assets.find(asset => asset.assetType === "original")
+        || assets[0]
+        || null;
+}
+
+function appendMetadata(label, value) {
+    const row = document.createElement("div");
+    row.className = "item-meta-row";
+    const labelElement = document.createElement("dt");
+    labelElement.textContent = label;
+    const valueElement = document.createElement("dd");
+    valueElement.textContent = value || "—";
+    row.append(labelElement, valueElement);
+    itemMetadata.append(row);
+}
+
+async function renderItemPreview(itemId, item, assets) {
+    itemPreview.replaceChildren();
+    const asset = getPrimaryAsset(assets);
+    const type = String(item.contentType || item.type || "").toLowerCase();
+    const fileUrl = assetUrl(itemId);
+
+    if (!asset) {
+        const empty = document.createElement("div");
+        empty.className = "preview-placeholder";
+        empty.innerHTML = "<span>📄</span><strong>Chưa có file</strong><small>Tài liệu này chưa được upload.</small>";
+        itemPreview.append(empty);
+        return;
+    }
+
+    const format = String(asset.format || "").toLowerCase();
+
+    if (type === "video" || ["mp4", "webm", "mov", "m4v"].includes(format)) {
+        const video = document.createElement("video");
+        video.className = "item-preview-media";
+        video.src = fileUrl;
+        video.preload = "metadata";
+        video.muted = true;
+        video.playsInline = true;
+        video.controls = false;
+        video.addEventListener("loadedmetadata", () => {
+            appendMetadata("Thời lượng", formatDuration(video.duration));
+            if (video.videoWidth && video.videoHeight) {
+                appendMetadata("Tỷ lệ", formatRatio(video.videoWidth, video.videoHeight));
+            }
+        }, { once: true });
+        video.addEventListener("loadeddata", () => {
+            video.currentTime = 0;
+        }, { once: true });
+        itemPreview.append(video);
+        appendMetadata("Dung lượng", formatBytes(asset.sizeBytes));
+        return;
+    }
+
+    if (type === "audio" || type === "podcast" || ["mp3", "wav", "m4a", "ogg", "flac"].includes(format)) {
+        const audio = document.createElement("audio");
+        audio.src = fileUrl;
+        audio.preload = "metadata";
+        audio.addEventListener("loadedmetadata", () => {
+            appendMetadata("Thời lượng", formatDuration(audio.duration));
+        }, { once: true });
+        itemPreview.innerHTML = '<div class="preview-placeholder audio-placeholder"><span>📀</span><strong>Âm thanh</strong><small>File âm thanh số</small></div>';
+        itemPreview.append(audio);
+        appendMetadata("Dung lượng", formatBytes(asset.sizeBytes));
+        return;
+    }
+
+    if (type === "ebook" || type === "document" || format === "pdf") {
+        const pdf = document.createElement("iframe");
+        pdf.className = "item-preview-pdf";
+        pdf.src = fileUrl + "#page=1&toolbar=0&navpanes=0&scrollbar=0";
+        pdf.title = "Trang đầu của tài liệu PDF";
+        itemPreview.append(pdf);
+        appendMetadata("Dung lượng", formatBytes(asset.sizeBytes));
+        appendMetadata("Trang", "Đang tải...");
+        try {
+            const pdfjs = await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
+            pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+            const documentProxy = await pdfjs.getDocument({ url: fileUrl }).promise;
+            const page = await documentProxy.getPage(1);
+            const viewport = page.getViewport({ scale: 1 });
+            const canvas = document.createElement("canvas");
+            canvas.className = "pdf-first-page";
+            const scale = Math.min(2, 520 / viewport.width);
+            const scaled = page.getViewport({ scale });
+            canvas.width = Math.ceil(scaled.width);
+            canvas.height = Math.ceil(scaled.height);
+            await page.render({ canvasContext: canvas.getContext("2d"), viewport: scaled }).promise;
+            itemPreview.replaceChildren(canvas);
+            itemMetadata.lastElementChild.querySelector("dd").textContent = String(documentProxy.numPages) + " trang";
+        } catch (error) {
+            console.warn("PDF preview unavailable:", error);
+            itemMetadata.lastElementChild.querySelector("dd").textContent = "Không xác định";
+        }
+        return;
+    }
+
+    if (["image", "png", "jpg", "jpeg", "webp", "gif", "svg"].includes(format) ||
+        ["postcard", "artwork", "design"].includes(type)) {
+        const image = document.createElement("img");
+        image.className = "item-preview-media";
+        image.src = fileUrl;
+        image.alt = item.title || "Ảnh xem trước";
+        image.addEventListener("load", () => {
+            appendMetadata("Kích thước", image.naturalWidth + " × " + image.naturalHeight + " px");
+            appendMetadata("Tỷ lệ", formatRatio(image.naturalWidth, image.naturalHeight));
+        }, { once: true });
+        itemPreview.append(image);
+        const imageCount = assets.filter(entry => ["image", "png", "jpg", "jpeg", "webp", "gif", "svg"].includes(String(entry.format || "").toLowerCase())).length || 1;
+        appendMetadata("Số ảnh", String(imageCount));
+        appendMetadata("Dung lượng", formatBytes(asset.sizeBytes));
+        return;
+    }
+
+    const fallback = document.createElement("div");
+    fallback.className = "preview-placeholder";
+    fallback.innerHTML = '<span>📄</span><strong>' + (asset.format || "Tệp số").toUpperCase() + '</strong><small>Xem tài liệu để mở nội dung đầy đủ.</small>';
+    itemPreview.append(fallback);
+    appendMetadata("Định dạng", String(asset.format || "Không xác định").toUpperCase());
+    appendMetadata("Dung lượng", formatBytes(asset.sizeBytes));
+}
+
+async function openItemModal(itemId) {
+    itemModal.hidden = false;
     document.body.classList.add("modal-open");
+    itemModalType.textContent = "ĐANG TẢI TÀI LIỆU";
+    itemModalTitle.textContent = "Đang tải...";
+    itemModalDescription.textContent = "";
+    itemMetadata.replaceChildren();
+    itemPreview.innerHTML = '<div class="preview-loading">Đang tải bản xem trước...</div>';
+    itemModalStatus.textContent = "";
 
     try {
+        const response = await fetch(
+            WORKER_API_BASE_URL.replace(/\/$/, "") + "/api/v1/library/" + encodeURIComponent(itemId),
+            { headers: { accept: "application/json" } }
+        );
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Không thể tải thông tin tài liệu.");
+
+        const item = data.item || {};
+        const assets = Array.isArray(data.assets) ? data.assets : [];
+        const targetUrl = buildLibraryItemUrl(itemId);
+
+        itemModalType.textContent = String(item.contentType || item.type || "TÀI LIỆU SỐ").toUpperCase();
+        itemModalTitle.textContent = item.title || "Tài liệu";
+        itemModalDescription.textContent = item.description || "Chưa có mô tả.";
+        appendMetadata("Thể loại", item.categoryId || item.contentType || item.type || "—");
+        if (Array.isArray(item.authors) && item.authors.length) appendMetadata("Tác giả", item.authors.join(", "));
+        if (item.language) appendMetadata("Ngôn ngữ", item.language.toUpperCase());
+
+        qrTargetUrl.textContent = targetUrl;
         await QRCode.toCanvas(qrCanvas, targetUrl, {
-            width: 320,
+            width: 180,
             margin: 2,
             errorCorrectionLevel: "M"
         });
-        qrStatus.textContent = "Mã QR được tạo tự động từ ID cố định của tài liệu.";
+
+        await renderItemPreview(itemId, item, assets);
     } catch (error) {
-        console.error("Digital Library QR generation:", error);
-        qrStatus.textContent = "Không thể tạo mã QR. Hãy thử lại.";
+        itemModalStatus.textContent = error.message || "Không thể tải thông tin tài liệu.";
+        itemPreview.innerHTML = '<div class="preview-placeholder"><span>⚠️</span><strong>Không thể tải bản xem trước</strong><small>Hãy thử lại sau.</small></div>';
     }
 }
 
-function closeQrModal() {
-    qrModal.hidden = true;
+function closeItemModal() {
+    itemModal.hidden = true;
     document.body.classList.remove("modal-open");
-    qrStatus.textContent = "";
+    itemModalStatus.textContent = "";
 }
 
-qrModalClose.addEventListener("click", closeQrModal);
-qrModal.addEventListener("click", event => {
-    if (event.target === qrModal) closeQrModal();
+itemModalClose.addEventListener("click", closeItemModal);
+itemModal.addEventListener("click", event => {
+    if (event.target === itemModal) closeItemModal();
 });
 document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && !qrModal.hidden) closeQrModal();
+    if (event.key === "Escape" && !itemModal.hidden) closeItemModal();
 });
 
 qrCopyButton.addEventListener("click", async () => {
     try {
         await navigator.clipboard.writeText(qrTargetUrl.textContent);
-        qrStatus.textContent = "Đã sao chép liên kết tài liệu.";
+        itemModalStatus.textContent = "Đã sao chép liên kết tài liệu.";
     } catch {
-        qrStatus.textContent = "Không thể sao chép tự động. Hãy sao chép liên kết bên trên.";
+        itemModalStatus.textContent = "Không thể sao chép tự động. Hãy sao chép liên kết bên trên.";
     }
 });
 
@@ -570,7 +752,7 @@ async function loadPublishedItems() {
             qrButton.addEventListener("click", event => {
                 event.preventDefault();
                 event.stopPropagation();
-                void openQrModal(documentSnapshot.id, item);
+                void openItemModal(documentSnapshot.id);
             });
 
             cardActions.append(qrButton);
@@ -639,7 +821,7 @@ async function loadPublishedItems() {
         if (requestedItemId) {
             const requestedDocument = documents.find(documentSnapshot => documentSnapshot.id === requestedItemId);
             if (requestedDocument) {
-                await openQrModal(requestedDocument.id, requestedDocument.data());
+                await openItemModal(requestedDocument.id);
             }
         }
     } catch (error) {
