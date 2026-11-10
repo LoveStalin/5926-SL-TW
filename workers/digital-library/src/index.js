@@ -342,7 +342,12 @@ function normalizeContentInput(body) {
 
 function normalizeQrCode(value, itemId) {
     const enabled = value === undefined ? true : value?.enabled === true;
-    return { enabled, targetPath: enabled ? "/library/" + itemId : null };
+    return {
+        enabled,
+        targetPath: enabled
+            ? "/features/digital-library/digital-library.html?item=" + encodeURIComponent(itemId)
+            : null
+    };
 }
 
 async function createLibraryItem(request, claims, profile, token, env) {
