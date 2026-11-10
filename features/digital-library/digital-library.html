@@ -139,6 +139,24 @@
         </section>
     </main>
 
+    <section id="qrModal" class="qr-modal" hidden aria-labelledby="qrModalTitle">
+        <div class="qr-dialog" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+            <button id="qrModalClose" class="qr-close" type="button" aria-label="Đóng">×</button>
+            <p class="eyebrow">AUTO-GENERATED QR</p>
+            <h2 id="qrModalTitle">Mã QR tài liệu</h2>
+            <p id="qrModalDescription" class="qr-description"></p>
+            <div class="qr-preview">
+                <canvas id="qrCanvas" width="320" height="320" aria-label="Mã QR của tài liệu"></canvas>
+            </div>
+            <p id="qrTargetUrl" class="qr-target-url"></p>
+            <div class="qr-actions">
+                <button id="qrCopyButton" class="secondary-button" type="button">📋 Sao chép liên kết</button>
+                <button id="qrDownloadButton" class="primary-button qr-download-button" type="button">⬇️ Tải mã QR</button>
+            </div>
+            <p id="qrStatus" class="form-status" role="status"></p>
+        </div>
+    </section>
+
     <footer>A5-K68 · Digital Library</footer>
     <script type="module" src="./digital-library.js"></script>
 </body>
