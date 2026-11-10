@@ -51,6 +51,7 @@ const qrCanvas = document.getElementById("qrCanvas");
 const qrTargetUrl = document.getElementById("qrTargetUrl");
 const qrCopyButton = document.getElementById("qrCopyButton");
 const qrDownloadButton = document.getElementById("qrDownloadButton");
+const itemOpenButton = document.getElementById("itemOpenButton");
 
 const PUBLIC_LIBRARY_PATH = "/features/digital-library/digital-library.html";
 
@@ -262,6 +263,7 @@ async function openItemModal(itemId) {
         const item = data.item || {};
         const assets = Array.isArray(data.assets) ? data.assets : [];
         const targetUrl = buildLibraryItemUrl(itemId);
+        const primaryAsset = getPrimaryAsset(assets);
 
         itemModalType.textContent = String(item.contentType || item.type || "TÀI LIỆU SỐ").toUpperCase();
         itemModalTitle.textContent = item.title || "Tài liệu";
@@ -271,6 +273,12 @@ async function openItemModal(itemId) {
         if (item.language) appendMetadata("Ngôn ngữ", item.language.toUpperCase());
 
         qrTargetUrl.textContent = targetUrl;
+        itemOpenButton.disabled = !primaryAsset;
+        itemOpenButton.onclick = () => {
+            if (!primaryAsset) return;
+            window.open(assetUrl(itemId), "_blank", "noopener,noreferrer");
+        };
+
         await QRCode.toCanvas(qrCanvas, targetUrl, {
             width: 180,
             margin: 2,
@@ -719,26 +727,6 @@ async function loadPublishedItems() {
             const item = documentSnapshot.data();
             const card = document.createElement("article");
             card.className = "book-card";
-
-            const fileUrl =
-                WORKER_API_BASE_URL.replace(/\/$/, "") +
-                "/api/v1/library/" + encodeURIComponent(documentSnapshot.id) + "/file";
-
-            if (item.fileStatus === "uploaded") {
-                card.classList.add("is-clickable");
-                card.tabIndex = 0;
-                card.setAttribute("role", "link");
-                card.setAttribute("aria-label", "Mở tài liệu: " + (item.title || "Tài liệu"));
-                card.addEventListener("click", () => {
-                    window.open(fileUrl, "_blank", "noopener,noreferrer");
-                });
-                card.addEventListener("keydown", event => {
-                    if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        window.open(fileUrl, "_blank", "noopener,noreferrer");
-                    }
-                });
-            }
 
             const type = document.createElement("span");
             type.className = "book-type";
