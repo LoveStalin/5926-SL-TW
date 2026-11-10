@@ -9,9 +9,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
     collection,
+    doc,
+    getDoc,
     getDocs,
     limit,
     query,
+    setDoc,
+    serverTimestamp,
     where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -52,6 +56,9 @@ const qrTargetUrl = document.getElementById("qrTargetUrl");
 const qrCopyButton = document.getElementById("qrCopyButton");
 const qrDownloadButton = document.getElementById("qrDownloadButton");
 const itemOpenButton = document.getElementById("itemOpenButton");
+const itemRatingSummary = document.getElementById("itemRatingSummary");
+const itemRatingStars = [...document.querySelectorAll(".rating-star")];
+const itemRatingStatus = document.getElementById("itemRatingStatus");
 
 const PUBLIC_LIBRARY_PATH = "/features/digital-library/digital-library.html";
 
@@ -135,6 +142,94 @@ function appendMetadata(label, value) {
     row.append(labelElement, valueElement);
     itemMetadata.append(row);
 }
+
+function formatRatingSummary(ratingCount, averageRating) {
+    if (!ratingCount) return "Chưa có đánh giá";
+    return averageRating.toFixed(1) + "/5 · " + ratingCount + (ratingCount === 1 ? " đánh giá" : " đánh giá");
+}
+
+function paintRatingStars(rating) {
+    itemRatingStars.forEach(button => {
+        const value = Number(button.dataset.rating);
+        button.classList.toggle("selected", value <= rating);
+    });
+}
+
+async function loadItemRating(itemId) {
+    itemRatingStatus.textContent = "";
+    itemRatingSummary.textContent = "Đang tải...";
+    paintRatingStars(0);
+
+    const reviewsRef = collection(libraryDb, "libraryItems", itemId, "ratings");
+    const snapshot = await getDocs(reviewsRef);
+    let total = 0;
+    let myRating = 0;
+    const currentUser = libraryAuth.currentUser;
+
+    snapshot.forEach(review => {
+        const rating = Number(review.data().rating);
+        if (rating >= 1 && rating <= 5) {
+            total += rating;
+            if (currentUser && review.id === currentUser.uid) myRating = rating;
+        }
+    });
+
+    const count = snapshot.size;
+    const average = count ? total / count : 0;
+    itemRatingSummary.textContent = formatRatingSummary(count, average);
+    paintRatingStars(myRating);
+
+    if (!currentUser) {
+        itemRatingStatus.textContent = "Đăng nhập bằng tài khoản Học sinh/Khách tham quan để đánh giá.";
+        itemRatingStars.forEach(button => button.disabled = true);
+        return;
+    }
+
+    const profileSnap = await getDoc(doc(libraryDb, "users", currentUser.uid));
+    const profile = profileSnap.exists() ? profileSnap.data() : null;
+    const canRate = profile
+        && profile.accountStatus === "active"
+        && profile.role === "viewer"
+        && ["student", "guest"].includes(profile.audienceType);
+
+    itemRatingStars.forEach(button => button.disabled = !canRate);
+
+    if (!canRate) {
+        itemRatingStatus.textContent = "Chỉ tài khoản Học sinh hoặc Khách tham quan mới có thể đánh giá.";
+    } else if (myRating) {
+        itemRatingStatus.textContent = "Bạn đã đánh giá " + myRating + "/5 sao. Chọn lại để cập nhật.";
+    } else {
+        itemRatingStatus.textContent = "Chọn số sao để đánh giá.";
+    }
+}
+
+async function saveItemRating(itemId, rating) {
+    const user = libraryAuth.currentUser;
+    if (!user) {
+        itemRatingStatus.textContent = "Vui lòng đăng nhập để đánh giá.";
+        return;
+    }
+
+    itemRatingStars.forEach(button => button.disabled = true);
+    itemRatingStatus.textContent = "Đang lưu đánh giá...";
+
+    try {
+        const ratingRef = doc(libraryDb, "libraryItems", itemId, "ratings", user.uid);
+        const existing = await getDoc(ratingRef);
+        const payload = existing.exists()
+            ? { rating, updatedAt: serverTimestamp() }
+            : { rating, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+
+        await setDoc(ratingRef, payload, { merge: true });
+        itemRatingStatus.textContent = "Đã lưu đánh giá " + rating + "/5 sao.";
+        await loadItemRating(itemId);
+    } catch (error) {
+        console.error("Digital Library rating:", error);
+        itemRatingStatus.textContent = "Không thể lưu đánh giá. Kiểm tra quyền tài khoản và thử lại.";
+        itemRatingStars.forEach(button => button.disabled = false);
+    }
+}
+
 
 async function renderItemPreview(itemId, item, assets) {
     itemPreview.replaceChildren();
@@ -274,6 +369,10 @@ async function openItemModal(itemId) {
     itemMetadata.replaceChildren();
     itemPreview.innerHTML = '<div class="preview-loading">Đang tải bản xem trước...</div>';
     itemModalStatus.textContent = "";
+    itemRatingSummary.textContent = "Chưa có đánh giá";
+    itemRatingStatus.textContent = "";
+    paintRatingStars(0);
+    itemRatingStars.forEach(button => button.disabled = true);
 
     try {
         const response = await fetch(
@@ -309,6 +408,7 @@ async function openItemModal(itemId) {
         });
 
         await renderItemPreview(itemId, item, assets);
+        await loadItemRating(itemId);
     } catch (error) {
         itemModalStatus.textContent = error.message || "Không thể tải thông tin tài liệu.";
         itemPreview.innerHTML = '<div class="preview-placeholder"><span>⚠️</span><strong>Không thể tải bản xem trước</strong><small>Hãy thử lại sau.</small></div>';
@@ -322,6 +422,14 @@ function closeItemModal() {
 }
 
 itemModalClose.addEventListener("click", closeItemModal);
+itemRatingStars.forEach(button => {
+    button.addEventListener("click", () => {
+        const itemId = new URLSearchParams(window.location.search).get("item");
+        if (!itemId) return;
+        saveItemRating(itemId, Number(button.dataset.rating));
+    });
+});
+
 itemModal.addEventListener("click", event => {
     if (event.target === itemModal) closeItemModal();
 });
