@@ -730,7 +730,10 @@ async function approveSubmission(id, claims, token, env) {
     const libraryItemId = randomId();
     const now = new Date().toISOString();
     const contentType = submission.data.contentType || ({ pdf: "ebook", audio: "podcast", image: "postcard", video: "video" }[submission.data.type] || "document");
-    const publishedItem = { schemaVersion: 2, title: submission.data.title, slug: submission.data.slug || normalizeSlug(submission.data.title), description: submission.data.description || "", contentType, type: submission.data.type || LEGACY_TYPE_BY_CONTENT[contentType], authors: submission.data.authors || [], authorNamesNormalized: submission.data.authorNamesNormalized || [], categoryId: submission.data.categoryId || "", tags: submission.data.tags || [], language: submission.data.language || "vi", metadata: submission.data.metadata || {}, reader: submission.data.reader || { enabled: false, defaultFormat: null }, qrCode: { enabled: true, targetPath: "/library/" + libraryItemId }, submittedBy: submission.data.submittedBy, submittedByName: submission.data.submittedByName || "", approvedBy: claims.sub, status: "published", fileStatus: "awaiting_upload", createdBy: submission.data.submittedBy, createdAt: submission.data.submittedAt || { __timestamp: now }, updatedAt: { __timestamp: now }, publishedAt: { __timestamp: now } };
+    const publishedItem = { schemaVersion: 2, title: submission.data.title, slug: submission.data.slug || normalizeSlug(submission.data.title), description: submission.data.description || "", contentType, type: submission.data.type || LEGACY_TYPE_BY_CONTENT[contentType], authors: submission.data.authors || [], authorNamesNormalized: submission.data.authorNamesNormalized || [], categoryId: submission.data.categoryId || "", tags: submission.data.tags || [], language: submission.data.language || "vi", metadata: submission.data.metadata || {}, reader: submission.data.reader || { enabled: false, defaultFormat: null }, qrCode: {
+            enabled: true,
+            targetPath: "/features/digital-library/digital-library.html?item=" + encodeURIComponent(libraryItemId)
+        }, submittedBy: submission.data.submittedBy, submittedByName: submission.data.submittedByName || "", approvedBy: claims.sub, status: "published", fileStatus: "awaiting_upload", createdBy: submission.data.submittedBy, createdAt: submission.data.submittedAt || { __timestamp: now }, updatedAt: { __timestamp: now }, publishedAt: { __timestamp: now } };
     await createDocument("libraryItems", libraryItemId, publishedItem, token, env);
     try {
         await patchDocument("submissions", id, { status: "approved", libraryItemId, reviewedBy: claims.sub, reviewedAt: { __timestamp: now } }, token, env);
@@ -873,8 +876,18 @@ async function handle(request, env) {
     const publicItemMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)$/);
     if (method === "GET" && publicItemMatch) {
         const item = await getPublishedItem(publicItemMatch[1], null, env);
+        const assets = await listSubcollection("libraryItems/" + item.id, "assets", null, env);
+        const safeAssets = assets.map(asset => ({
+            id: asset.id,
+            assetType: asset.assetType || "original",
+            format: asset.format || "",
+            mimeType: asset.mimeType || "",
+            sizeBytes: Number(asset.sizeBytes || 0),
+            isPrimary: asset.isPrimary === true,
+            access: asset.access || "public"
+        }));
         const { assetKey, ...publicData } = item.data;
-        return withHeaders(json({ id: item.id, item: publicData }), cors);
+        return withHeaders(json({ id: item.id, item: publicData, assets: safeAssets }), cors);
     }
 
     const publicFileMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/file$/);
