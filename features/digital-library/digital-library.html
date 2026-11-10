@@ -139,21 +139,37 @@
         </section>
     </main>
 
-    <section id="qrModal" class="qr-modal" hidden aria-labelledby="qrModalTitle">
-        <div class="qr-dialog" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
-            <button id="qrModalClose" class="qr-close" type="button" aria-label="Đóng">×</button>
-            <p class="eyebrow">AUTO-GENERATED QR</p>
-            <h2 id="qrModalTitle">Mã QR tài liệu</h2>
-            <p id="qrModalDescription" class="qr-description"></p>
-            <div class="qr-preview">
-                <canvas id="qrCanvas" width="320" height="320" aria-label="Mã QR của tài liệu"></canvas>
+    <section id="itemModal" class="item-modal" hidden aria-labelledby="itemModalTitle">
+        <div class="item-dialog" role="dialog" aria-modal="true" aria-labelledby="itemModalTitle">
+            <button id="itemModalClose" class="item-close" type="button" aria-label="Đóng">×</button>
+
+            <div class="item-preview-panel">
+                <div id="itemPreview" class="item-preview" aria-live="polite">
+                    <div class="preview-loading">Đang tải bản xem trước...</div>
+                </div>
             </div>
-            <p id="qrTargetUrl" class="qr-target-url"></p>
-            <div class="qr-actions">
-                <button id="qrCopyButton" class="secondary-button" type="button">📋 Sao chép liên kết</button>
-                <button id="qrDownloadButton" class="primary-button qr-download-button" type="button">⬇️ Tải mã QR</button>
+
+            <div class="item-info-panel">
+                <p id="itemModalType" class="eyebrow">TÀI LIỆU SỐ</p>
+                <h2 id="itemModalTitle">Đang tải...</h2>
+                <p id="itemModalDescription" class="item-description"></p>
+
+                <dl id="itemMetadata" class="item-metadata"></dl>
+
+                <div class="item-qr-section">
+                    <div>
+                        <p class="eyebrow">AUTO-GENERATED QR</p>
+                        <p class="item-qr-hint">Quét mã để mở trực tiếp trang giới thiệu này.</p>
+                    </div>
+                    <canvas id="qrCanvas" width="180" height="180" aria-label="Mã QR của tài liệu"></canvas>
+                    <p id="qrTargetUrl" class="qr-target-url"></p>
+                    <div class="qr-actions">
+                        <button id="qrCopyButton" class="secondary-button" type="button">📋 Sao chép liên kết</button>
+                        <button id="qrDownloadButton" class="primary-button" type="button">⬇️ Tải QR</button>
+                    </div>
+                </div>
+                <p id="itemModalStatus" class="form-status" role="status"></p>
             </div>
-            <p id="qrStatus" class="form-status" role="status"></p>
         </div>
     </section>
 
