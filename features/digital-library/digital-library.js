@@ -54,10 +54,16 @@ const qrDownloadButton = document.getElementById("qrDownloadButton");
 
 const PUBLIC_LIBRARY_PATH = "/features/digital-library/digital-library.html";
 
-// QR codes are permanent public entry points.
-// Never put localhost or a LAN IP into the QR target: when a phone scans it,
-// "localhost" means the phone itself, not the development PC.
-const PUBLIC_LIBRARY_URL = "https://a5-k68-website.pages.dev" + PUBLIC_LIBRARY_PATH;
+// LOCAL DEV QR TARGET
+// The phone must reach the PC's Live Server through the PC's LAN IP.
+// Do NOT use 127.0.0.1/localhost here: on the phone, that points to the phone itself.
+// Do NOT use the production Pages domain while this feature is still being tested locally.
+const LOCAL_LAN_LIBRARY_URL = "http://192.168.1.104:5500" + PUBLIC_LIBRARY_PATH;
+
+// QR codes generated during local development intentionally point to the LAN host.
+// When the feature is eventually deployed publicly, this constant can be changed
+// to the final public library URL.
+const PUBLIC_LIBRARY_URL = LOCAL_LAN_LIBRARY_URL;
 
 // The production Worker is intentionally used from local development too.
 // This keeps the local frontend connected to the real Firestore + B2 backend.
