@@ -285,3 +285,95 @@ footer { padding: 26px; border-top: 1px solid #ffffff18; color: #81778f; text-al
     font: inherit;
     cursor: pointer;
 }
+
+
+/* Auto-generated QR modal */
+body.modal-open { overflow: hidden; }
+.qr-modal {
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(5, 4, 10, .78);
+    backdrop-filter: blur(14px);
+}
+.qr-modal[hidden] { display: none !important; }
+.qr-dialog {
+    position: relative;
+    width: min(520px, 100%);
+    max-height: min(92vh, 760px);
+    overflow: auto;
+    padding: 30px;
+    border: 1px solid #ffffff24;
+    border-radius: 28px;
+    background: linear-gradient(145deg, #211a31, #151120);
+    box-shadow: 0 30px 100px #000a;
+    text-align: center;
+}
+.qr-dialog h2 { margin-top: 8px; }
+.qr-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border: 1px solid #ffffff20;
+    border-radius: 50%;
+    background: #ffffff0b;
+    color: #fff;
+    font-size: 25px;
+    line-height: 1;
+    cursor: pointer;
+}
+.qr-close:hover { background: #ffffff18; }
+.qr-description {
+    margin: 10px auto 20px;
+    max-width: 390px;
+    color: #b8afc8;
+    font-size: 13px;
+    line-height: 1.65;
+}
+.qr-preview {
+    display: grid;
+    place-items: center;
+    width: min(100%, 350px);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    padding: 15px;
+    border-radius: 22px;
+    background: #fff;
+}
+.qr-preview canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    image-rendering: pixelated;
+}
+.qr-target-url {
+    margin: 16px auto 0;
+    max-width: 440px;
+    overflow-wrap: anywhere;
+    color: #a9a0b5;
+    font-size: 11px;
+    line-height: 1.55;
+}
+.qr-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+}
+.qr-actions .secondary-button,
+.qr-actions .primary-button { width: 100%; margin-top: 0; }
+.qr-card-button { margin-top: 15px; width: 100%; }
+.book-card-actions { display: flex; margin-top: auto; }
+.book-card {
+    display: flex;
+    flex-direction: column;
+}
+@media (max-width: 560px) {
+    .qr-dialog { padding: 24px 18px; border-radius: 22px; }
+    .qr-actions { grid-template-columns: 1fr; }
+}
