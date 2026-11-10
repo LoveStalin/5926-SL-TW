@@ -429,8 +429,7 @@ async function b2PutObject(request, env, storageKey, mimeType, itemId, assetId, 
             "content-length": String(contentLength),
             "content-disposition": "inline",
             "x-amz-meta-itemid": itemId,
-            "x-amz-meta-assetid": assetId,
-            "x-amz-meta-originalname": fileName
+            "x-amz-meta-assetid": assetId
         },
         body
     });
@@ -558,6 +557,7 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
             mimeType,
             sizeBytes: contentLength,
             checksum: "",
+            originalName: fileName,
             isPrimary: url.searchParams.get("isPrimary") !== "false",
             access: url.searchParams.get("access") === "private" ? "private" : "public",
             createdAt: { __timestamp: now },
