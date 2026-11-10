@@ -155,8 +155,9 @@ async function renderItemPreview(itemId, item, assets) {
     if (type === "video" || ["mp4", "webm", "mov", "m4v"].includes(format)) {
         const video = document.createElement("video");
         video.className = "item-preview-media";
+        video.crossOrigin = "anonymous";
         video.src = fileUrl;
-        video.preload = "auto";
+        video.preload = "metadata";
         video.muted = true;
         video.playsInline = true;
         video.setAttribute("playsinline", "");
@@ -180,15 +181,9 @@ async function renderItemPreview(itemId, item, assets) {
         video.addEventListener("durationchange", renderVideoMetadata, { once: false });
         video.addEventListener("loadeddata", () => {
             renderVideoMetadata();
-            // Muted inline playback is allowed on iOS Safari and forces the
-            // browser to decode the first frame instead of leaving a black box.
-            video.play().then(() => {
-                video.pause();
-                try { video.currentTime = 0; } catch {}
-            }).catch(() => {
-                try { video.currentTime = 0; } catch {}
-            });
+            try { video.currentTime = 0; } catch {}
         }, { once: true });
+        video.load();
         video.addEventListener("error", () => {
             if (!videoMetadataRendered) {
                 appendMetadata("Thời lượng", "Không xác định");
