@@ -296,6 +296,36 @@ service cloud.firestore {
       allow list, create, update, delete: if isStaff();
     }
 
+    match /libraryItems/{itemId}/ratings/{userId} {
+      allow get, list: if get(/databases/$(database)/documents/libraryItems/$(itemId)).data.status == "published";
+
+      allow create: if activeUser()
+        && myProfile().role == "viewer"
+        && myProfile().audienceType in ["student", "guest"]
+        && userId == request.auth.uid
+        && request.resource.data.keys().hasOnly(["rating", "createdAt", "updatedAt"])
+        && request.resource.data.keys().hasAll(["rating", "createdAt"])
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.createdAt is timestamp
+        && (!("updatedAt" in request.resource.data) || request.resource.data.updatedAt is timestamp);
+
+      allow update: if activeUser()
+        && myProfile().role == "viewer"
+        && myProfile().audienceType in ["student", "guest"]
+        && userId == request.auth.uid
+        && request.resource.data.keys().hasOnly(["rating", "createdAt", "updatedAt"])
+        && request.resource.data.keys().hasAll(["rating", "createdAt"])
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt is timestamp;
+
+      allow delete: if false;
+    }
+
     match /bookReviews/{reviewId} {
       allow get, list: if resource.data.status == "published";
 
