@@ -156,19 +156,47 @@ async function renderItemPreview(itemId, item, assets) {
         const video = document.createElement("video");
         video.className = "item-preview-media";
         video.src = fileUrl;
-        video.preload = "metadata";
+        video.preload = "auto";
         video.muted = true;
         video.playsInline = true;
-        video.controls = false;
-        video.addEventListener("loadedmetadata", () => {
-            appendMetadata("Thời lượng", formatDuration(video.duration));
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+        video.controls = true;
+
+        let videoMetadataRendered = false;
+        const renderVideoMetadata = () => {
+            if (videoMetadataRendered) return;
+            if (!Number.isFinite(video.duration) && !(video.videoWidth && video.videoHeight)) return;
+            videoMetadataRendered = true;
+            if (Number.isFinite(video.duration)) {
+                appendMetadata("Thời lượng", formatDuration(video.duration));
+            }
             if (video.videoWidth && video.videoHeight) {
                 appendMetadata("Tỷ lệ", formatRatio(video.videoWidth, video.videoHeight));
             }
-        }, { once: true });
+        };
+
+        video.addEventListener("loadedmetadata", renderVideoMetadata, { once: false });
+        video.addEventListener("durationchange", renderVideoMetadata, { once: false });
         video.addEventListener("loadeddata", () => {
-            video.currentTime = 0;
+            renderVideoMetadata();
+            // Muted inline playback is allowed on iOS Safari and forces the
+            // browser to decode the first frame instead of leaving a black box.
+            video.play().then(() => {
+                video.pause();
+                try { video.currentTime = 0; } catch {}
+            }).catch(() => {
+                try { video.currentTime = 0; } catch {}
+            });
         }, { once: true });
+        video.addEventListener("error", () => {
+            if (!videoMetadataRendered) {
+                appendMetadata("Thời lượng", "Không xác định");
+                appendMetadata("Tỷ lệ", "Không xác định");
+                videoMetadataRendered = true;
+            }
+        }, { once: true });
+
         itemPreview.append(video);
         appendMetadata("Dung lượng", formatBytes(asset.sizeBytes));
         return;
