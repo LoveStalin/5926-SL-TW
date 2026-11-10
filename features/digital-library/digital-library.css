@@ -329,7 +329,7 @@ body.modal-open { overflow: hidden; }
 }
 .item-close:hover { background: #ffffff18; }
 .item-preview-panel {
-    min-height: 540px;
+    min-height: 0;
     display: grid;
     place-items: center;
     padding: 32px;
@@ -382,7 +382,10 @@ body.modal-open { overflow: hidden; }
 .preview-placeholder small { max-width: 260px; line-height: 1.6; }
 .audio-placeholder { min-height: 300px; }
 .item-info-panel {
-    overflow: auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
     padding: 46px 34px 34px;
 }
 .item-info-panel h2 {
@@ -463,7 +466,8 @@ body.modal-open { overflow: hidden; }
     .item-dialog {
         grid-template-columns: 1fr;
         max-height: 94vh;
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     .item-preview-panel {
         min-height: 340px;
