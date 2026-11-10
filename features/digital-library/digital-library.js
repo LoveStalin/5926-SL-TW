@@ -52,8 +52,11 @@ const qrTargetUrl = document.getElementById("qrTargetUrl");
 const qrCopyButton = document.getElementById("qrCopyButton");
 const qrDownloadButton = document.getElementById("qrDownloadButton");
 
+const PUBLIC_LIBRARY_PATH = "/features/digital-library/digital-library.html";
 const PUBLIC_LIBRARY_URL =
-    "http://192.168.1.104:5500/features/digital-library/digital-library.html"; // Remember to change back to https://a5-k68-website.pages.dev/features/digital-library/digital-library.html.This is only for developer testing.
+    /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname)
+        ? "http://192.168.1.104:5500" + PUBLIC_LIBRARY_PATH
+        : window.location.origin + PUBLIC_LIBRARY_PATH;
 
 // Set this to the exact workers.dev URL after deploying the Worker.
 // Example format: https://a5-digital-library-api.<your-subdomain>.workers.dev
