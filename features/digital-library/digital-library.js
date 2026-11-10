@@ -85,6 +85,7 @@ const WORKER_API_BASE_URL = USE_LOCAL_WORKER
 
 let authMode = "login";
 let diagnosticsRun = 0;
+let activeItemId = null;
 
 function buildLibraryItemUrl(itemId) {
     return PUBLIC_LIBRARY_URL + "?item=" + encodeURIComponent(itemId);
@@ -361,6 +362,7 @@ async function renderItemPreview(itemId, item, assets) {
 }
 
 async function openItemModal(itemId) {
+    activeItemId = itemId;
     itemModal.hidden = false;
     document.body.classList.add("modal-open");
     itemModalType.textContent = "ĐANG TẢI TÀI LIỆU";
@@ -417,6 +419,7 @@ async function openItemModal(itemId) {
 
 function closeItemModal() {
     itemModal.hidden = true;
+    activeItemId = null;
     document.body.classList.remove("modal-open");
     itemModalStatus.textContent = "";
 }
@@ -424,9 +427,8 @@ function closeItemModal() {
 itemModalClose.addEventListener("click", closeItemModal);
 itemRatingStars.forEach(button => {
     button.addEventListener("click", () => {
-        const itemId = new URLSearchParams(window.location.search).get("item");
-        if (!itemId) return;
-        saveItemRating(itemId, Number(button.dataset.rating));
+        if (!activeItemId) return;
+        saveItemRating(activeItemId, Number(button.dataset.rating));
     });
 });
 
