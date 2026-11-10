@@ -1,4 +1,5 @@
 import { libraryAuth, libraryDb } from "./firebase.js";
+import QRCode from "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm";
 import {
     createUserWithEmailAndPassword,
     onAuthStateChanged,
@@ -38,6 +39,19 @@ const publishSubmit = document.getElementById("publishSubmit");
 const publishStatus = document.getElementById("publishStatus");
 const modeButtons = [...document.querySelectorAll("[data-mode]")];
 
+const qrModal = document.getElementById("qrModal");
+const qrModalClose = document.getElementById("qrModalClose");
+const qrModalTitle = document.getElementById("qrModalTitle");
+const qrModalDescription = document.getElementById("qrModalDescription");
+const qrCanvas = document.getElementById("qrCanvas");
+const qrTargetUrl = document.getElementById("qrTargetUrl");
+const qrCopyButton = document.getElementById("qrCopyButton");
+const qrDownloadButton = document.getElementById("qrDownloadButton");
+const qrStatus = document.getElementById("qrStatus");
+
+const PUBLIC_LIBRARY_URL =
+    "https://a5-k68-website.pages.dev/features/digital-library/digital-library.html";
+
 // Set this to the exact workers.dev URL after deploying the Worker.
 // Example format: https://a5-digital-library-api.<your-subdomain>.workers.dev
 const PRODUCTION_WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
@@ -51,6 +65,63 @@ const WORKER_API_BASE_URL =
 
 let authMode = "login";
 let diagnosticsRun = 0;
+
+function buildLibraryItemUrl(itemId) {
+    return PUBLIC_LIBRARY_URL + "?item=" + encodeURIComponent(itemId);
+}
+
+async function openQrModal(itemId, item) {
+    const targetUrl = buildLibraryItemUrl(itemId);
+    qrModalTitle.textContent = item.title || "Mã QR tài liệu";
+    qrModalDescription.textContent =
+        "Quét mã này để mở trang giới thiệu và truy cập tài liệu.";
+    qrTargetUrl.textContent = targetUrl;
+    qrStatus.textContent = "Đang tạo mã QR...";
+    qrModal.hidden = false;
+    document.body.classList.add("modal-open");
+
+    try {
+        await QRCode.toCanvas(qrCanvas, targetUrl, {
+            width: 320,
+            margin: 2,
+            errorCorrectionLevel: "M"
+        });
+        qrStatus.textContent = "Mã QR được tạo tự động từ ID cố định của tài liệu.";
+    } catch (error) {
+        console.error("Digital Library QR generation:", error);
+        qrStatus.textContent = "Không thể tạo mã QR. Hãy thử lại.";
+    }
+}
+
+function closeQrModal() {
+    qrModal.hidden = true;
+    document.body.classList.remove("modal-open");
+    qrStatus.textContent = "";
+}
+
+qrModalClose.addEventListener("click", closeQrModal);
+qrModal.addEventListener("click", event => {
+    if (event.target === qrModal) closeQrModal();
+});
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !qrModal.hidden) closeQrModal();
+});
+
+qrCopyButton.addEventListener("click", async () => {
+    try {
+        await navigator.clipboard.writeText(qrTargetUrl.textContent);
+        qrStatus.textContent = "Đã sao chép liên kết tài liệu.";
+    } catch {
+        qrStatus.textContent = "Không thể sao chép tự động. Hãy sao chép liên kết bên trên.";
+    }
+});
+
+qrDownloadButton.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = "a5-digital-library-qr.png";
+    link.href = qrCanvas.toDataURL("image/png");
+    link.click();
+});
 
 function setAuthMode(mode) {
     authMode = mode;
@@ -488,7 +559,22 @@ async function loadPublishedItems() {
             const description = document.createElement("p");
             description.textContent = item.description || "Chưa có mô tả.";
 
-            card.append(type, title, description);
+            const cardActions = document.createElement("div");
+            cardActions.className = "book-card-actions";
+
+            const qrButton = document.createElement("button");
+            qrButton.type = "button";
+            qrButton.className = "secondary-button qr-card-button";
+            qrButton.innerHTML = "▣ QR Code";
+            qrButton.setAttribute("aria-label", "Xem mã QR: " + (item.title || "Tài liệu"));
+            qrButton.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+                void openQrModal(documentSnapshot.id, item);
+            });
+
+            cardActions.append(qrButton);
+            card.append(type, title, description, cardActions);
 
             if (["admin", "teacher"].includes(accountRole.dataset.role)) {
                 const deleteButton = document.createElement("button");
@@ -548,6 +634,14 @@ async function loadPublishedItems() {
             libraryGrid.append(card);
         });
         libraryStatus.textContent = `Đang hiển thị ${snapshot.size} tài liệu đã xuất bản.`;
+
+        const requestedItemId = new URLSearchParams(window.location.search).get("item");
+        if (requestedItemId) {
+            const requestedDocument = documents.find(documentSnapshot => documentSnapshot.id === requestedItemId);
+            if (requestedDocument) {
+                await openQrModal(requestedDocument.id, requestedDocument.data());
+            }
+        }
     } catch (error) {
         libraryStatus.textContent = "Chưa kết nối được Firestore. Hãy kiểm tra cấu hình và Security Rules.";
         console.error("Digital Library Firestore:", error);
