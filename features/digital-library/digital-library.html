@@ -3,93 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#171329">
-    <title>Digital Library | A5-K68</title>
+    <meta name="theme-color" content="#090c0b">
+    <title>Tủ Sách Số 3D | A5-K68 Digital Library</title>
+    <!-- Google Fonts for Editorial & Literary Aesthetics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,500;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./digital-library.css">
 </head>
 <body>
+    <!-- Top Navigation Bar -->
     <header class="topbar">
-        <a class="brand" href="../../index.html"><span class="brand-mark">A5</span><span> DIGITAL LIBRARY</span></a>
-        <a class="back-link" href="../../index.html">← A5-K68</a>
+        <div class="topbar-left">
+            <a class="brand" href="../../index.html">
+                <span class="brand-mark">A5</span>
+                <span class="brand-text">
+                    <strong>DIGITAL LIBRARY</strong>
+                    <small>K68 ARCHIVE</small>
+                </span>
+            </a>
+        </div>
+        <nav class="topbar-nav" aria-label="Điều hướng chính">
+            <a class="nav-pill active" href="#bookshelfSection">📚 Kệ sách 3D</a>
+            <a class="nav-pill" href="#librarySection">⊞ Tra cứu tất cả</a>
+            <a class="nav-pill" href="#authSection">👤 Tài khoản</a>
+            <a class="back-link" href="../../index.html">← Trang chủ A5</a>
+        </nav>
     </header>
 
     <main class="page-shell">
+        <!-- Hero Section -->
         <section class="hero">
             <div class="hero-copy-column">
-                <div class="hero-kicker"><span class="hero-kicker-dot"></span> A5 DIGITAL LIBRARY · K68</div>
-                <p class="eyebrow">KHÔNG GIAN ĐỌC · SÁNG TẠO · KHÁM PHÁ</p>
-                <h1>Tri thức, nhưng <em>được trưng bày.</em></h1>
-                <p class="hero-copy">Một không gian số dành cho những cuốn sách, video, podcast và tác phẩm do học sinh tạo ra — nơi mỗi sản phẩm có một câu chuyện riêng.</p>
+                <div class="hero-kicker">
+                    <span class="hero-kicker-dot"></span>
+                    <span>A5 DIGITAL LIBRARY · K68 · TRI THỨC VÀ SÁNG TẠO</span>
+                </div>
+                <h1 class="hero-title">Tri thức, <em>được trưng bày</em> sống động.</h1>
+                <p class="hero-copy">
+                    Không gian thư viện số 3D dành cho sách, tài liệu PDF, podcast và video của học sinh A5-K68.
+                    Mỗi tác phẩm là một câu chuyện riêng, được hiển thị trực quan với bìa sách thực tế và trải nghiệm chân thực.
+                </p>
+                <div class="hero-highlights">
+                    <span class="highlight-chip"><span>✨</span> 3D Virtual Bookshelf</span>
+                    <span class="highlight-chip"><span>📖</span> Bìa trang đầu PDF</span>
+                    <span class="highlight-chip"><span>🎧</span> Podcast & Video số</span>
+                    <span class="highlight-chip"><span>📍</span> Quảng Ninh · Việt Nam</span>
+                </div>
                 <div class="hero-actions">
-                    <a class="hero-cta" href="#libraryHeading">Khám phá thư viện <span>↘</span></a>
-                    <span class="hero-note">Quảng Ninh · Việt Nam</span>
+                    <a class="hero-cta" href="#bookshelfSection">
+                        <span>Khám phá kệ sách 3D</span>
+                        <span class="cta-arrow">↘</span>
+                    </a>
+                    <a class="hero-secondary-cta" href="#publishPanel">
+                        <span>➕ Đóng góp tài liệu mới</span>
+                    </a>
                 </div>
             </div>
+
+            <!-- Hero 3D Book Visual Object -->
             <div class="hero-visual" aria-hidden="true">
+                <div class="hero-glow"></div>
                 <div class="hero-orbit hero-orbit-one"></div>
                 <div class="hero-orbit hero-orbit-two"></div>
-                <div class="hero-glow"></div>
-                <div class="floating-label label-top">01 / READ</div>
-                <div class="floating-label label-bottom">SCAN · OPEN · EXPLORE</div>
-                <div class="book-scene">
-                    <div class="book-shadow"></div>
-                    <div class="book book-back">
-                        <div class="book-cover">A5<br><span>ARCHIVE</span></div>
-                        <div class="book-pages"></div>
-                    </div>
-                    <div class="book book-front">
-                        <div class="book-cover">
-                            <small>DIGITAL</small>
-                            <strong>THƯ<br>VIỆN<br>SỐ</strong>
-                            <span>QUẢNG NINH · K68</span>
+                <div class="floating-badge badge-top">01 / VIRTUAL ARCHIVE</div>
+                <div class="floating-badge badge-bottom">PDF · MP3 · MP4 · ART</div>
+                <div class="hero-book-showcase">
+                    <div class="hero-book-3d">
+                        <div class="hero-book-face hero-front">
+                            <div class="hero-cover-tag">A5 · SPECIAL EDITION</div>
+                            <h2 class="hero-cover-title">KHO TÀNG<br>TRI THỨC<br>A5-K68</h2>
+                            <div class="hero-cover-bottom">
+                                <span>QUẢNG NINH</span>
+                                <strong>2026</strong>
+                            </div>
+                            <div class="hero-cover-sheen"></div>
                         </div>
-                        <div class="book-pages"></div>
+                        <div class="hero-book-face hero-spine">
+                            <span>A5</span>
+                            <span class="hero-spine-text">A5 DIGITAL LIBRARY · 2026</span>
+                            <span>K68</span>
+                        </div>
+                        <div class="hero-book-face hero-pages-edge"></div>
+                        <div class="hero-book-shadow"></div>
                     </div>
-                    <div class="book bookmark"></div>
                 </div>
             </div>
         </section>
 
-        <section class="library-section" aria-labelledby="libraryHeading">
+        <!-- 3D VIRTUAL BOOKSHELF SHOWCASE (Centerpiece matching reference image!) -->
+        <section id="bookshelfSection" class="bookshelf-section" aria-labelledby="shelfHeading">
+            <div class="shelf-header">
+                <div class="shelf-brand-column">
+                    <div class="shelf-eyebrow">
+                        <span class="eyebrow-line"></span>
+                        <span>TRƯỜNG KHOA · SÁNG TÁC & LƯU TRỮ SỐ</span>
+                        <span class="eyebrow-line"></span>
+                    </div>
+                    <h2 id="shelfHeading" class="shelf-brand-title">A5-K68 Digital Library</h2>
+                    <p class="shelf-brand-subtitle">TỦ SÁCH & KHÔNG GIAN NGHỆ THUẬT SỐ</p>
+                </div>
+
+                <!-- Media Category Filter Pills -->
+                <div class="shelf-category-bar" role="tablist" aria-label="Phân loại nội dung thư viện">
+                    <button type="button" class="category-pill active" data-filter="all" role="tab" aria-selected="true">
+                        <span class="pill-text">TẤT CẢ</span>
+                        <span class="pill-count" id="countAll">0</span>
+                    </button>
+                    <button type="button" class="category-pill" data-filter="book" role="tab" aria-selected="false">
+                        <span class="pill-icon">📖</span>
+                        <span class="pill-text">SÁCH & PDF</span>
+                        <span class="pill-count" id="countBook">0</span>
+                    </button>
+                    <button type="button" class="category-pill" data-filter="podcast" role="tab" aria-selected="false">
+                        <span class="pill-icon">🎧</span>
+                        <span class="pill-text">PODCAST (MP3)</span>
+                        <span class="pill-count" id="countPodcast">0</span>
+                    </button>
+                    <button type="button" class="category-pill" data-filter="video" role="tab" aria-selected="false">
+                        <span class="pill-icon">🎬</span>
+                        <span class="pill-text">VIDEO (MP4)</span>
+                        <span class="pill-count" id="countVideo">0</span>
+                    </button>
+                    <button type="button" class="category-pill" data-filter="other" role="tab" aria-selected="false">
+                        <span class="pill-icon">🎨</span>
+                        <span class="pill-text">TRANH ẢNH & KHÁC</span>
+                        <span class="pill-count" id="countOther">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3D Shelf Stage Container -->
+            <div class="shelf-stage-container">
+                <!-- Atmospheric background layers -->
+                <div class="shelf-atmosphere" aria-hidden="true">
+                    <div class="atmosphere-sky"></div>
+                    <div class="atmosphere-glow"></div>
+                    <div class="atmosphere-lightbeam"></div>
+                    <div class="atmosphere-grass"></div>
+                    <div class="floating-particles" id="particlesContainer"></div>
+                </div>
+
+                <!-- Shelf Stage Controls (Left & Right Navigation) -->
+                <button id="shelfPrevBtn" class="shelf-nav-button nav-prev" type="button" aria-label="Xem cuốn sách trước">
+                    <span>‹</span>
+                </button>
+                <button id="shelfNextBtn" class="shelf-nav-button nav-next" type="button" aria-label="Xem cuốn sách tiếp theo">
+                    <span>›</span>
+                </button>
+
+                <!-- The Interactive 3D Bookshelf Rack -->
+                <div class="shelf-stage-viewport" id="shelfViewport">
+                    <div id="shelfTrack" class="shelf-track" role="region" aria-label="Dãy sách trên kệ 3D">
+                        <!-- Dynamic 3D books injected here by digital-library.js -->
+                        <div class="shelf-loading-state">
+                            <div class="spinner-dot"></div>
+                            <span>Đang sắp xếp tủ sách số...</span>
+                        </div>
+                    </div>
+
+                    <!-- Shelf Plank Surface with Realistic Wood / Glass Lighting & Reflections -->
+                    <div class="shelf-plank-assembly" aria-hidden="true">
+                        <div class="shelf-surface-top"></div>
+                        <div class="shelf-surface-bevel"></div>
+                        <div class="shelf-surface-front"></div>
+                        <div class="shelf-cast-shadow"></div>
+                    </div>
+                </div>
+
+                <!-- Active Book Spotlight Information Area (Directly below the books!) -->
+                <div id="shelfSpotlight" class="shelf-spotlight">
+                    <div class="spotlight-header">
+                        <div class="spotlight-title-group">
+                            <div class="spotlight-tags">
+                                <span id="spotlightCategoryBadge" class="spotlight-badge">SÁCH SỐ</span>
+                                <span id="spotlightFormatBadge" class="spotlight-format">PDF</span>
+                                <span id="spotlightYearBadge" class="spotlight-year">2026</span>
+                            </div>
+                            <h3 id="spotlightTitle" class="spotlight-title">Đang chọn tài liệu...</h3>
+                            <div class="spotlight-subline">
+                                <span id="spotlightAuthor" class="spotlight-author">Tác giả</span>
+                                <span class="spotlight-divider">·</span>
+                                <span id="spotlightCategory" class="spotlight-category">Thể loại</span>
+                            </div>
+                        </div>
+                        <div class="spotlight-rating-box">
+                            <div id="spotlightRatingStars" class="spotlight-stars">★★★★★</div>
+                            <span id="spotlightRatingSummary" class="spotlight-rating-text">Chưa có đánh giá</span>
+                        </div>
+                    </div>
+
+                    <p id="spotlightDescription" class="spotlight-description">Mô tả tác phẩm sẽ xuất hiện tại đây.</p>
+
+                    <div class="spotlight-actions">
+                        <button id="spotlightOpenBtn" class="primary-button spotlight-action-btn" type="button">
+                            <span>📖 Mở tài liệu / Đọc ngay</span>
+                        </button>
+                        <button id="spotlightDetailsBtn" class="secondary-button spotlight-action-btn" type="button">
+                            <span>▣ Chi tiết & Mã QR</span>
+                        </button>
+                        <button id="spotlightRateBtn" class="secondary-button spotlight-action-btn" type="button">
+                            <span>★ Đánh giá</span>
+                        </button>
+                        <div class="spotlight-keyboard-tip">
+                            <span>Mẹo: Dùng phím <strong>←</strong> <strong>→</strong> trên bàn phím để chuyển sách</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shelf Bottom Ambient Bar (Matching reference screenshot!) -->
+                <div class="shelf-bottom-bar">
+                    <div class="bottom-brand-note">
+                        <span>A5-K68 DIGITAL ARCHIVE · QUẢNG NINH</span>
+                    </div>
+
+                    <div class="ambient-music-capsule" id="ambientMusicCapsule">
+                        <div class="capsule-eq" id="capsuleEq">
+                            <span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="capsule-text">
+                            <strong id="ambientTrackTitle">Không gian đọc A5</strong>
+                            <small id="ambientTrackSub">Âm hưởng tĩnh lặng · Thư viện số</small>
+                        </div>
+                        <button id="ambientToggleBtn" class="ambient-play-button" type="button" aria-label="Bật/Tắt âm thanh thư viện">
+                            <span id="ambientPlayIcon">▶</span>
+                        </button>
+                    </div>
+
+                    <div class="shelf-item-counter" id="shelfCounter">
+                        <span>Tác phẩm 01 / 01</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECONDARY COLLECTION GRID & SEARCH SECTION -->
+        <section id="librarySection" class="library-section" aria-labelledby="libraryHeading">
             <div class="section-intro">
                 <div>
-                    <p class="eyebrow">01 / COLLECTION</p>
-                    <h2 id="libraryHeading">Tủ sách số</h2>
-                    <p class="section-subtitle">Những sản phẩm đã được tuyển chọn và xuất bản trong thư viện A5.</p>
+                    <p class="eyebrow">02 / KHÁM PHÁ & TRA CỨU</p>
+                    <h2 id="libraryHeading">Kho lưu trữ số toàn diện</h2>
+                    <p class="section-subtitle">Duyệt qua danh mục đầy đủ các tài liệu, bài viết, podcast và video đã xuất bản trong thư viện A5.</p>
                 </div>
-                <div class="collection-stamp"><span>OPEN</span><strong>24</strong><small>ITEMS / MAX</small></div>
+                <div class="collection-search-wrap">
+                    <div class="search-input-box">
+                        <span class="search-icon" aria-hidden="true">🔍</span>
+                        <input id="librarySearchInput" type="search" placeholder="Tìm theo tên sách, tác giả, thể loại..." aria-label="Tìm kiếm trong thư viện">
+                        <button id="clearSearchBtn" type="button" class="clear-search-button" hidden aria-label="Xóa tìm kiếm">×</button>
+                    </div>
+                </div>
             </div>
+
             <div class="section-heading">
-                <div>
-                    <p class="eyebrow">KHÁM PHÁ</p>
-                    <h2 id="libraryHeading">Tủ sách số</h2>
+                <div class="section-heading-left">
+                    <span id="libraryStatus" class="notice" role="status">Đang tải tài liệu...</span>
                 </div>
-                <span class="public-label"><i></i> Nội dung công khai</span>
+                <div class="section-heading-right">
+                    <span class="public-label"><i></i> Nội dung công khai & số hóa</span>
+                </div>
             </div>
-            <div id="libraryStatus" class="notice" role="status">Đang tải tài liệu...</div>
+
+            <!-- Standard Collection Grid (Preserved ID) -->
             <div id="libraryGrid" class="library-grid"></div>
         </section>
 
-        <section class="auth-section" aria-labelledby="authHeading">
-            <div>
-                <p class="eyebrow">TÀI KHOẢN THƯ VIỆN</p>
-                <h2 id="authHeading">Tham gia đóng góp</h2>
-                <p class="muted">Tạo tài khoản riêng cho Digital Library. Tài khoản này không liên kết với tài khoản lớp A5-K68.</p>
+        <!-- AUTHENTICATION & IDENTITY SECTION (Preserved IDs) -->
+        <section id="authSection" class="auth-section" aria-labelledby="authHeading">
+            <div class="auth-intro">
+                <p class="eyebrow">03 / THÀNH VIÊN & ĐÓNG GÓP</p>
+                <h2 id="authHeading">Tham gia đóng góp tri thức</h2>
+                <p class="muted">
+                    Tạo tài khoản riêng cho Digital Library để lưu đánh giá, viết bài và tải lên tài liệu mới.
+                    Tài khoản được phân quyền bảo mật: Học sinh, Khách tham quan, Project Member, Giáo viên và Quản trị viên.
+                </p>
+                <div class="auth-features-list">
+                    <div class="auth-feature-item">
+                        <span class="feature-icon">🎓</span>
+                        <div>
+                            <strong>Dành cho học sinh & khách</strong>
+                            <p>Đọc tài liệu, nghe podcast, xem video và gửi đánh giá 5 sao.</p>
+                        </div>
+                    </div>
+                    <div class="auth-feature-item">
+                        <span class="feature-icon">📦</span>
+                        <div>
+                            <strong>Dành cho người đóng góp (Contributors)</strong>
+                            <p>Tải lên file PDF, MP3, MP4 và tạo mã QR tự động cho từng tác phẩm.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
+            <!-- Auth Form Card (Preserved ID) -->
             <form id="authForm" class="auth-card">
                 <div class="mode-switch">
                     <button type="button" class="mode-button active" data-mode="login">Đăng nhập</button>
                     <button type="button" class="mode-button" data-mode="register">Đăng ký</button>
                 </div>
-                <label for="authEmail">Email</label>
-                <input id="authEmail" type="email" autocomplete="email" placeholder="name@example.com" required>
-                <label for="authPassword">Mật khẩu</label>
-                <input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Tối thiểu 6 ký tự" required>
+                <div class="form-group">
+                    <label for="authEmail">Email</label>
+                    <input id="authEmail" type="email" autocomplete="email" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="authPassword">Mật khẩu</label>
+                    <input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Tối thiểu 6 ký tự" required>
+                </div>
                 <button id="authSubmit" class="primary-button" type="submit">Đăng nhập</button>
                 <p id="authStatus" class="form-status" role="status"></p>
             </form>
 
+            <!-- Account Diagnostics Panel (Preserved ID) -->
             <section id="accountPanel" class="account-panel" aria-labelledby="accountPanelHeading" hidden>
                 <div class="account-panel-heading">
                     <div>
@@ -116,6 +339,7 @@
                 </div>
             </section>
 
+            <!-- Audience Selection Modal (Preserved ID) -->
             <section id="audienceSelection" class="audience-modal" hidden aria-labelledby="audienceHeading">
                 <div class="audience-dialog" role="dialog" aria-modal="true" aria-labelledby="audienceHeading">
                     <p class="eyebrow">CHÀO MỪNG ĐẾN VỚI A5 DIGITAL LIBRARY</p>
@@ -139,61 +363,87 @@
                 </div>
             </section>
 
+            <!-- Publish / Upload Panel (Preserved ID) -->
             <section id="publishPanel" class="account-panel publish-panel" hidden aria-labelledby="publishHeading">
                 <p class="eyebrow">LIBRARY MANAGEMENT</p>
                 <h2 id="publishHeading">Thêm sách / vở / sản phẩm</h2>
-                <p class="muted">Admin, Teacher và Project Member có thể tạo tài liệu và upload file trực tiếp. Khi mở bằng Live Server, file sẽ đi qua Worker local → Cloudflare local R2.</p>
+                <p class="muted">Admin, Teacher và Project Member có thể tạo tài liệu và upload file trực tiếp lên Cloudflare Storage & Firestore.</p>
                 <form id="publishForm" class="auth-card publish-form">
-                    <label for="publishTitle">Tên tài liệu / sản phẩm</label>
-                    <input id="publishTitle" name="title" type="text" minlength="3" maxlength="160" placeholder="Ví dụ: Lịch sử Quảng Ninh 1945–2025" required>
+                    <div class="form-group">
+                        <label for="publishTitle">Tên tài liệu / sản phẩm</label>
+                        <input id="publishTitle" name="title" type="text" minlength="3" maxlength="160" placeholder="Ví dụ: Lịch sử Quảng Ninh 1945–2025" required>
+                    </div>
 
-                    <label for="publishDescription">Mô tả</label>
-                    <textarea id="publishDescription" name="description" rows="3" maxlength="3000" placeholder="Mô tả ngắn về tài liệu..."></textarea>
+                    <div class="form-group">
+                        <label for="publishDescription">Mô tả tóm tắt</label>
+                        <textarea id="publishDescription" name="description" rows="3" maxlength="3000" placeholder="Mô tả ngắn về nội dung tài liệu..."></textarea>
+                    </div>
 
-                    <label for="publishType">Loại nội dung</label>
-                    <select id="publishType" name="contentType" required>
-                        <option value="ebook">📖 Sách số (eBook)</option>
-                        <option value="document">📚 Tài liệu / vở</option>
-                        <option value="article">📝 Bài viết</option>
-                        <option value="video">🎬 Video</option>
-                        <option value="podcast">🎧 Podcast</option>
-                        <option value="audio">🔊 Âm thanh</option>
-                        <option value="postcard">🖼️ Bưu thiếp</option>
-                        <option value="artwork">🎨 Tác phẩm nghệ thuật</option>
-                        <option value="design">💻 Thiết kế</option>
-                        <option value="digital_product">📦 Sản phẩm số</option>
-                    </select>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="publishType">Loại nội dung</label>
+                            <select id="publishType" name="contentType" required>
+                                <option value="ebook">📖 Sách số (eBook - PDF)</option>
+                                <option value="document">📚 Tài liệu / Vở ghi chép (PDF)</option>
+                                <option value="podcast">🎧 Podcast (MP3)</option>
+                                <option value="audio">🔊 Âm thanh số (Audio)</option>
+                                <option value="video">🎬 Video / Thước phim (MP4)</option>
+                                <option value="article">📝 Bài viết chuyên đề</option>
+                                <option value="postcard">🖼️ Bưu thiếp số</option>
+                                <option value="artwork">🎨 Tác phẩm nghệ thuật</option>
+                                <option value="design">💻 Thiết kế số</option>
+                                <option value="digital_product">📦 Sản phẩm số</option>
+                            </select>
+                        </div>
 
-                    <label for="publishCategory">Mã danh mục (không bắt buộc)</label>
-                    <input id="publishCategory" name="categoryId" type="text" maxlength="80" placeholder="book, history, literature...">
+                        <div class="form-group">
+                            <label for="publishCategory">Mã danh mục</label>
+                            <input id="publishCategory" name="categoryId" type="text" maxlength="80" placeholder="book, history, literature, art...">
+                        </div>
+                    </div>
 
-                    <label for="publishFile">File đính kèm <span class="muted">(PDF / MP4 / MP3 / ảnh...)</span></label>
-                    <input id="publishFile" name="file" type="file" accept=".pdf,.mp4,.webm,.mp3,.wav,.png,.jpg,.jpeg,.webp,.zip">
+                    <div class="form-group file-upload-group">
+                        <label for="publishFile">File đính kèm <span class="muted">(PDF / MP4 / MP3 / Ảnh...)</span></label>
+                        <div class="file-upload-zone">
+                            <span class="file-zone-icon">📁</span>
+                            <span class="file-zone-hint">Chọn file từ máy tính của bạn</span>
+                            <input id="publishFile" name="file" type="file" accept=".pdf,.mp4,.webm,.mp3,.wav,.png,.jpg,.jpeg,.webp,.zip">
+                        </div>
+                    </div>
 
-                    <button id="publishSubmit" class="primary-button" type="submit">➕ Thêm và upload</button>
+                    <button id="publishSubmit" class="primary-button" type="submit">➕ Thêm và upload lên thư viện</button>
                     <p id="publishStatus" class="form-status" role="status"></p>
                 </form>
             </section>
         </section>
     </main>
 
+    <!-- FULL ITEM EXHIBITION MODAL (Preserved IDs) -->
     <section id="itemModal" class="item-modal" hidden aria-labelledby="itemModalTitle">
         <div class="item-dialog" role="dialog" aria-modal="true" aria-labelledby="itemModalTitle">
-            <button id="itemModalClose" class="item-close" type="button" aria-label="Đóng">×</button>
+            <button id="itemModalClose" class="item-close" type="button" aria-label="Đóng cửa sổ">×</button>
 
+            <!-- Media Preview Panel (Video, Audio, PDF, Image) -->
             <div class="item-preview-panel">
                 <div id="itemPreview" class="item-preview" aria-live="polite">
                     <div class="preview-loading">Đang tải bản xem trước...</div>
                 </div>
             </div>
 
+            <!-- Details & QR Panel -->
             <div class="item-info-panel">
-                <p id="itemModalType" class="eyebrow">TÀI LIỆU SỐ</p>
-                <h2 id="itemModalTitle">Đang tải...</h2>
+                <div class="item-header-meta">
+                    <p id="itemModalType" class="eyebrow">TÀI LIỆU SỐ</p>
+                    <h2 id="itemModalTitle">Đang tải...</h2>
+                </div>
                 <p id="itemModalDescription" class="item-description"></p>
 
-                <dl id="itemMetadata" class="item-metadata"></dl>
+                <div class="metadata-wrapper">
+                    <h4 class="metadata-heading">Thông số kỹ thuật</h4>
+                    <dl id="itemMetadata" class="item-metadata"></dl>
+                </div>
 
+                <!-- Star Rating Section -->
                 <section class="item-rating-section" aria-labelledby="itemRatingHeading">
                     <div class="item-rating-heading">
                         <div>
@@ -212,17 +462,20 @@
                     <p id="itemRatingStatus" class="form-status" role="status"></p>
                 </section>
 
+                <!-- QR Code & Quick Action Section -->
                 <div class="item-qr-section">
-                    <div>
-                        <p class="eyebrow">AUTO-GENERATED QR</p>
-                        <p class="item-qr-hint">Quét mã để mở trực tiếp trang giới thiệu này.</p>
+                    <div class="qr-info-header">
+                        <p class="eyebrow">AUTO-GENERATED QR CODE</p>
+                        <p class="item-qr-hint">Quét mã bằng camera điện thoại để mở ngay tài liệu trên thiết bị di động.</p>
                     </div>
-                    <canvas id="qrCanvas" width="180" height="180" aria-label="Mã QR của tài liệu"></canvas>
+                    <div class="qr-canvas-holder">
+                        <canvas id="qrCanvas" width="180" height="180" aria-label="Mã QR của tài liệu"></canvas>
+                    </div>
                     <p id="qrTargetUrl" class="qr-target-url"></p>
                     <div class="qr-actions">
                         <button id="itemOpenButton" class="primary-button" type="button" disabled>📖 Mở tài liệu</button>
                         <button id="qrCopyButton" class="secondary-button" type="button">📋 Sao chép liên kết</button>
-                        <button id="qrDownloadButton" class="primary-button" type="button">⬇️ Tải QR</button>
+                        <button id="qrDownloadButton" class="secondary-button" type="button">⬇️ Tải ảnh QR</button>
                     </div>
                 </div>
                 <p id="itemModalStatus" class="form-status" role="status"></p>
@@ -230,7 +483,18 @@
         </div>
     </section>
 
-    <footer>A5-K68 · Digital Library</footer>
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="footer-mark">A5</span>
+                <span>DIGITAL LIBRARY · K68 · QUẢNG NINH</span>
+            </div>
+            <p class="footer-copy">Không gian số dành cho tri thức, sáng tạo và kỷ niệm học trò niên khóa 2024–2027.</p>
+        </div>
+    </footer>
+
+    <!-- Main Module Script -->
     <script type="module" src="./digital-library.js"></script>
 </body>
 </html>
