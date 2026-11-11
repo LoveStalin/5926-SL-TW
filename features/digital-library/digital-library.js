@@ -861,9 +861,32 @@ async function loadPublishedItems() {
             const card = document.createElement("article");
             card.className = "book-card";
 
+            const typeLabel = String(item.contentType || item.type || "Tài liệu").replace(/_/g, " ");
+
+            const visual = document.createElement("div");
+            visual.className = "book-card-visual";
+
+            const cardObject = document.createElement("div");
+            cardObject.className = "card-object";
+
+            const coverSmall = document.createElement("small");
+            coverSmall.textContent = typeLabel.toUpperCase();
+
+            const coverTitle = document.createElement("strong");
+            coverTitle.textContent = (item.title || "TÀI LIỆU").slice(0, 28);
+
+            const coverMeta = document.createElement("span");
+            coverMeta.textContent = "A5 · DIGITAL ARCHIVE";
+
+            cardObject.append(coverSmall, coverTitle, coverMeta);
+            visual.append(cardObject);
+
+            const body = document.createElement("div");
+            body.className = "book-card-body";
+
             const type = document.createElement("span");
             type.className = "book-type";
-            type.textContent = item.type || "Tài liệu";
+            type.textContent = typeLabel;
 
             const title = document.createElement("h3");
             title.textContent = item.title || "Tài liệu chưa có tiêu đề";
@@ -886,7 +909,8 @@ async function loadPublishedItems() {
             });
 
             cardActions.append(qrButton);
-            card.append(type, title, description, cardActions);
+            body.append(type, title, description, cardActions);
+            card.append(visual, body);
 
             if (["admin", "teacher"].includes(accountRole.dataset.role)) {
                 const deleteButton = document.createElement("button");
