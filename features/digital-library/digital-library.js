@@ -98,7 +98,7 @@ const countVideoEl = document.getElementById("countVideo");
 const countOtherEl = document.getElementById("countOther");
 
 const PUBLIC_LIBRARY_PATH = "/features/digital-library/digital-library.html";
-const LOCAL_LAN_LIBRARY_URL = "http://192.168.1.104:5500" + PUBLIC_LIBRARY_PATH;
+const LOCAL_LAN_LIBRARY_URL = "http://192.168.1.104:5500" + PUBLIC_LIBRARY_PATH; // TODO: Change to Production Address to activate the QR Code
 const PUBLIC_LIBRARY_URL = LOCAL_LAN_LIBRARY_URL;
 const PRODUCTION_WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
 const USE_LOCAL_WORKER = new URLSearchParams(window.location.search).get("api") === "local";
