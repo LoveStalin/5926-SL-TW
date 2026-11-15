@@ -831,12 +831,20 @@ async function archiveLibraryItem(id, claims, token, env) {
     return json({ id, status: "archived" });
 }
 
+const DEFAULT_ALLOWED_ORIGINS = [
+    "https://a5-k68-website.pages.dev",
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+    "http://192.168.1.104:5500"
+];
+
 function corsHeaders(request, env) {
     const origin = request.headers.get("origin");
-    const allowed = (env.ALLOWED_ORIGINS || "")
+    const configured = String(env.ALLOWED_ORIGINS || "")
         .split(",")
         .map(value => value.trim())
         .filter(Boolean);
+    const allowed = [...new Set([...DEFAULT_ALLOWED_ORIGINS, ...configured])];
 
     if (origin && !allowed.includes(origin)) {
         throw new HttpError(403, "Origin không được phép truy cập API.");
