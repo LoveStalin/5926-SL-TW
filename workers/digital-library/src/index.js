@@ -421,7 +421,6 @@ function b2Client(env) {
 }
 
 async function b2PutObject(request, env, storageKey, mimeType, itemId, assetId, fileName, contentLength) {
-    const body = await request.arrayBuffer();
     const response = await b2Client(env).fetch(b2ObjectUrl(env, storageKey), {
         method: "PUT",
         headers: {
@@ -431,7 +430,7 @@ async function b2PutObject(request, env, storageKey, mimeType, itemId, assetId, 
             "x-amz-meta-itemid": itemId,
             "x-amz-meta-assetid": assetId
         },
-        body
+        body: request.body
     });
     if (!response.ok) {
         const detail = await response.text().catch(() => "");
@@ -605,8 +604,8 @@ async function serveLibraryAsset(request, itemId, token, env) {
     }
 
     const asset = await getPrimaryLibraryAsset(itemId, token || "", env);
-    if (!asset || !asset.storageKey) {
-        throw new HttpError(404, "Tài liệu chưa có file.");
+    if (!asset || !asset.storageKey || asset.access === "private") {
+        throw new HttpError(404, "Tài liệu chưa có file công khai.");
     }
 
     const storageProvider = String(asset.storageProvider || env.DIGITAL_LIBRARY_STORAGE_PROVIDER || "dev").trim().toLowerCase();
@@ -733,7 +732,7 @@ async function approveSubmission(id, claims, token, env) {
     const publishedItem = { schemaVersion: 2, title: submission.data.title, slug: submission.data.slug || normalizeSlug(submission.data.title), description: submission.data.description || "", contentType, type: submission.data.type || LEGACY_TYPE_BY_CONTENT[contentType], authors: submission.data.authors || [], authorNamesNormalized: submission.data.authorNamesNormalized || [], categoryId: submission.data.categoryId || "", tags: submission.data.tags || [], language: submission.data.language || "vi", metadata: submission.data.metadata || {}, reader: submission.data.reader || { enabled: false, defaultFormat: null }, qrCode: {
             enabled: true,
             targetPath: "/features/digital-library/digital-library.html?item=" + encodeURIComponent(libraryItemId)
-        }, submittedBy: submission.data.submittedBy, submittedByName: submission.data.submittedByName || "", publishedBy: claims.sub, status: "published", fileStatus: "awaiting_upload", createdBy: submission.data.submittedBy, createdAt: submission.data.submittedAt || { __timestamp: now }, updatedAt: { __timestamp: now }, publishedAt: { __timestamp: now } };
+        }, submittedBy: submission.data.submittedBy, submittedByName: submission.data.submittedByName || "", publishedBy: claims.sub, status: "published", fileStatus: "awaiting_upload", createdBy: claims.sub, createdAt: submission.data.submittedAt || { __timestamp: now }, updatedAt: { __timestamp: now }, publishedAt: { __timestamp: now } };
     await createDocument("libraryItems", libraryItemId, publishedItem, token, env);
     try {
         await patchDocument("submissions", id, { status: "approved", libraryItemId, reviewedBy: claims.sub, reviewedAt: { __timestamp: now } }, token, env);
@@ -818,7 +817,8 @@ async function archiveLibraryItem(id, claims, token, env) {
     await patchDocument("libraryItems", id, {
         status: "archived",
         archivedBy: claims.sub,
-        archivedAt: { __timestamp: now }
+        archivedAt: { __timestamp: now },
+        updatedAt: { __timestamp: now }
     }, token, env);
 
     await createDocument("moderationLogs", randomId(), {
