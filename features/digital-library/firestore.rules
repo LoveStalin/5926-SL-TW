@@ -106,7 +106,7 @@ service cloud.firestore {
     function validAssetFields(data) {
       return data.keys().hasOnly([
           "assetType", "format", "storageProvider", "storageKey",
-          "mimeType", "sizeBytes", "checksum", "isPrimary",
+          "mimeType", "sizeBytes", "checksum", "originalName", "isPrimary",
           "access", "createdAt", "createdBy"
         ])
         && data.keys().hasAll([
@@ -131,6 +131,7 @@ service cloud.firestore {
         && (!("mimeType" in data) || data.mimeType is string)
         && (!("sizeBytes" in data) || (data.sizeBytes is int && data.sizeBytes >= 0))
         && (!("checksum" in data) || data.checksum is string)
+        && (!("originalName" in data) || (data.originalName is string && data.originalName.size() <= 200))
         && (!("isPrimary" in data) || data.isPrimary is bool)
         && (!("access" in data) || data.access in ["public", "private"]);
     }
