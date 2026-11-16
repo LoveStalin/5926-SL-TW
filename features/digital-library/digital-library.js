@@ -1439,7 +1439,7 @@ publishForm.addEventListener("submit", async event => {
                 .replace(/[^a-z0-9]+/g, "")
                 .slice(0, 20) || "bin";
 
-            publishStatus.textContent = "② Đang tải " + file.name + " (" + Math.ceil(file.size / 1024 / 1024) + " MB) lên Cloudflare Storage...";
+            publishStatus.textContent = "② Đang tải " + file.name + " (" + Math.ceil(file.size / 1024 / 1024) + " MB) lên thư viện...";
 
             const uploadResponse = await fetch(
                 WORKER_API_BASE_URL.replace(/\/$/, "") +
