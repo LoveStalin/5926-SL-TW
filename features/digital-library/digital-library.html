@@ -13,11 +13,18 @@
     <link rel="stylesheet" href="./video-theme.css">
 </head>
 <body>
-    <div class="library-video-background" aria-hidden="true">
+    <!-- Full-bleed opening video: plays first, then the library starts below. -->
+    <section class="library-video-hero" aria-label="Video giới thiệu thư viện số">
         <video id="libraryThemeVideo" class="library-theme-video" autoplay loop muted playsinline preload="metadata"></video>
-        <div class="library-video-wash"></div>
-        <div class="library-video-vignette"></div>
-    </div>
+        <div class="library-video-overlay"></div>
+        <div class="library-video-content">
+            <span class="library-video-kicker">A5 · K68 DIGITAL LIBRARY</span>
+            <h1>Tri thức bắt đầu từ một câu chuyện.</h1>
+            <p>Cuộn xuống để bước vào thư viện số.</p>
+            <span class="library-video-scroll">↓ CUỘN XUỐNG</span>
+        </div>
+    </section>
+
     <!-- Top Navigation Bar -->
     <header class="topbar">
         <div class="topbar-left">
