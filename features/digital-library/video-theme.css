@@ -35,8 +35,9 @@ body::before {
 .library-video-background {
     position: fixed;
     inset: 0;
-    z-index: -2;
+    z-index: 0;
     overflow: hidden;
+    pointer-events: none;
     background: #eef2ed;
 }
 
@@ -76,6 +77,14 @@ body.video-scrolled .library-theme-video {
 body.video-scrolled .library-video-wash {
     background:
         linear-gradient(180deg, rgba(250, 252, 249, 0.94) 0%, rgba(247, 250, 247, 0.91) 100%);
+}
+
+/* Keep the page content above the fixed video layer. */
+.topbar,
+main,
+.site-footer {
+    position: relative;
+    z-index: 1;
 }
 
 /* Make the old dark surfaces feel like a bright editorial archive. */
