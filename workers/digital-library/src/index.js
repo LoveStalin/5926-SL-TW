@@ -663,6 +663,27 @@ async function serveLibraryAsset(request, itemId, token, env) {
         headers.set("cache-control", "public, max-age=3600");
         headers.set("accept-ranges", "bytes");
         headers.set("x-content-type-options", "nosniff");
+
+        // Always serve published media inline so browsers can open/play it
+        // instead of treating the asset as a download.
+        headers.set("content-disposition", "inline");
+        if (asset.mimeType) {
+            headers.set("content-type", asset.mimeType);
+        } else if (asset.format) {
+            const mimeByFormat = {
+                mp3: "audio/mpeg",
+                wav: "audio/wav",
+                m4a: "audio/mp4",
+                ogg: "audio/ogg",
+                flac: "audio/flac",
+                mp4: "video/mp4",
+                webm: "video/webm",
+                mov: "video/quicktime",
+                pdf: "application/pdf"
+            };
+            if (mimeByFormat[asset.format]) headers.set("content-type", mimeByFormat[asset.format]);
+        }
+
         return new Response(response.body, { status: response.status, headers });
     }
 
