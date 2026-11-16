@@ -448,6 +448,47 @@ async function b2DeleteObject(env, storageKey) {
     }
 }
 
+const THEME_VIDEO_STORAGE_KEY = "themes/digital-library/theme.mp4";
+
+async function b2HeadObject(env, storageKey) {
+    return b2Client(env).fetch(b2ObjectUrl(env, storageKey), {
+        method: "HEAD"
+    });
+}
+
+async function serveThemeVideo(request, env) {
+    const storageProvider = getStorageProvider(env);
+    if (storageProvider !== "b2") {
+        throw new HttpError(503, "Theme video yêu cầu Backblaze B2.");
+    }
+
+    if (request.method === "HEAD") {
+        const response = await b2HeadObject(env, THEME_VIDEO_STORAGE_KEY);
+        if (response.status === 404) throw new HttpError(404, "Theme video chưa được tải lên B2.");
+        if (!response.ok) throw new HttpError(response.status >= 500 ? 502 : response.status, "Không thể đọc theme video từ Backblaze B2.");
+
+        const headers = new Headers(response.headers);
+        headers.set("content-type", headers.get("content-type") || "video/mp4");
+        headers.set("cache-control", "public, max-age=86400");
+        headers.set("accept-ranges", "bytes");
+        headers.set("x-content-type-options", "nosniff");
+        return new Response(null, { status: 200, headers });
+    }
+
+    const response = await b2GetObject(request, env, THEME_VIDEO_STORAGE_KEY);
+    if (response.status === 404) throw new HttpError(404, "Theme video chưa được tải lên B2.");
+    if (!response.ok && response.status !== 206 && response.status !== 304) {
+        throw new HttpError(response.status >= 500 ? 502 : response.status, "Không thể đọc theme video từ Backblaze B2.");
+    }
+
+    const headers = new Headers(response.headers);
+    headers.set("content-type", headers.get("content-type") || "video/mp4");
+    headers.set("cache-control", "public, max-age=86400");
+    headers.set("accept-ranges", "bytes");
+    headers.set("x-content-type-options", "nosniff");
+    return new Response(response.body, { status: response.status, headers });
+}
+
 async function b2GetObject(request, env, storageKey) {
     const headers = new Headers();
     const range = request.headers.get("range");
@@ -622,6 +663,27 @@ async function serveLibraryAsset(request, itemId, token, env) {
         headers.set("cache-control", "public, max-age=3600");
         headers.set("accept-ranges", "bytes");
         headers.set("x-content-type-options", "nosniff");
+
+        // Always serve published media inline so browsers can open/play it
+        // instead of treating the asset as a download.
+        headers.set("content-disposition", "inline");
+        if (asset.mimeType) {
+            headers.set("content-type", asset.mimeType);
+        } else if (asset.format) {
+            const mimeByFormat = {
+                mp3: "audio/mpeg",
+                wav: "audio/wav",
+                m4a: "audio/mp4",
+                ogg: "audio/ogg",
+                flac: "audio/flac",
+                mp4: "video/mp4",
+                webm: "video/webm",
+                mov: "video/quicktime",
+                pdf: "application/pdf"
+            };
+            if (mimeByFormat[asset.format]) headers.set("content-type", mimeByFormat[asset.format]);
+        }
+
         return new Response(response.body, { status: response.status, headers });
     }
 
@@ -851,7 +913,7 @@ function corsHeaders(request, env) {
     }
 
     const headers = {
-        "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "access-control-allow-methods": "GET, HEAD, POST, PUT, DELETE, OPTIONS",
         "access-control-allow-headers": "Authorization, Content-Type, X-File-Name",
         "access-control-max-age": "86400",
         "vary": "Origin"
@@ -879,6 +941,10 @@ async function handle(request, env) {
     const cors = corsHeaders(request, env);
     if (method === "GET" && path === "/api/v1/library") {
         return listPublished(url, null, env).then(response => withHeaders(response, cors));
+    }
+
+    if ((method === "GET" || method === "HEAD") && path === "/api/v1/theme/video") {
+        return withHeaders(await serveThemeVideo(request, env), cors);
     }
 
     const publicItemMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)$/);

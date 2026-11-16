@@ -10,8 +10,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,500;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./digital-library.css">
+    <link rel="stylesheet" href="./video-theme.css">
 </head>
 <body>
+    <!-- Full-bleed opening video: plays first, then the library starts below. -->
+    <section class="library-video-hero" aria-label="Video giới thiệu thư viện số">
+        <video id="libraryThemeVideo" class="library-theme-video" autoplay loop muted playsinline preload="metadata"></video>
+        <div class="library-video-overlay"></div>
+        <div class="library-video-content">
+            <span class="library-video-kicker">A5 · K68 DIGITAL LIBRARY</span>
+            <h1>Tri thức bắt đầu từ một câu chuyện.</h1>
+            <p>Cuộn xuống để bước vào thư viện số.</p>
+            <span class="library-video-scroll">↓ CUỘN XUỐNG</span>
+        </div>
+    </section>
+
     <!-- Top Navigation Bar -->
     <header class="topbar">
         <div class="topbar-left">
@@ -37,19 +50,12 @@
             <div class="hero-copy-column">
                 <div class="hero-kicker">
                     <span class="hero-kicker-dot"></span>
-                    <span>A5 DIGITAL LIBRARY · K68 · TRI THỨC VÀ SÁNG TẠO</span>
+                    <span>Thư Viện Số lớp A5-K68</span>
                 </div>
                 <h1 class="hero-title">Tri thức, <em>được trưng bày</em> sống động.</h1>
                 <p class="hero-copy">
-                    Không gian thư viện số 3D dành cho sách, tài liệu PDF, podcast và video của học sinh A5-K68.
-                    Mỗi tác phẩm là một câu chuyện riêng, được hiển thị trực quan với bìa sách thực tế và trải nghiệm chân thực.
+                    Không gian thư viện số dành cho sách, tài liệu PDF, podcast và video của học sinh A5-K68.
                 </p>
-                <div class="hero-highlights">
-                    <span class="highlight-chip"><span>✨</span> 3D Virtual Bookshelf</span>
-                    <span class="highlight-chip"><span>📖</span> Bìa trang đầu PDF</span>
-                    <span class="highlight-chip"><span>🎧</span> Podcast & Video số</span>
-                    <span class="highlight-chip"><span>📍</span> Quảng Ninh · Việt Nam</span>
-                </div>
                 <div class="hero-actions">
                     <a class="hero-cta" href="#bookshelfSection">
                         <span>Khám phá kệ sách 3D</span>
@@ -66,13 +72,13 @@
                 <div class="hero-glow"></div>
                 <div class="hero-orbit hero-orbit-one"></div>
                 <div class="hero-orbit hero-orbit-two"></div>
-                <div class="floating-badge badge-top">01 / VIRTUAL ARCHIVE</div>
-                <div class="floating-badge badge-bottom">PDF · MP3 · MP4 · ART</div>
+                <div class="floating-badge badge-top">00 / MODEL THÊM CHO ĐẸP</div>
+                <div class="floating-badge badge-bottom">PDF · MP3 · MP4 · PNG</div>
                 <div class="hero-book-showcase">
                     <div class="hero-book-3d">
                         <div class="hero-book-face hero-front">
-                            <div class="hero-cover-tag">A5 · SPECIAL EDITION</div>
-                            <h2 class="hero-cover-title">KHO TÀNG<br>TRI THỨC<br>A5-K68</h2>
+                            <div class="hero-cover-tag">Học Sinh A5</div>
+                            <h2 class="hero-cover-title">KHO<br>TRI THỨC<br>A5-K68</h2>
                             <div class="hero-cover-bottom">
                                 <span>QUẢNG NINH</span>
                                 <strong>2026</strong>
@@ -81,7 +87,7 @@
                         </div>
                         <div class="hero-book-face hero-spine">
                             <span>A5</span>
-                            <span class="hero-spine-text">A5 DIGITAL LIBRARY · 2026</span>
+                            <span class="hero-spine-text">Thư Viện Số lớp A5-K68 · 2026</span>
                             <span>K68</span>
                         </div>
                         <div class="hero-book-face hero-pages-edge"></div>
@@ -97,10 +103,10 @@
                 <div class="shelf-brand-column">
                     <div class="shelf-eyebrow">
                         <span class="eyebrow-line"></span>
-                        <span>TRƯỜNG KHOA · SÁNG TÁC & LƯU TRỮ SỐ</span>
+                        <span class="eyebrow-text">01 / KỆ SÁCH 3D</span>
                         <span class="eyebrow-line"></span>
                     </div>
-                    <h2 id="shelfHeading" class="shelf-brand-title">A5-K68 Digital Library</h2>
+                    <h2 id="shelfHeading" class="shelf-brand-title">Thư Viện Số lớp A5-K68</h2>
                     <p class="shelf-brand-subtitle">TỦ SÁCH & KHÔNG GIAN NGHỆ THUẬT SỐ</p>
                 </div>
 
@@ -133,9 +139,7 @@
                 </div>
             </div>
 
-            <!-- 3D Shelf Stage Container -->
             <div class="shelf-stage-container">
-                <!-- Atmospheric background layers -->
                 <div class="shelf-atmosphere" aria-hidden="true">
                     <div class="atmosphere-sky"></div>
                     <div class="atmosphere-glow"></div>
@@ -214,20 +218,7 @@
                 <!-- Shelf Bottom Ambient Bar (Matching reference screenshot!) -->
                 <div class="shelf-bottom-bar">
                     <div class="bottom-brand-note">
-                        <span>A5-K68 DIGITAL ARCHIVE · QUẢNG NINH</span>
-                    </div>
-
-                    <div class="ambient-music-capsule" id="ambientMusicCapsule">
-                        <div class="capsule-eq" id="capsuleEq">
-                            <span></span><span></span><span></span><span></span>
-                        </div>
-                        <div class="capsule-text">
-                            <strong id="ambientTrackTitle">Không gian đọc A5</strong>
-                            <small id="ambientTrackSub">Âm hưởng tĩnh lặng · Thư viện số</small>
-                        </div>
-                        <button id="ambientToggleBtn" class="ambient-play-button" type="button" aria-label="Bật/Tắt âm thanh thư viện">
-                            <span id="ambientPlayIcon">▶</span>
-                        </button>
+                        <span>A5-K68 DIGITAL ARCHIVE</span>
                     </div>
 
                     <div class="shelf-item-counter" id="shelfCounter">
@@ -270,24 +261,23 @@
         <!-- AUTHENTICATION & IDENTITY SECTION (Preserved IDs) -->
         <section id="authSection" class="auth-section" aria-labelledby="authHeading">
             <div class="auth-intro">
-                <p class="eyebrow">03 / THÀNH VIÊN & ĐÓNG GÓP</p>
+                <p class="eyebrow">03 / THÀNH VIÊN & ĐÓNG GÓP (Phần này do Dev lười xóa)</p>
                 <h2 id="authHeading">Tham gia đóng góp tri thức</h2>
                 <p class="muted">
                     Tạo tài khoản riêng cho Digital Library để lưu đánh giá, viết bài và tải lên tài liệu mới.
-                    Tài khoản được phân quyền bảo mật: Học sinh, Khách tham quan, Project Member, Giáo viên và Quản trị viên.
                 </p>
                 <div class="auth-features-list">
                     <div class="auth-feature-item">
                         <span class="feature-icon">🎓</span>
                         <div>
                             <strong>Dành cho học sinh & khách</strong>
-                            <p>Đọc tài liệu, nghe podcast, xem video và gửi đánh giá 5 sao.</p>
+                            <p>Đọc tài liệu, nghe podcast, xem video và gửi đánh giá.</p>
                         </div>
                     </div>
                     <div class="auth-feature-item">
                         <span class="feature-icon">📦</span>
                         <div>
-                            <strong>Dành cho người đóng góp (Contributors)</strong>
+                            <strong>Dành cho người đóng góp</strong>
                             <p>Tải lên file PDF, MP3, MP4 và tạo mã QR tự động cho từng tác phẩm.</p>
                         </div>
                     </div>
@@ -496,5 +486,6 @@
 
     <!-- Main Module Script -->
     <script type="module" src="./digital-library.js"></script>
+    <script src="./video-theme.js"></script>
 </body>
 </html>

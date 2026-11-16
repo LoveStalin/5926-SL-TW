@@ -1,0 +1,598 @@
+/* ==========================================================================
+   A5 DIGITAL LIBRARY · LIGHT VIDEO THEME OVERRIDES
+   Video stays behind the page; content remains readable and editorial.
+   ========================================================================== */
+
+:root {
+    color-scheme: light;
+    --bg: #f5f7f4;
+    --bg-gradient: linear-gradient(180deg, #ffffff 0%, #f3f6f2 100%);
+    --surface: rgba(255, 255, 255, 0.86);
+    --surface-2: #f7f9f7;
+    --surface-glass: rgba(255, 255, 255, 0.72);
+    --surface-glass-border: rgba(20, 40, 28, 0.10);
+    --ink: #172019;
+    --ink-secondary: #5f6c63;
+    --ink-muted: #8b958e;
+    --line: rgba(20, 40, 28, 0.11);
+    --accent: #237a4b;
+    --accent-glow: rgba(35, 122, 75, 0.20);
+    --accent-subtle: rgba(35, 122, 75, 0.09);
+    --gold: #a96f17;
+    --gold-glow: rgba(169, 111, 23, 0.20);
+}
+
+body {
+    position: relative;
+    background: #f5f7f4;
+    color: var(--ink);
+}
+
+body::before {
+    opacity: 0.018;
+}
+
+.library-video-hero {
+    position: relative;
+    width: 100%;
+    height: min(82vh, 860px);
+    min-height: 520px;
+    overflow: hidden;
+    background: #050806;
+    isolation: isolate;
+}
+
+.library-theme-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    background: #050806;
+    filter: saturate(0.9) brightness(0.9) contrast(1.02);
+    opacity: 1;
+    transform: scale(1.01);
+    transition: filter 900ms ease, transform 1400ms ease;
+}
+
+.library-video-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.02) 42%, rgba(0,0,0,0.64) 100%),
+        linear-gradient(90deg, rgba(0,0,0,0.34), transparent 55%);
+    pointer-events: none;
+}
+
+.library-video-content {
+    position: absolute;
+    z-index: 2;
+    left: clamp(24px, 7vw, 110px);
+    bottom: clamp(34px, 8vh, 90px);
+    max-width: 680px;
+    color: #fff;
+    text-shadow: 0 3px 24px rgba(0,0,0,0.45);
+}
+
+.library-video-kicker {
+    display: inline-block;
+    margin-bottom: 14px;
+    font: 600 0.78rem/1.2 "DM Mono", monospace;
+    letter-spacing: 0.18em;
+}
+
+.library-video-content h1 {
+    margin: 0;
+    font: 700 clamp(2.2rem, 5vw, 5rem)/0.98 "Playfair Display", serif;
+    letter-spacing: -0.03em;
+}
+
+.library-video-content p {
+    margin: 18px 0 0;
+    font: 500 clamp(0.95rem, 1.5vw, 1.15rem)/1.5 "Plus Jakarta Sans", sans-serif;
+    opacity: 0.9;
+}
+
+.library-video-scroll {
+    display: inline-flex;
+    margin-top: 26px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 999px;
+    font: 500 0.68rem/1 "DM Mono", monospace;
+    letter-spacing: 0.14em;
+    background: rgba(0,0,0,0.16);
+    backdrop-filter: blur(8px);
+}
+
+body.video-scrolled .library-theme-video {
+    filter: saturate(0.65) brightness(0.92) contrast(1);
+    transform: scale(1.025);
+}
+
+body.video-scrolled .library-video-overlay {
+    background:
+        linear-gradient(180deg, rgba(0,0,0,0.22), rgba(0,0,0,0.58));
+}
+
+@media (max-width: 700px) {
+    .library-video-hero {
+        height: 76vh;
+        min-height: 480px;
+    }
+
+    .library-video-content {
+        left: 22px;
+        right: 22px;
+        bottom: 34px;
+    }
+
+    .library-video-content h1 {
+        font-size: clamp(2rem, 11vw, 3.2rem);
+    }
+}
+
+/* Keep the page content above the fixed video layer. */
+.topbar,
+main,
+.site-footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* Make the old dark surfaces feel like a bright editorial archive. */
+.topbar {
+    background: rgba(255, 255, 255, 0.82);
+    border-bottom-color: rgba(20, 40, 28, 0.10);
+    box-shadow: 0 8px 30px rgba(25, 45, 30, 0.05);
+}
+
+.brand-mark {
+    background: rgba(35, 122, 75, 0.08);
+    border-color: rgba(35, 122, 75, 0.20);
+    box-shadow: none;
+}
+
+.brand-text strong,
+.hero-title,
+.shelf-brand-title,
+.auth-intro h2,
+.account-panel-heading h2,
+.item-header-meta h2 {
+    color: var(--ink);
+}
+
+.brand-text small,
+.hero-kicker,
+.shelf-eyebrow,
+.book-type,
+.metadata-heading {
+    color: var(--accent);
+}
+
+.nav-pill {
+    color: #667168;
+}
+
+.nav-pill:hover {
+    color: var(--ink);
+    background: rgba(35, 122, 75, 0.06);
+    border-color: rgba(35, 122, 75, 0.12);
+}
+
+.nav-pill.active {
+    color: #fff;
+    background: var(--accent);
+    box-shadow: 0 8px 24px rgba(35, 122, 75, 0.18);
+}
+
+.back-link:hover {
+    color: var(--accent);
+}
+
+.hero {
+    position: relative;
+}
+
+.hero-kicker {
+    background: rgba(255,255,255,0.72);
+    border-color: rgba(35,122,75,0.18);
+    box-shadow: 0 8px 30px rgba(25,45,30,0.05);
+}
+
+.hero-title em {
+    color: var(--accent);
+    text-shadow: none;
+}
+
+.hero-copy,
+.shelf-brand-subtitle,
+.book-card p,
+.auth-intro .muted,
+.auth-feature-item p,
+.item-description {
+    color: var(--ink-secondary);
+}
+
+.highlight-chip {
+    color: #334139;
+    background: rgba(255,255,255,0.68);
+    border-color: rgba(20,40,28,0.10);
+    box-shadow: 0 5px 20px rgba(25,45,30,0.04);
+}
+
+.hero-cta,
+.primary-button {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 10px 26px rgba(35,122,75,0.18);
+}
+
+.hero-cta:hover,
+.primary-button:hover:not(:disabled) {
+    box-shadow: 0 14px 34px rgba(35,122,75,0.26);
+}
+
+.cta-arrow {
+    background: #fff;
+    color: var(--accent);
+}
+
+.hero-secondary-cta,
+.secondary-button {
+    background: rgba(255,255,255,0.76);
+    border-color: rgba(20,40,28,0.12);
+    color: #344139;
+}
+
+.hero-secondary-cta:hover,
+.secondary-button:hover:not(:disabled) {
+    background: #fff;
+    border-color: rgba(35,122,75,0.25);
+    color: var(--ink);
+}
+
+.hero-glow {
+    background: radial-gradient(circle, rgba(86, 180, 121, 0.18), transparent 70%);
+}
+
+.hero-orbit {
+    border-color: rgba(35,122,75,0.15);
+}
+
+.floating-badge {
+    color: #758078;
+}
+
+.hero-front {
+    background: linear-gradient(145deg, #e8f1ea, #cbdccf 70%);
+    border-color: rgba(35,122,75,0.25);
+    box-shadow: inset 0 0 50px rgba(35,122,75,0.06), 25px 25px 60px rgba(44,65,50,0.18);
+}
+
+.hero-cover-title {
+    color: #1c3023;
+}
+
+.hero-cover-bottom {
+    color: #65736a;
+}
+
+.hero-cover-bottom strong {
+    color: var(--gold);
+}
+
+.hero-spine {
+    background: linear-gradient(90deg, rgba(0,0,0,0.14), rgba(255,255,255,0.38) 35%, rgba(0,0,0,0.14)), #c5d8c9;
+    color: #4f6255;
+}
+
+.bookshelf-section {
+    border-color: rgba(20,40,28,0.10);
+}
+
+.shelf-category-bar {
+    background: rgba(255,255,255,0.78);
+    border-color: rgba(20,40,28,0.10);
+    box-shadow: 0 10px 30px rgba(25,45,30,0.06);
+}
+
+.category-pill {
+    color: #6a756d;
+}
+
+.category-pill:hover {
+    color: var(--ink);
+    background: rgba(35,122,75,0.06);
+}
+
+.category-pill.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(35,122,75,0.18);
+}
+
+.category-pill.active .pill-count {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+}
+
+.pill-count {
+    background: rgba(20,40,28,0.06);
+    color: #526058;
+}
+
+.shelf-stage-container {
+    background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(235,241,236,0.94));
+    border-color: rgba(20,40,28,0.10);
+    box-shadow: 0 30px 80px rgba(38,60,45,0.12);
+}
+
+.atmosphere-sky {
+    background: radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.95), transparent 70%);
+}
+
+.atmosphere-glow {
+    background: radial-gradient(circle, rgba(93, 180, 124, 0.16), transparent 65%);
+}
+
+.atmosphere-lightbeam {
+    background: linear-gradient(135deg, rgba(255,255,255,0.62), transparent 70%);
+}
+
+.atmosphere-grass {
+    background: linear-gradient(180deg, transparent, rgba(202,220,207,0.32) 60%, rgba(184,207,191,0.52) 100%);
+}
+
+.shelf-nav-button {
+    background: rgba(255,255,255,0.84);
+    border-color: rgba(20,40,28,0.11);
+    color: #344139;
+    box-shadow: 0 10px 28px rgba(38,60,45,0.10);
+}
+
+.shelf-nav-button:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(35,122,75,0.20);
+}
+
+.shelf-loading-state,
+.shelf-empty-state {
+    color: var(--ink-secondary);
+}
+
+.shelf-spotlight {
+    background: rgba(255,255,255,0.78) !important;
+    border-color: rgba(20,40,28,0.10) !important;
+    box-shadow: 0 18px 50px rgba(38,60,45,0.07);
+}
+
+.spotlight-title,
+.spotlight-author,
+.spotlight-category {
+    color: var(--ink) !important;
+}
+
+.spotlight-description {
+    color: var(--ink-secondary) !important;
+}
+
+.spotlight-badge,
+.spotlight-format,
+.spotlight-year {
+    background: rgba(35,122,75,0.07) !important;
+    border-color: rgba(35,122,75,0.13) !important;
+    color: var(--accent) !important;
+}
+
+.shelf-bottom-bar {
+    color: #667168;
+}
+
+.ambient-music-capsule {
+    background: rgba(255,255,255,0.82) !important;
+    border-color: rgba(20,40,28,0.10) !important;
+    box-shadow: 0 10px 28px rgba(38,60,45,0.07);
+}
+
+.ambient-track-title,
+.capsule-text strong {
+    color: var(--ink) !important;
+}
+
+.ambient-track-sub,
+.capsule-text small {
+    color: var(--ink-secondary) !important;
+}
+
+.ambient-play-button {
+    background: var(--accent) !important;
+    color: #fff !important;
+}
+
+.library-section,
+.auth-section {
+    border-color: rgba(20,40,28,0.10);
+}
+
+.section-intro h2,
+.section-heading {
+    color: var(--ink);
+}
+
+.search-input-box {
+    background: rgba(255,255,255,0.82) !important;
+    border-color: rgba(20,40,28,0.11) !important;
+    box-shadow: 0 8px 24px rgba(38,60,45,0.05);
+}
+
+.search-input-box input {
+    color: var(--ink) !important;
+}
+
+.search-input-box input::placeholder {
+    color: #9aa39d;
+}
+
+.public-label {
+    color: #68746c !important;
+}
+
+.auth-card,
+.account-panel,
+.book-card {
+    background: rgba(255,255,255,0.82) !important;
+    border-color: rgba(20,40,28,0.10) !important;
+    box-shadow: 0 20px 55px rgba(38,60,45,0.08);
+}
+
+.book-card h3 {
+    color: var(--ink);
+}
+
+.book-card .card-object {
+    box-shadow: 18px 22px 40px rgba(38,60,45,0.20);
+}
+
+.mode-switch {
+    background: #eef2ee;
+    border-color: rgba(20,40,28,0.08);
+}
+
+.mode-button {
+    color: #7a857d;
+}
+
+.mode-button.active {
+    background: var(--accent);
+    color: #fff;
+}
+
+.auth-card input,
+.publish-form textarea,
+.publish-form select {
+    background: #f7f9f7;
+    border-color: rgba(20,40,28,0.11);
+    color: var(--ink);
+}
+
+.file-upload-zone {
+    border-color: rgba(20,40,28,0.15);
+    background: rgba(247,249,247,0.76);
+}
+
+.file-upload-zone:hover {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+}
+
+.account-identity,
+.diagnostic-row {
+    background: rgba(241,245,242,0.72);
+    border-color: rgba(20,40,28,0.08);
+}
+
+.account-avatar {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(35,122,75,0.18);
+}
+
+.audience-modal,
+.item-modal {
+    background: rgba(232,237,233,0.72);
+}
+
+.audience-dialog,
+.item-dialog {
+    background: rgba(255,255,255,0.96);
+    border-color: rgba(20,40,28,0.11);
+    box-shadow: 0 30px 90px rgba(38,60,45,0.18);
+}
+
+.audience-option {
+    background: #f7f9f7;
+    border-color: rgba(20,40,28,0.10);
+}
+
+.audience-option:hover {
+    background: rgba(35,122,75,0.05);
+    border-color: rgba(35,122,75,0.30);
+}
+
+.item-preview-panel {
+    background: #edf2ee;
+    border-color: rgba(20,40,28,0.09);
+}
+
+.item-preview-media,
+.pdf-first-page {
+    box-shadow: 0 20px 50px rgba(38,60,45,0.16);
+}
+
+.item-rating-section,
+.item-qr-section {
+    background: #f5f8f5;
+    border-color: rgba(20,40,28,0.09);
+}
+
+.item-meta-row {
+    background: rgba(239,244,240,0.78);
+}
+
+.item-meta-row dt {
+    color: #7b867f;
+}
+
+.item-meta-row dd {
+    color: var(--ink);
+}
+
+.qr-target-url,
+.footer-copy {
+    color: #849088;
+}
+
+.site-footer {
+    border-color: rgba(20,40,28,0.10);
+}
+
+.footer-brand {
+    color: var(--ink);
+}
+
+.footer-mark {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* Scroll reveal: only the main library blocks fade in, not the hero. */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 850ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 850ms cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .library-theme-video {
+        transition: none;
+    }
+
+    .reveal-on-scroll {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
