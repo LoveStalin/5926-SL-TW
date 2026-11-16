@@ -2,6 +2,13 @@
     const video = document.getElementById("libraryThemeVideo");
     if (!video) return;
 
+    // The theme video lives in private Backblaze B2 and is streamed through the Worker.
+    // Keep local Worker support so LAN testing does not accidentally hit production.
+    const workerBase = new URLSearchParams(window.location.search).get("api") === "local"
+        ? "http://127.0.0.1:8787"
+        : "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
+    video.src = workerBase.replace(/\/$/, "") + "/api/v1/theme/video";
+
     // Background video is intentionally muted for reliable autoplay.
     // If the browser permits audible autoplay, we still keep the experience silent
     // until the user explicitly interacts with the page.
