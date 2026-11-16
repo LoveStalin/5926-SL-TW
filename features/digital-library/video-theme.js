@@ -9,25 +9,26 @@
         : "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
     video.src = workerBase.replace(/\/$/, "") + "/api/v1/theme/video";
 
-    // Background video is intentionally muted for reliable autoplay.
-    // If the browser permits audible autoplay, we still keep the experience silent
-    // until the user explicitly interacts with the page.
-    video.muted = true;
-    video.defaultMuted = true;
+    // Try audible autoplay first. Modern mobile browsers usually block it, so
+    // fall back to muted autoplay. Scrolling always silences the video.
+    video.defaultMuted = false;
 
-    const startVideo = () => {
-        const promise = video.play();
-        if (promise && typeof promise.catch === "function") {
-            promise.catch(() => {
-                // Autoplay can be blocked by browser policy; the page remains usable.
-            });
+    const startVideo = async () => {
+        video.muted = false;
+        try {
+            await video.play();
+        } catch {
+            video.muted = true;
+            try {
+                await video.play();
+            } catch {
+                // The browser may still require a user gesture.
+            }
         }
     };
 
     startVideo();
 
-    // Once the visitor moves away from the opening hero, keep the video running
-    // but make the audio state explicit and visually subordinate.
     let scrolled = false;
     const updateScrollState = () => {
         const nextScrolled = window.scrollY > Math.min(window.innerHeight * 0.35, 320);
