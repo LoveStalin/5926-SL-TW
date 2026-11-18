@@ -660,13 +660,13 @@ function navigateShelf(dir) {
 
 function updateSpotlight(item) {
     if (!item) {
-        if (spotlightTitle) spotlightTitle.textContent = "Thư viện đang chờ tác phẩm";
+        if (spotlightTitle) spotlightTitle.textContent = "Thư viện chưa có tác phẩm nào";
         if (spotlightCategoryBadge) spotlightCategoryBadge.textContent = "TRỐNG";
         if (spotlightFormatBadge) spotlightFormatBadge.textContent = "—";
         if (spotlightYearBadge) spotlightYearBadge.textContent = "—";
         if (spotlightAuthor) spotlightAuthor.textContent = "—";
         if (spotlightCategory) spotlightCategory.textContent = "—";
-        if (spotlightDescription) spotlightDescription.textContent = "Hiện chưa có tác phẩm nào trong mục này. Hãy sử dụng form bên dưới để tải lên tác phẩm đầu tiên.";
+        if (spotlightDescription) spotlightDescription.textContent = "Hiện chưa có tác phẩm nào trong mục này.";
         if (spotlightRatingStars) spotlightRatingStars.textContent = "☆☆☆☆☆";
         if (spotlightRatingSummary) spotlightRatingSummary.textContent = "Chưa có đánh giá";
         if (spotlightOpenBtn) spotlightOpenBtn.disabled = true;
@@ -930,9 +930,9 @@ function renderCollectionGrid() {
                 event.stopPropagation();
 
                 const confirmed = window.confirm(
-                    "Xóa tài liệu này khỏi cơ sở dữ liệu?\n\n" +
+                    "Xóa tài liệu này khỏi database?\n\n" +
                     (item.title || "Tài liệu") +
-                    "\n\nFile và metadata sẽ bị xóa vĩnh viễn khỏi Cloudflare R2 và Firestore."
+                    "\n\nFile và metadata sẽ bị xóa vĩnh viễn khỏi Backblaze B2 và Firestore Database(đối với dev mode)."
                 );
                 if (!confirmed) return;
 
@@ -941,7 +941,7 @@ function renderCollectionGrid() {
 
                 try {
                     const user = libraryAuth.currentUser;
-                    if (!user) throw new Error("Phiên đăng nhập đã hết. Hãy đăng nhập lại.");
+                    if (!user) throw new Error("Phiên đăng nhập đã hết.Đăng nhập lại đê.");
 
                     const idToken = await user.getIdToken();
                     const response = await fetch(
@@ -955,13 +955,13 @@ function renderCollectionGrid() {
 
                     const resBody = await response.json().catch(() => ({}));
                     if (!response.ok) {
-                        throw new Error(resBody.error || resBody.message || "Không thể xóa tài liệu.");
+                        throw new Error(resBody.error || resBody.message || "Ko thể xóa tài liệu.");
                     }
 
                     await loadPublishedItems();
                 } catch (error) {
                     console.error("Digital Library delete:", error);
-                    alert("Không thể xóa tài liệu.\n\n" + (error.message || "Lỗi không xác định."));
+                    alert("Không thể xóa tài liệu.\n\n" + (error.message || "Lỗi ko xác định."));
                     deleteButton.disabled = false;
                     deleteButton.innerHTML = "🗑️";
                 }
@@ -1009,7 +1009,7 @@ async function loadItemRating(itemId) {
     paintRatingStars(myRating);
 
     if (!currentUser) {
-        itemRatingStatus.textContent = "Đăng nhập bằng tài khoản Học sinh/Khách để đánh giá.";
+        itemRatingStatus.textContent = "Đăng nhập bằng tài khoản Học sinh/Khách tham quan đi để đánh giá.";
         itemRatingStars.forEach(button => button.disabled = true);
         return;
     }
@@ -1026,7 +1026,7 @@ async function loadItemRating(itemId) {
     if (!canRate) {
         itemRatingStatus.textContent = "Chỉ tài khoản Học sinh hoặc Khách tham quan mới có thể đánh giá.";
     } else if (myRating) {
-        itemRatingStatus.textContent = "Bạn đã đánh giá " + myRating + "/5 sao. Chọn lại để cập nhật.";
+        itemRatingStatus.textContent = "Bạn đã đánh giá " + myRating + "/5 sao. Có thể chọn lại đánh giá-ấn lại thôi.";
     } else {
         itemRatingStatus.textContent = "Chọn số sao để đánh giá.";
     }
@@ -1072,7 +1072,7 @@ async function renderItemPreview(itemId, item, assets) {
     if (!asset) {
         const empty = document.createElement("div");
         empty.className = "preview-placeholder";
-        empty.innerHTML = "<span>📄</span><strong>Chưa có file</strong><small>Tài liệu này chưa được upload file đính kèm.</small>";
+        empty.innerHTML = "<span>📄</span><strong>Chưa có file</strong><small>Tài liệu này chưa được upload file đính kèm 😞.</small>";
         itemPreview.append(empty);
         return;
     }
