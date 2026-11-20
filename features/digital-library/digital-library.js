@@ -1493,7 +1493,7 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         addDiagnostic("Firestore profile", "Chưa kiểm tra", "warn");
         addDiagnostic("Cloudflare Worker", "Chưa kiểm tra", "warn");
         addDiagnostic("Role authorization", "Bị chặn", "error");
-        diagnosticsMessage.textContent = "Email chưa được xác minh. Hãy xác minh email trước khi sử dụng API thư viện.";
+        diagnosticsMessage.textContent = "Email chưa được xác minh. Hãy xác minh email trước khi sử dụng database thư viện số.";
         refreshDiagnosticsButton.disabled = false;
         return;
     }
