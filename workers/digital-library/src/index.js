@@ -516,8 +516,8 @@ function buildStorageKey(itemId, assetId, format) {
 }
 
 async function uploadLibraryAsset(request, itemId, claims, profile, token, env) {
-    if (!["project_member", "teacher", "admin"].includes(profile.role)) {
-        throw new HttpError(403, "Chỉ Project Member, giáo viên hoặc admin mới được upload file.");
+    if (!["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)) {
+        throw new HttpError(403, "Tài khoản không có quyền upload file.");
     }
 
     const item = await getDocument("libraryItems", itemId, token, env);
@@ -525,10 +525,10 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
         throw new HttpError(404, "Không tìm thấy tài liệu hợp lệ.");
     }
 
-    // Project members may upload only to items they created/submitted.
+    // Contributors may upload only to items they created/submitted.
     // Staff can manage any library item.
     if (
-        profile.role === "project_member"
+        ["project_member", "viewer", "student"].includes(profile.role)
         && item.data.createdBy !== claims.sub
         && item.data.submittedBy !== claims.sub
     ) {
@@ -720,7 +720,8 @@ async function serveLibraryAsset(request, itemId, token, env) {
 
 async function createAssetMetadata(request, itemId, claims, profile, token, env) {
     const item = await getDocument("libraryItems", itemId, token, env);
-    const canWrite = ["project_member", "teacher", "admin"].includes(profile.role) || item.data.submittedBy === claims.sub;
+    const canWrite = ["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)
+        && (["teacher", "admin"].includes(profile.role) || item.data.submittedBy === claims.sub || item.data.createdBy === claims.sub);
     if (!canWrite) throw new HttpError(403, "Không có quyền gắn asset cho tài liệu này.");
     const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
     const assetType = String(body.assetType || "").trim();
@@ -989,8 +990,8 @@ async function handle(request, env) {
     if (!profile) throw new HttpError(409, "Hãy chọn Guest hoặc Student để hoàn tất hồ sơ.");
 
     if (method === "POST" && path === "/api/v1/library") {
-        if (!["project_member", "teacher", "admin"].includes(profile.role)) {
-            throw new HttpError(403, "Chỉ Project Member, giáo viên hoặc admin mới được thêm tài liệu.");
+        if (!["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)) {
+            throw new HttpError(403, "Tài khoản không có quyền thêm tài liệu.");
         }
         return withHeaders(await createLibraryItem(request, claims, profile, token, env), cors);
     }
