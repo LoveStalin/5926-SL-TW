@@ -1553,7 +1553,7 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         accountDisplayName.textContent = profile.displayName || user.displayName || user.email;
         accountRole.textContent = roleLabel;
         accountRole.dataset.role = profile.role || "viewer";
-        publishPanel.hidden = !["project_member", "teacher", "admin"].includes(profile.role);
+        publishPanel.hidden = !["viewer", "student", "project_member", "teacher", "admin"].includes(profile.role);
         await loadPublishedItems();
 
         diagnosticsMessage.textContent = "Đã xác minh thành công: Firebase Authentication, Firestore profile và vai trò.";
