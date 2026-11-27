@@ -660,7 +660,8 @@ async function serveLibraryAsset(request, itemId, token, env) {
         }
 
         const headers = new Headers(response.headers);
-        headers.set("cache-control", "public, max-age=3600");
+        headers.set("cache-control", "public, max-age=86400, immutable");
+        headers.set("cdn-cache-control", "public, max-age=86400");
         headers.set("accept-ranges", "bytes");
         headers.set("x-content-type-options", "nosniff");
 
