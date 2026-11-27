@@ -2564,3 +2564,121 @@ button {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   MOBILE FIX — 02 / KHÁM PHÁ & TRA CỨU
+   ========================================================================== */
+@media (max-width: 768px) {
+    html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .page-shell {
+        width: min(100% - 28px, 1360px);
+    }
+
+    .library-section {
+        padding: 56px 0 72px;
+    }
+
+    .section-intro {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+        margin-bottom: 22px;
+    }
+
+    .section-intro > div {
+        min-width: 0;
+    }
+
+    .section-intro h2 {
+        font-size: clamp(30px, 9vw, 42px);
+        line-height: 1.05;
+        overflow-wrap: anywhere;
+    }
+
+    .collection-search-wrap {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .search-input-box {
+        width: 100%;
+    }
+
+    .search-input-box input {
+        min-width: 0;
+        height: 48px;
+        font-size: 14px;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        padding-bottom: 16px;
+    }
+
+    .notice {
+        max-width: 100%;
+        line-height: 1.5;
+    }
+
+    .public-label {
+        max-width: 100%;
+        line-height: 1.5;
+    }
+
+    .library-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+        margin-top: 22px;
+    }
+
+    .book-card {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .book-card-visual {
+        height: 190px;
+    }
+
+    .book-card-body {
+        min-width: 0;
+    }
+
+    .book-card-title,
+    .book-card-description {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-shell {
+        width: calc(100% - 22px);
+    }
+
+    .library-section {
+        padding-top: 46px;
+    }
+
+    .section-intro h2 {
+        font-size: 30px;
+    }
+
+    .search-input-box input {
+        height: 46px;
+        padding-left: 38px;
+        padding-right: 36px;
+    }
+
+    .book-card-visual {
+        height: 175px;
+    }
+}
