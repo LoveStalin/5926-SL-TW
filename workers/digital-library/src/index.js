@@ -180,7 +180,12 @@ async function firestoreRequest(path, token, options = {}) {
     if (!response.ok) {
         const message = data.error?.message || "Firestore request thất bại.";
         if (response.status === 404) throw new HttpError(404, message);
-        if (response.status === 403) throw new HttpError(403, "Firestore Security Rules từ chối thao tác.");
+        if (response.status === 403) {
+            // Keep the real Firestore Rules reason visible during development.
+            // This is essential because the Worker otherwise hides whether the
+            // rejection is caused by role/profile data or by a field validation rule.
+            throw new HttpError(403, "Firestore Security Rules từ chối thao tác: " + message);
+        }
         throw new HttpError(response.status >= 500 ? 502 : response.status, message);
     }
     return data;
