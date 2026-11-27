@@ -719,6 +719,70 @@ async function serveLibraryAsset(request, itemId, token, env) {
     return new Response(object.body, { status: 200, headers });
 }
 
+async function createDirectUploadUrl(request, itemId, claims, profile, token, env) {
+    if (!["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)) {
+        throw new HttpError(403, "Tài khoản không có quyền upload file.");
+    }
+
+    const item = await getDocument("libraryItems", itemId, token, env);
+    if (!["published", "archived"].includes(item.data.status)) {
+        throw new HttpError(404, "Không tìm thấy tài liệu hợp lệ.");
+    }
+
+    if (
+        ["project_member", "viewer", "student"].includes(profile.role)
+        && item.data.createdBy !== claims.sub
+        && item.data.submittedBy !== claims.sub
+    ) {
+        throw new HttpError(403, "Bạn chỉ được upload file cho tài liệu do chính mình tạo.");
+    }
+
+    if (getStorageProvider(env) !== "b2") {
+        throw new HttpError(503, "Direct upload hiện chỉ hỗ trợ Backblaze B2.");
+    }
+
+    const body = await request.json().catch(() => {
+        throw new HttpError(400, "JSON upload không hợp lệ.");
+    });
+
+    const sizeBytes = Number(body.sizeBytes || 0);
+    const maxBytes = Number(env.DIGITAL_LIBRARY_MAX_UPLOAD_BYTES || 50 * 1024 * 1024);
+    if (!Number.isSafeInteger(sizeBytes) || sizeBytes <= 0) {
+        throw new HttpError(400, "Thiếu kích thước file.");
+    }
+    if (sizeBytes > maxBytes) {
+        throw new HttpError(413, "File vượt quá giới hạn upload hiện tại.");
+    }
+
+    const format = String(body.format || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 20);
+    if (!format) throw new HttpError(400, "Thiếu format file.");
+
+    const assetId = randomId();
+    const storageKey = buildStorageKey(itemId, assetId, format);
+    const mimeType = String(body.mimeType || "application/octet-stream").slice(0, 120);
+
+    const signedRequest = await b2Client(env).sign(
+        b2ObjectUrl(env, storageKey),
+        {
+            method: "PUT",
+            aws: {
+                signQuery: true,
+                expires: 900
+            }
+        }
+    );
+
+    return json({
+        assetId,
+        itemId,
+        storageProvider: "b2",
+        storageKey,
+        uploadUrl: signedRequest.url,
+        mimeType,
+        sizeBytes
+    }, 200);
+}
+
 async function createAssetMetadata(request, itemId, claims, profile, token, env) {
     const item = await getDocument("libraryItems", itemId, token, env);
     const canWrite = ["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)
@@ -734,7 +798,9 @@ async function createAssetMetadata(request, itemId, claims, profile, token, env)
     if (!["dev", "b2"].includes(storageProvider)) throw new HttpError(400, "storageProvider phải là dev hoặc b2.");
     if (storageKey.length > 500) throw new HttpError(400, "storageKey quá dài.");
     if (storageProvider === "b2" && !storageKey) throw new HttpError(400, "B2 asset phải có storageKey.");
-    const assetId = randomId();
+    const requestedAssetId = String(body.assetId || "").trim();
+    const assetId = requestedAssetId || randomId();
+    if (!/^[A-Za-z0-9_-]{8,80}$/.test(assetId)) throw new HttpError(400, "assetId không hợp lệ.");
     const now = new Date().toISOString();
     await createDocument("libraryItems/" + itemId + "/assets", assetId, { assetType, format, storageProvider, storageKey: storageKey || null, mimeType: String(body.mimeType || "").slice(0, 120), sizeBytes: Number.isSafeInteger(body.sizeBytes) && body.sizeBytes >= 0 ? body.sizeBytes : 0, checksum: String(body.checksum || "").slice(0, 128), isPrimary: body.isPrimary === true, access: body.access === "private" ? "private" : "public", createdAt: { __timestamp: now }, createdBy: claims.sub }, token, env);
     return json({ id: assetId, itemId, storageProvider, message: storageProvider === "dev" ? "Đã lưu metadata asset ở chế độ DEV; file bytes chưa được lưu." : "Đã lưu metadata asset cho B2." }, 201);
@@ -1019,6 +1085,11 @@ async function handle(request, env) {
     if (method === "POST" && rejectMatch) {
         requireStaff(profile);
         return withHeaders(await rejectSubmission(rejectMatch[1], request, claims, token, env), cors);
+    }
+
+    const directUploadMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/upload-url$/);
+    if (method === "POST" && directUploadMatch) {
+        return withHeaders(await createDirectUploadUrl(request, directUploadMatch[1], claims, profile, token, env), cors);
     }
 
     const uploadMatch = path.match(/^\/api\/v1\/library\/([a-zA-Z0-9_-]+)\/upload$/);
