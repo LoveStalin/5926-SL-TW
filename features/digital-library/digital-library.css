@@ -2490,6 +2490,96 @@ button {
 /* ==========================================================================
    RESPONSIVE MEDIA QUERIES
    ========================================================================== */
+/* ==========================================================================
+   MOBILE FIX — ITEM / QR MODAL
+   Keep the dialog inside the viewport and keep the close button reachable.
+   ========================================================================== */
+@media (max-width: 768px) {
+    .item-modal {
+        align-items: flex-start;
+        justify-items: center;
+        padding: max(12px, env(safe-area-inset-top)) 12px 12px;
+        overflow-y: auto;
+    }
+
+    .item-dialog {
+        width: 100%;
+        max-width: 620px;
+        max-height: calc(100dvh - max(24px, env(safe-area-inset-top) + 12px));
+        display: block;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .item-close {
+        position: fixed;
+        top: max(12px, env(safe-area-inset-top));
+        right: 12px;
+        z-index: 220;
+        width: 44px;
+        height: 44px;
+        font-size: 25px;
+        background: rgba(8, 12, 10, 0.88);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .item-preview-panel {
+        min-height: 240px;
+        padding: 20px;
+    }
+
+    .item-preview-media,
+    .pdf-first-page {
+        max-height: 38vh;
+    }
+
+    .item-preview-pdf {
+        height: min(42vh, 420px);
+    }
+
+    .item-info-panel {
+        max-height: none;
+        overflow: visible;
+        padding: 28px 20px 24px;
+    }
+
+    .item-header-meta h2 {
+        font-size: clamp(24px, 7vw, 30px);
+        padding-right: 48px;
+    }
+
+    .item-rating-heading {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .item-rating-stars {
+        justify-content: center;
+    }
+
+    .qr-canvas-holder {
+        max-width: min(100%, 220px);
+        padding: 12px;
+    }
+
+    #qrCanvas {
+        display: block;
+        width: min(180px, 42vw) !important;
+        height: auto !important;
+        max-width: 100%;
+    }
+
+    .qr-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .qr-actions .primary-button {
+        grid-column: auto;
+    }
+}
+
 @media (max-width: 1024px) {
     .hero {
         grid-template-columns: 1fr;
