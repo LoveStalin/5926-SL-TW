@@ -284,8 +284,9 @@ async function createAudienceProfile(claims, token, env, audienceType) {
 }
 
 function requireStaff(profile) {
-    if (!["teacher", "admin"].includes(profile.role)) {
-        throw new HttpError(403, "Chức năng này chỉ dành cho giáo viên hoặc quản trị viên.");
+    // All active library roles have the same permissions.
+    if (!profile || profile.accountStatus !== "active") {
+        throw new HttpError(403, "Tài khoản thư viện chưa được kích hoạt.");
     }
 }
 
@@ -521,8 +522,8 @@ function buildStorageKey(itemId, assetId, format) {
 }
 
 async function uploadLibraryAsset(request, itemId, claims, profile, token, env) {
-    if (!["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)) {
-        throw new HttpError(403, "Tài khoản không có quyền upload file.");
+    if (profile.accountStatus !== "active") {
+        throw new HttpError(403, "Tài khoản thư viện chưa được kích hoạt.");
     }
 
     const item = await getDocument("libraryItems", itemId, token, env);
@@ -530,15 +531,7 @@ async function uploadLibraryAsset(request, itemId, claims, profile, token, env) 
         throw new HttpError(404, "Không tìm thấy tài liệu hợp lệ.");
     }
 
-    // Contributors may upload only to items they created/submitted.
-    // Staff can manage any library item.
-    if (
-        ["project_member", "viewer", "student"].includes(profile.role)
-        && item.data.createdBy !== claims.sub
-        && item.data.submittedBy !== claims.sub
-    ) {
-        throw new HttpError(403, "Project Member chỉ được upload file cho tài liệu do chính mình tạo.");
-    }
+
 
     const storageProvider = getStorageProvider(env);
     const maxBytes = Number(env.DIGITAL_LIBRARY_MAX_UPLOAD_BYTES || 50 * 1024 * 1024);
@@ -725,8 +718,8 @@ async function serveLibraryAsset(request, itemId, token, env) {
 }
 
 async function createDirectUploadUrl(request, itemId, claims, profile, token, env) {
-    if (!["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)) {
-        throw new HttpError(403, "Tài khoản không có quyền upload file.");
+    if (profile.accountStatus !== "active") {
+        throw new HttpError(403, "Tài khoản thư viện chưa được kích hoạt.");
     }
 
     const item = await getDocument("libraryItems", itemId, token, env);
@@ -734,13 +727,7 @@ async function createDirectUploadUrl(request, itemId, claims, profile, token, en
         throw new HttpError(404, "Không tìm thấy tài liệu hợp lệ.");
     }
 
-    if (
-        ["project_member", "viewer", "student"].includes(profile.role)
-        && item.data.createdBy !== claims.sub
-        && item.data.submittedBy !== claims.sub
-    ) {
-        throw new HttpError(403, "Bạn chỉ được upload file cho tài liệu do chính mình tạo.");
-    }
+
 
     if (getStorageProvider(env) !== "b2") {
         throw new HttpError(503, "Direct upload hiện chỉ hỗ trợ Backblaze B2.");
@@ -790,8 +777,7 @@ async function createDirectUploadUrl(request, itemId, claims, profile, token, en
 
 async function createAssetMetadata(request, itemId, claims, profile, token, env) {
     const item = await getDocument("libraryItems", itemId, token, env);
-    const canWrite = ["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)
-        && (["teacher", "admin"].includes(profile.role) || item.data.submittedBy === claims.sub || item.data.createdBy === claims.sub);
+    const canWrite = profile.accountStatus === "active";
     if (!canWrite) throw new HttpError(403, "Không có quyền gắn asset cho tài liệu này.");
     const body = await request.json().catch(() => { throw new HttpError(400, "JSON không hợp lệ."); });
     const assetType = String(body.assetType || "").trim();
@@ -1062,8 +1048,8 @@ async function handle(request, env) {
     if (!profile) throw new HttpError(409, "Hãy chọn Guest hoặc Student để hoàn tất hồ sơ.");
 
     if (method === "POST" && path === "/api/v1/library") {
-        if (!["project_member", "teacher", "admin", "viewer", "student"].includes(profile.role)) {
-            throw new HttpError(403, "Tài khoản không có quyền thêm tài liệu.");
+        if (profile.accountStatus !== "active") {
+            throw new HttpError(403, "Tài khoản thư viện chưa được kích hoạt.");
         }
         return withHeaders(await createLibraryItem(request, claims, profile, token, env), cors);
     }
