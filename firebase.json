@@ -1,0 +1,8 @@
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "asia-southeast1",
+    "rules": "/home/linus-torvalds/5926-SL-TW/features/digital-library/firestore.rules",
+    "indexes": "n"
+  }
+}

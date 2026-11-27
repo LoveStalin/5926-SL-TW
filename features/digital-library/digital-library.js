@@ -43,6 +43,7 @@ const publishSubmit = document.getElementById("publishSubmit");
 const publishStatus = document.getElementById("publishStatus");
 const publishTypeSelect = document.getElementById("publishType");
 const publishFileInput = document.getElementById("publishFile");
+const publishFileName = document.getElementById("publishFileName");
 const modeButtons = [...document.querySelectorAll("[data-mode]")];
 
 const itemModal = document.getElementById("itemModal");
@@ -520,7 +521,7 @@ function renderBookshelf() {
         const catLabel = category === "video" ? "VIDEO (MP4)" : category === "podcast" ? "PODCAST (MP3)" : "SÁCH SỐ";
         procCover.innerHTML = `
             <div class="cover-header-ornament">
-                <span>A5 ARCHIVE</span>
+                <span>A5 STUDENT</span>
                 <span>${catLabel}</span>
             </div>
             <div class="cover-title-wrap">
@@ -528,7 +529,7 @@ function renderBookshelf() {
                 <p class="cover-author">${escapeHtml(Array.isArray(item.authors) && item.authors.length ? item.authors.join(", ") : "A5-K68")}</p>
             </div>
             <div class="cover-footer">
-                <span>QUẢNG NINH</span>
+                <span>Trần Phú</span>
                 <strong>${item.year || (item.publishedAt ? new Date(item.publishedAt.toMillis?.() || Date.now()).getFullYear() : "2026")}</strong>
             </div>
         `;
@@ -549,7 +550,7 @@ function renderBookshelf() {
         } else if (category === "video") {
             const videoOverlay = document.createElement("div");
             videoOverlay.className = "video-play-overlay";
-            videoOverlay.innerHTML = '<div class="video-play-badge">Play</div>';
+            videoOverlay.innerHTML = '<div class="video-play-badge">▶🎬</div>';
             faceFront.append(videoOverlay);
         }
 
@@ -1310,7 +1311,14 @@ audienceButtons.forEach(button => {
 if (publishFileInput && publishTypeSelect) {
     publishFileInput.addEventListener("change", () => {
         const file = publishFileInput.files?.[0];
-        if (!file) return;
+        if (!file) {
+            if (publishFileName) publishFileName.textContent = "Chưa chọn file";
+            return;
+        }
+        if (publishFileName) {
+            publishFileName.textContent = file.name;
+            publishFileName.title = file.name;
+        }
         const ext = file.name.split(".").pop()?.toLowerCase() || "";
         const mime = file.type?.toLowerCase() || "";
 
@@ -1338,7 +1346,7 @@ publishForm.addEventListener("submit", async event => {
         const formData = new FormData(publishForm);
         const file = formData.get("file");
 
-        if (file instanceof File && file.size > 100 * 1024 * 1024) {
+        if (file instanceof File && file.size > 100000000) {
             throw new Error("File vượt quá 100 MB. Hãy dùng file nhỏ hơn.");
         }
 
@@ -1382,16 +1390,23 @@ publishForm.addEventListener("submit", async event => {
 
             publishStatus.textContent = "Đang tải " + file.name + " (" + Math.ceil(file.size / 1024 / 1024) + " MB) lên thư viện...";
 
+            // Upload through the Worker instead of directly to B2.
+            // This keeps the B2 bucket private and avoids browser CORS/preflight
+            // failures on signed S3 URLs. The Worker streams request.body to B2.
+            publishStatus.textContent = "Đang tải lên thư viện...";
+
             const uploadResponse = await fetch(
                 WORKER_API_BASE_URL.replace(/\/$/, "") +
                 "/api/v1/library/" + encodeURIComponent(data.id) +
-                "/upload?assetType=original&format=" + encodeURIComponent(format) + "&isPrimary=true",
+                "/upload?assetType=original&format=" + encodeURIComponent(format) +
+                "&isPrimary=true",
                 {
                     method: "PUT",
                     headers: {
                         authorization: "Bearer " + idToken,
                         "content-type": file.type || "application/octet-stream",
-                        "x-file-name": encodeURIComponent(file.name)
+                        "x-file-name": encodeURIComponent(file.name),
+                        accept: "application/json"
                     },
                     body: file
                 }
@@ -1399,7 +1414,7 @@ publishForm.addEventListener("submit", async event => {
 
             const uploadData = await uploadResponse.json().catch(() => ({}));
             if (!uploadResponse.ok) {
-                throw new Error("Metadata đã tạo nhưng upload thất bại: " + (uploadData.error || "Storage không nhận file."));
+                throw new Error("Upload file thất bại: " + (uploadData.error || "Worker từ chối file."));
             }
 
             publishStatus.textContent = "Đã thêm tài liệu và upload file thành công!";
