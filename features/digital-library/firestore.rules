@@ -26,16 +26,18 @@ service cloud.firestore {
       return hasProfile() && myProfile().accountStatus == "active";
     }
 
+    // All active roles have the same Digital Library permissions.
+    // The role value is kept for account/profile metadata and UI only.
     function isProjectMember() {
-      return activeUser() && myProfile().role == "project_member";
+      return activeUser();
     }
 
     function isLibraryContributor() {
-      return activeUser() && myProfile().role in ["viewer", "student", "project_member", "teacher", "admin"];
+      return activeUser();
     }
 
     function isStaff() {
-      return activeUser() && myProfile().role in ["teacher", "admin"];
+      return activeUser();
     }
 
     function validTitle(data) {
@@ -305,8 +307,6 @@ service cloud.firestore {
       allow get, list: if get(/databases/$(database)/documents/libraryItems/$(itemId)).data.status == "published";
 
       allow create: if activeUser()
-        && myProfile().role == "viewer"
-        && myProfile().audienceType in ["student", "guest"]
         && userId == request.auth.uid
         && request.resource.data.keys().hasOnly(["rating", "createdAt", "updatedAt"])
         && request.resource.data.keys().hasAll(["rating", "createdAt"])
@@ -317,8 +317,6 @@ service cloud.firestore {
         && (!("updatedAt" in request.resource.data) || request.resource.data.updatedAt is timestamp);
 
       allow update: if activeUser()
-        && myProfile().role == "viewer"
-        && myProfile().audienceType in ["student", "guest"]
         && userId == request.auth.uid
         && request.resource.data.keys().hasOnly(["rating", "createdAt", "updatedAt"])
         && request.resource.data.keys().hasAll(["rating", "createdAt"])
