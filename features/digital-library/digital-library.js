@@ -1338,7 +1338,7 @@ publishForm.addEventListener("submit", async event => {
         const formData = new FormData(publishForm);
         const file = formData.get("file");
 
-        if (file instanceof File && file.size > 100 * 1024 * 1024) {
+        if (file instanceof File && file.size > 100000000) {
             throw new Error("File vượt quá 100 MB. Hãy dùng file nhỏ hơn.");
         }
 
