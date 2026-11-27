@@ -1390,73 +1390,31 @@ publishForm.addEventListener("submit", async event => {
 
             publishStatus.textContent = "Đang tải " + file.name + " (" + Math.ceil(file.size / 1024 / 1024) + " MB) lên thư viện...";
 
-            // Ask the Worker for a short-lived signed B2 URL, then upload the
-            // bytes directly from the browser to B2. This removes the Worker
-            // from the data path and is much faster for large files.
-            const uploadUrlResponse = await fetch(
+            // Upload through the Worker instead of directly to B2.
+            // This keeps the B2 bucket private and avoids browser CORS/preflight
+            // failures on signed S3 URLs. The Worker streams request.body to B2.
+            publishStatus.textContent = "Đang tải lên thư viện...";
+
+            const uploadResponse = await fetch(
                 WORKER_API_BASE_URL.replace(/\/$/, "") +
-                "/api/v1/library/" + encodeURIComponent(data.id) + "/upload-url",
+                "/api/v1/library/" + encodeURIComponent(data.id) +
+                "/upload?assetType=original&format=" + encodeURIComponent(format) +
+                "&isPrimary=true",
                 {
-                    method: "POST",
+                    method: "PUT",
                     headers: {
                         authorization: "Bearer " + idToken,
-                        "content-type": "application/json",
+                        "content-type": file.type || "application/octet-stream",
+                        "x-file-name": encodeURIComponent(file.name),
                         accept: "application/json"
                     },
-                    body: JSON.stringify({
-                        format,
-                        mimeType: file.type || "application/octet-stream",
-                        sizeBytes: file.size
-                    })
+                    body: file
                 }
             );
 
-            const uploadUrlData = await uploadUrlResponse.json().catch(() => ({}));
-            if (!uploadUrlResponse.ok || !uploadUrlData.uploadUrl) {
-                throw new Error("Không tạo được đường upload trực tiếp: " + (uploadUrlData.error || "Worker không cấp upload URL."));
-            }
-
-            publishStatus.textContent = "Đang tải trực tiếp lên B2...";
-
-            const directUploadResponse = await fetch(uploadUrlData.uploadUrl, {
-                method: "PUT",
-                headers: {
-                    "content-type": uploadUrlData.mimeType || file.type || "application/octet-stream"
-                },
-                body: file
-            });
-
-            if (!directUploadResponse.ok) {
-                throw new Error("Upload B2 thất bại (" + directUploadResponse.status + ").");
-            }
-
-            const metadataResponse = await fetch(
-                WORKER_API_BASE_URL.replace(/\/$/, "") +
-                "/api/v1/library/" + encodeURIComponent(data.id) + "/assets",
-                {
-                    method: "POST",
-                    headers: {
-                        authorization: "Bearer " + idToken,
-                        "content-type": "application/json",
-                        accept: "application/json"
-                    },
-                    body: JSON.stringify({
-                        assetId: uploadUrlData.assetId,
-                        assetType: "original",
-                        format,
-                        storageProvider: "b2",
-                        storageKey: uploadUrlData.storageKey,
-                        mimeType: uploadUrlData.mimeType || file.type || "application/octet-stream",
-                        sizeBytes: file.size,
-                        isPrimary: true,
-                        access: "public"
-                    })
-                }
-            );
-
-            const metadataData = await metadataResponse.json().catch(() => ({}));
-            if (!metadataResponse.ok) {
-                throw new Error("File đã upload nhưng không lưu được metadata: " + (metadataData.error || "Firestore từ chối metadata."));
+            const uploadData = await uploadResponse.json().catch(() => ({}));
+            if (!uploadResponse.ok) {
+                throw new Error("Upload file thất bại: " + (uploadData.error || "Worker từ chối file."));
             }
 
             publishStatus.textContent = "Đã thêm tài liệu và upload file thành công!";
