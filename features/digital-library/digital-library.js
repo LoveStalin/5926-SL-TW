@@ -43,6 +43,7 @@ const publishSubmit = document.getElementById("publishSubmit");
 const publishStatus = document.getElementById("publishStatus");
 const publishTypeSelect = document.getElementById("publishType");
 const publishFileInput = document.getElementById("publishFile");
+const publishFileName = document.getElementById("publishFileName");
 const modeButtons = [...document.querySelectorAll("[data-mode]")];
 
 const itemModal = document.getElementById("itemModal");
@@ -1310,7 +1311,14 @@ audienceButtons.forEach(button => {
 if (publishFileInput && publishTypeSelect) {
     publishFileInput.addEventListener("change", () => {
         const file = publishFileInput.files?.[0];
-        if (!file) return;
+        if (!file) {
+            if (publishFileName) publishFileName.textContent = "Chưa chọn file";
+            return;
+        }
+        if (publishFileName) {
+            publishFileName.textContent = file.name;
+            publishFileName.title = file.name;
+        }
         const ext = file.name.split(".").pop()?.toLowerCase() || "";
         const mime = file.type?.toLowerCase() || "";
 
