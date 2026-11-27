@@ -19,7 +19,6 @@ import {
     where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// DOM Elements
 const authForm = document.getElementById("authForm");
 const authEmail = document.getElementById("authEmail");
 const authPassword = document.getElementById("authPassword");
@@ -63,7 +62,6 @@ const itemRatingSummary = document.getElementById("itemRatingSummary");
 const itemRatingStars = [...document.querySelectorAll(".rating-star")];
 const itemRatingStatus = document.getElementById("itemRatingStatus");
 
-// 3D Bookshelf Elements
 const shelfTrack = document.getElementById("shelfTrack");
 const shelfPrevBtn = document.getElementById("shelfPrevBtn");
 const shelfNextBtn = document.getElementById("shelfNextBtn");
@@ -90,7 +88,6 @@ const ambientTrackTitle = document.getElementById("ambientTrackTitle");
 const ambientTrackSub = document.getElementById("ambientTrackSub");
 const particlesContainer = document.getElementById("particlesContainer");
 
-// Category counter badges
 const countAllEl = document.getElementById("countAll");
 const countBookEl = document.getElementById("countBook");
 const countPodcastEl = document.getElementById("countPodcast");
@@ -98,7 +95,7 @@ const countVideoEl = document.getElementById("countVideo");
 const countOtherEl = document.getElementById("countOther");
 
 const PUBLIC_LIBRARY_PATH = "/features/digital-library/digital-library.html";
-const LOCAL_LAN_LIBRARY_URL = "https://a5-k68-website.pages.dev" + PUBLIC_LIBRARY_PATH; // TODO: Change to Production Address to activate the QR Code
+const LOCAL_LAN_LIBRARY_URL = "https://a5-k68-website.pages.dev" + PUBLIC_LIBRARY_PATH; // Public URL used in QR codes.
 const PUBLIC_LIBRARY_URL = LOCAL_LAN_LIBRARY_URL;
 const PRODUCTION_WORKER_API_BASE_URL = "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
 const USE_LOCAL_WORKER = new URLSearchParams(window.location.search).get("api") === "local";
@@ -115,7 +112,6 @@ let allLibraryItems = [];
 let filteredLibraryItems = [];
 let activeShelfIndex = 0;
 
-// PDF.js dynamic loader
 let pdfjsLibPromise = null;
 function getPdfJs() {
     if (!pdfjsLibPromise) {
@@ -128,10 +124,8 @@ function getPdfJs() {
     return pdfjsLibPromise;
 }
 
-// In-memory thumbnail caches
 const thumbnailCache = new Map();
 
-// Color schemes for dynamic 3D cards
 const BOOK_THEMES = [
     {
         cover: "linear-gradient(145deg, #1d4332 0%, #0d2118 70%)",
@@ -266,10 +260,7 @@ function paintRatingStars(rating) {
     });
 }
 
-// --------------------------------------------------------------------------
-// ACCURATE CONTENT CLASSIFICATION
-// Prioritizes primary file format & mime type over raw form fields
-// --------------------------------------------------------------------------
+// Prefer file format and MIME type when classifying content.
 function getItemCategory(item) {
     if (!item) return "other";
 
@@ -281,7 +272,6 @@ function getItemCategory(item) {
     const title = String(item.title || "").trim().toLowerCase();
     const desc = String(item.description || "").trim().toLowerCase();
 
-    // 1. VIDEO (Check format, MIME type, contentType, and keywords)
     const isVideoFormat = ["mp4", "webm", "mov", "m4v", "mkv", "avi", "flv"].includes(format);
     const isVideoMime = mime.startsWith("video/") || mime.includes("mp4");
     const isVideoType = contentType === "video" || legacyType === "video";
@@ -298,7 +288,6 @@ function getItemCategory(item) {
         return "video";
     }
 
-    // 2. PODCAST / AUDIO (Check format, MIME type, contentType, and keywords)
     const isAudioFormat = ["mp3", "wav", "m4a", "ogg", "flac", "aac", "wma"].includes(format);
     const isAudioMime = mime.startsWith("audio/") || mime.includes("mpeg") || mime.includes("audio");
     const isAudioType = ["podcast", "audio"].includes(contentType) || legacyType === "audio";
@@ -314,7 +303,6 @@ function getItemCategory(item) {
         return "podcast";
     }
 
-    // 3. BOOK / PDF / DOCUMENT (Check format, MIME type, contentType, and keywords)
     const isPdfFormat = format === "pdf" || mime.includes("pdf");
     const isBookType = ["ebook", "document"].includes(contentType) || ["pdf", "document"].includes(legacyType);
     const isBookText = title.endsWith(".pdf")
@@ -328,7 +316,6 @@ function getItemCategory(item) {
         return "book";
     }
 
-    // 4. IMAGE / POSTCARD / ARTWORK
     const isImageFormat = ["png", "jpg", "jpeg", "webp", "gif", "svg"].includes(format) || mime.startsWith("image/");
     const isImageType = ["postcard", "artwork", "design", "image"].includes(contentType) || legacyType === "image";
 
@@ -339,7 +326,7 @@ function getItemCategory(item) {
     return "other";
 }
 
-// Render first page of PDF onto a Canvas element (for 3D book cover)
+// Render the first PDF page for the book cover.
 async function renderPdfCoverToCanvas(canvas, itemId, targetWidth = 440) {
     if (!canvas) return;
 
@@ -374,7 +361,6 @@ async function renderPdfCoverToCanvas(canvas, itemId, targetWidth = 440) {
         await page.render({ canvasContext: ctx, viewport }).promise;
         canvas.classList.add("loaded");
 
-        // Cache the rendered image
         const img = new Image();
         img.src = canvas.toDataURL("image/jpeg", 0.88);
         img.width = canvas.width;
@@ -385,7 +371,7 @@ async function renderPdfCoverToCanvas(canvas, itemId, targetWidth = 440) {
     }
 }
 
-// Render video frame onto canvas for video 3D cover
+// Capture a video frame for its cover.
 async function renderVideoPosterToCanvas(canvas, itemId) {
     if (!canvas) return;
 
@@ -434,9 +420,6 @@ async function renderVideoPosterToCanvas(canvas, itemId) {
     }
 }
 
-// --------------------------------------------------------------------------
-// 3D Bookshelf Construction & Navigation
-// --------------------------------------------------------------------------
 function updateCategoryCounters() {
     let bookCount = 0;
     let podcastCount = 0;
@@ -486,13 +469,12 @@ function renderBookshelf() {
     if (!shelfTrack) return;
     shelfTrack.replaceChildren();
 
-    // Empty state: when no documents match the active filter or library is empty
     if (filteredLibraryItems.length === 0) {
         shelfTrack.style.justifyContent = "center";
         const empty = document.createElement("div");
         empty.className = "shelf-empty-state";
         empty.innerHTML = `
-            <div class="empty-book-icon">📚</div>
+            <div class="empty-book-icon">A5</div>
             <h3>Chưa có tài liệu nào</h3>
             <p>${currentFilter === "all" ? "Hiện chưa có tác phẩm nào được xuất bản trong cơ sở dữ liệu." : "Không có tác phẩm nào thuộc mục này. Hãy chọn mục khác hoặc đăng tải tài liệu mới."}</p>
         `;
@@ -504,10 +486,8 @@ function renderBookshelf() {
         return;
     }
 
-    // Adjust shelf centering depending on item count
     shelfTrack.style.justifyContent = filteredLibraryItems.length <= 3 ? "center" : "flex-start";
 
-    // Show/hide shelf navigation buttons
     if (shelfPrevBtn) shelfPrevBtn.style.display = filteredLibraryItems.length > 1 ? "grid" : "none";
     if (shelfNextBtn) shelfNextBtn.style.display = filteredLibraryItems.length > 1 ? "grid" : "none";
 
@@ -529,15 +509,12 @@ function renderBookshelf() {
         bookEl.setAttribute("tabindex", "0");
         bookEl.setAttribute("aria-label", item.title || "Tài liệu");
 
-        // 3D Box Container
         const box = document.createElement("div");
         box.className = "book-3d-box";
 
-        // Front Face
         const faceFront = document.createElement("div");
         faceFront.className = "face face-front";
 
-        // Procedural designed cover
         const procCover = document.createElement("div");
         procCover.className = "cover-procedural";
         const catLabel = category === "video" ? "VIDEO (MP4)" : category === "podcast" ? "PODCAST (MP3)" : "SÁCH SỐ";
@@ -556,17 +533,14 @@ function renderBookshelf() {
             </div>
         `;
 
-        // Canvas for PDF First Page or Video Poster
         const canvas = document.createElement("canvas");
         canvas.className = "pdf-cover-canvas";
         faceFront.append(procCover, canvas);
 
-        // Glossy sheen overlay
         const sheen = document.createElement("div");
         sheen.className = "cover-sheen";
         faceFront.append(sheen);
 
-        // Custom 3D accessories for Podcast & Video
         if (category === "podcast") {
             const vinyl = document.createElement("div");
             vinyl.className = "podcast-vinyl-disc";
@@ -575,21 +549,19 @@ function renderBookshelf() {
         } else if (category === "video") {
             const videoOverlay = document.createElement("div");
             videoOverlay.className = "video-play-overlay";
-            videoOverlay.innerHTML = '<div class="video-play-badge">▶</div>';
+            videoOverlay.innerHTML = '<div class="video-play-badge">Play</div>';
             faceFront.append(videoOverlay);
         }
 
-        // Spine Face (Gáy sách)
         const faceSpine = document.createElement("div");
         faceSpine.className = "face face-spine";
-        const spineIcon = category === "video" ? "🎬" : category === "podcast" ? "🎧" : "📖";
+        const spineLabel = category === "video" ? "V" : category === "podcast" ? "P" : "S";
         faceSpine.innerHTML = `
-            <div class="spine-badge">${spineIcon}</div>
+            <div class="spine-badge">${spineLabel}</div>
             <div class="spine-title-vertical">${escapeHtml(item.title || "TÀI LIỆU")}</div>
             <div class="spine-footer-year">${item.year || "2026"}</div>
         `;
 
-        // Page Edges
         const facePagesRight = document.createElement("div");
         facePagesRight.className = "face face-pages-right";
 
@@ -599,26 +571,22 @@ function renderBookshelf() {
         const facePagesBottom = document.createElement("div");
         facePagesBottom.className = "face face-pages-bottom";
 
-        // Back Cover Face
         const faceBack = document.createElement("div");
         faceBack.className = "face face-back";
         faceBack.innerHTML = '<div class="back-barcode"></div>';
 
-        // Floor Shadow
         const shadow = document.createElement("div");
         shadow.className = "book-floor-shadow";
 
         box.append(faceFront, faceSpine, facePagesRight, facePagesTop, facePagesBottom, faceBack, shadow);
         bookEl.append(box);
 
-        // Click to focus
         bookEl.addEventListener("click", () => {
             setActiveShelfBook(index);
         });
 
         shelfTrack.append(bookEl);
 
-        // Dynamic cover render
         if (category === "book") {
             void renderPdfCoverToCanvas(canvas, item.id);
         } else if (category === "video") {
@@ -695,15 +663,14 @@ function updateSpotlight(item) {
     if (spotlightDescription) spotlightDescription.textContent = item.description || "Không có mô tả cho tác phẩm này.";
     if (shelfCounter) shelfCounter.textContent = `Tác phẩm ${String(activeShelfIndex + 1).padStart(2, "0")} / ${String(filteredLibraryItems.length).padStart(2, "0")}`;
 
-    // Action button labels and handlers
     if (spotlightOpenBtn) {
         spotlightOpenBtn.disabled = false;
         if (category === "video") {
-            spotlightOpenBtn.innerHTML = "<span>▶ Xem video / Mở file</span>";
+            spotlightOpenBtn.textContent = "Xem video / Mở file";
         } else if (category === "podcast") {
-            spotlightOpenBtn.innerHTML = "<span>🎧 Nghe podcast / Mở file</span>";
+            spotlightOpenBtn.innerHTML = "<span>Nghe podcast / Mở file</span>";
         } else {
-            spotlightOpenBtn.innerHTML = "<span>📖 Mở tài liệu / Đọc ngay</span>";
+            spotlightOpenBtn.innerHTML = "<span>Mở tài liệu / Đọc ngay</span>";
         }
         spotlightOpenBtn.onclick = () => {
             window.open(assetUrl(item.id), "_blank", "noopener,noreferrer");
@@ -724,7 +691,6 @@ function updateSpotlight(item) {
         };
     }
 
-    // Load real rating from Firestore
     void fetchSpotlightRating(item.id);
 }
 
@@ -751,9 +717,6 @@ async function fetchSpotlightRating(itemId) {
     }
 }
 
-// --------------------------------------------------------------------------
-// Ambient Audio / Sound Environment
-// --------------------------------------------------------------------------
 let ambientAudioCtx = null;
 let ambientGain = null;
 let isAmbientPlaying = false;
@@ -791,7 +754,7 @@ function startAmbientAudio() {
 
         isAmbientPlaying = true;
         if (ambientMusicCapsule) ambientMusicCapsule.classList.add("is-playing");
-        if (ambientPlayIcon) ambientPlayIcon.textContent = "⏸";
+        if (ambientPlayIcon) ambientPlayIcon.textContent = "Tạm dừng";
         if (ambientTrackTitle) ambientTrackTitle.textContent = "Âm hưởng thư viện số";
         if (ambientTrackSub) ambientTrackSub.textContent = "Đang phát · Yên tĩnh";
     } catch (err) {
@@ -809,7 +772,7 @@ function stopAmbientAudio() {
     }
     isAmbientPlaying = false;
     if (ambientMusicCapsule) ambientMusicCapsule.classList.remove("is-playing");
-    if (ambientPlayIcon) ambientPlayIcon.textContent = "▶";
+    if (ambientPlayIcon) ambientPlayIcon.textContent = "Phát";
     if (ambientTrackTitle) ambientTrackTitle.textContent = "Không gian đọc A5";
     if (ambientTrackSub) ambientTrackSub.textContent = "Bấm để bật âm hưởng";
 }
@@ -828,9 +791,6 @@ function createAmbientParticles() {
     }
 }
 
-// --------------------------------------------------------------------------
-// Secondary Collection Grid Rendering
-// --------------------------------------------------------------------------
 function renderCollectionGrid() {
     if (!libraryGrid) return;
     libraryGrid.replaceChildren();
@@ -894,7 +854,7 @@ function renderCollectionGrid() {
         const openBtn = document.createElement("button");
         openBtn.type = "button";
         openBtn.className = "primary-button qr-card-button";
-        openBtn.innerHTML = category === "video" ? "▶ Xem video" : category === "podcast" ? "🎧 Nghe" : "📖 Mở đọc";
+        openBtn.textContent = category === "video" ? "Xem video" : category === "podcast" ? "Nghe" : "Mở đọc";
         openBtn.addEventListener("click", event => {
             event.preventDefault();
             event.stopPropagation();
@@ -916,14 +876,13 @@ function renderCollectionGrid() {
         body.append(type, title, description, cardActions);
         card.append(visual, body);
 
-        // Delete button for Admins and Teachers
         if (["admin", "teacher"].includes(accountRole.dataset.role)) {
             const deleteButton = document.createElement("button");
             deleteButton.type = "button";
             deleteButton.className = "delete-book-button";
             deleteButton.setAttribute("aria-label", "Xóa tài liệu");
             deleteButton.title = "Xóa tài liệu";
-            deleteButton.innerHTML = "🗑️";
+            deleteButton.textContent = "×";
 
             deleteButton.addEventListener("click", async event => {
                 event.preventDefault();
@@ -963,7 +922,7 @@ function renderCollectionGrid() {
                     console.error("Digital Library delete:", error);
                     alert("Không thể xóa tài liệu.\n\n" + (error.message || "Lỗi ko xác định."));
                     deleteButton.disabled = false;
-                    deleteButton.innerHTML = "🗑️";
+                    deleteButton.textContent = "×";
                 }
             });
 
@@ -972,7 +931,6 @@ function renderCollectionGrid() {
 
         libraryGrid.append(card);
 
-        // Cover thumbnail rendering
         if (category === "book") {
             void renderPdfCoverToCanvas(cardCanvas, item.id, 240);
         } else if (category === "video") {
@@ -981,9 +939,6 @@ function renderCollectionGrid() {
     });
 }
 
-// --------------------------------------------------------------------------
-// Rating Management
-// --------------------------------------------------------------------------
 async function loadItemRating(itemId) {
     itemRatingStatus.textContent = "";
     itemRatingSummary.textContent = "Đang tải...";
@@ -1060,9 +1015,6 @@ async function saveItemRating(itemId, rating) {
     }
 }
 
-// --------------------------------------------------------------------------
-// Modal Preview Rendering
-// --------------------------------------------------------------------------
 async function renderItemPreview(itemId, item, assets) {
     itemPreview.replaceChildren();
     const asset = getPrimaryAsset(assets);
@@ -1072,14 +1024,13 @@ async function renderItemPreview(itemId, item, assets) {
     if (!asset) {
         const empty = document.createElement("div");
         empty.className = "preview-placeholder";
-        empty.innerHTML = "<span>📄</span><strong>Chưa có file</strong><small>Tài liệu này chưa được upload file đính kèm 😞.</small>";
+        empty.innerHTML = "<strong>Chưa có file</strong><small>Tài liệu này chưa được upload file đính kèm.</small>";
         itemPreview.append(empty);
         return;
     }
 
     const format = String(asset.format || "").toLowerCase();
 
-    // Video preview
     if (type === "video" || ["mp4", "webm", "mov", "m4v"].includes(format)) {
         const video = document.createElement("video");
         video.className = "item-preview-media";
@@ -1099,7 +1050,6 @@ async function renderItemPreview(itemId, item, assets) {
         return;
     }
 
-    // Audio / Podcast preview
     if (type === "audio" || type === "podcast" || ["mp3", "wav", "m4a", "ogg", "flac"].includes(format)) {
         const audio = document.createElement("audio");
         audio.src = fileUrl;
@@ -1114,14 +1064,13 @@ async function renderItemPreview(itemId, item, assets) {
 
         const holder = document.createElement("div");
         holder.className = "preview-placeholder";
-        holder.innerHTML = "<span>🎧</span><strong>Tệp âm thanh số</strong><small>Nghe trực tiếp podcast trong thư viện</small>";
+        holder.innerHTML = "<strong>Tệp âm thanh số</strong><small>Nghe trực tiếp podcast trong thư viện</small>";
         holder.append(audio);
         itemPreview.append(holder);
         appendMetadata("Dung lượng", formatBytes(asset.sizeBytes));
         return;
     }
 
-    // PDF preview
     if (type === "ebook" || type === "document" || format === "pdf") {
         const canvas = document.createElement("canvas");
         canvas.className = "pdf-first-page";
@@ -1144,12 +1093,11 @@ async function renderItemPreview(itemId, item, assets) {
             if (pageRow) pageRow.textContent = String(docProxy.numPages) + " trang";
         } catch (error) {
             console.warn("PDF preview fallback:", error);
-            itemPreview.innerHTML = '<div class="preview-placeholder"><span>📖</span><strong>Tài liệu PDF</strong><small>Bấm "Mở tài liệu" để xem đầy đủ.</small></div>';
+            itemPreview.innerHTML = '<div class="preview-placeholder"><strong>Tài liệu PDF</strong><small>Bấm "Mở tài liệu" để xem đầy đủ.</small></div>';
         }
         return;
     }
 
-    // Image preview
     if (["image", "png", "jpg", "jpeg", "webp", "gif", "svg"].includes(format) ||
         ["postcard", "artwork", "design"].includes(type)) {
         const image = document.createElement("img");
@@ -1167,7 +1115,7 @@ async function renderItemPreview(itemId, item, assets) {
 
     const fallback = document.createElement("div");
     fallback.className = "preview-placeholder";
-    fallback.innerHTML = '<span>📄</span><strong>' + (asset.format || "Tệp số").toUpperCase() + '</strong><small>Xem tài liệu để mở nội dung đầy đủ.</small>';
+    fallback.innerHTML = '<strong>' + (asset.format || "Tệp số").toUpperCase() + '</strong><small>Xem tài liệu để mở nội dung đầy đủ.</small>';
     itemPreview.append(fallback);
     appendMetadata("Định dạng", String(asset.format || "Không xác định").toUpperCase());
     appendMetadata("Dung lượng", formatBytes(asset.sizeBytes));
@@ -1225,7 +1173,7 @@ async function openItemModal(itemId) {
         await loadItemRating(itemId);
     } catch (error) {
         itemModalStatus.textContent = error.message || "Không thể tải thông tin tài liệu.";
-        itemPreview.innerHTML = '<div class="preview-placeholder"><span>⚠️</span><strong>Không thể tải bản xem trước</strong><small>Hãy thử lại sau.</small></div>';
+        itemPreview.innerHTML = '<div class="preview-placeholder"><strong>Không thể tải bản xem trước</strong><small>Hãy thử lại sau.</small></div>';
     }
 }
 
@@ -1278,9 +1226,6 @@ qrDownloadButton.addEventListener("click", () => {
     link.click();
 });
 
-// --------------------------------------------------------------------------
-// Auth & Account Diagnostics
-// --------------------------------------------------------------------------
 function setAuthMode(mode) {
     authMode = mode;
     modeButtons.forEach(button => {
@@ -1361,7 +1306,7 @@ audienceButtons.forEach(button => {
     button.addEventListener("click", () => chooseAudience(button.dataset.audience));
 });
 
-// Auto-detect content type when a file is chosen in publishForm
+// Choose a content type based on the selected file.
 if (publishFileInput && publishTypeSelect) {
     publishFileInput.addEventListener("change", () => {
         const file = publishFileInput.files?.[0];
@@ -1381,9 +1326,6 @@ if (publishFileInput && publishTypeSelect) {
     });
 }
 
-// --------------------------------------------------------------------------
-// Publish / Upload Item
-// --------------------------------------------------------------------------
 publishForm.addEventListener("submit", async event => {
     event.preventDefault();
     publishSubmit.disabled = true;
@@ -1401,7 +1343,6 @@ publishForm.addEventListener("submit", async event => {
         }
 
         let contentType = String(formData.get("contentType") || "").trim();
-        // Intelligent auto-correction for uploaded file format
         if (file instanceof File && file.size > 0) {
             const ext = file.name.split(".").pop()?.toLowerCase() || "";
             if (["mp4", "webm", "mov", "m4v"].includes(ext)) {
@@ -1413,7 +1354,7 @@ publishForm.addEventListener("submit", async event => {
             }
         }
 
-        publishStatus.textContent = "① Đang tạo metadata tài liệu...";
+        publishStatus.textContent = "Đang tạo thông tin tài liệu...";
         const response = await fetch(WORKER_API_BASE_URL.replace(/\/$/, "") + "/api/v1/library", {
             method: "POST",
             headers: {
@@ -1439,7 +1380,7 @@ publishForm.addEventListener("submit", async event => {
                 .replace(/[^a-z0-9]+/g, "")
                 .slice(0, 20) || "bin";
 
-            publishStatus.textContent = "② Đang tải " + file.name + " (" + Math.ceil(file.size / 1024 / 1024) + " MB) lên thư viện...";
+            publishStatus.textContent = "Đang tải " + file.name + " (" + Math.ceil(file.size / 1024 / 1024) + " MB) lên thư viện...";
 
             const uploadResponse = await fetch(
                 WORKER_API_BASE_URL.replace(/\/$/, "") +
@@ -1461,9 +1402,9 @@ publishForm.addEventListener("submit", async event => {
                 throw new Error("Metadata đã tạo nhưng upload thất bại: " + (uploadData.error || "Storage không nhận file."));
             }
 
-            publishStatus.textContent = "✅ Đã thêm tài liệu và upload file thành công!";
+            publishStatus.textContent = "Đã thêm tài liệu và upload file thành công!";
         } else {
-            publishStatus.textContent = "✅ Đã thêm tài liệu vào thư viện.";
+            publishStatus.textContent = "Đã thêm tài liệu vào thư viện.";
         }
 
         publishForm.reset();
@@ -1638,9 +1579,7 @@ onAuthStateChanged(libraryAuth, user => {
     }
 });
 
-// --------------------------------------------------------------------------
-// Load Published Items from Firestore ONLY (Zero hardcoding)
-// --------------------------------------------------------------------------
+// Load the published library items.
 async function loadPublishedItems() {
     try {
         const publishedQuery = query(
@@ -1660,14 +1599,13 @@ async function loadPublishedItems() {
             return;
         }
 
-        // Fetch each document and its primary asset from the subcollection or Worker
+        // Read asset details from Firestore, then fall back to the Worker if needed.
         const documents = await Promise.all(snapshot.docs.map(async docSnap => {
             const data = docSnap.data();
             let primaryAsset = null;
             let format = "";
             let mimeType = "";
 
-            // 1. Check Firestore subcollection libraryItems/{id}/assets
             try {
                 const assetsSnap = await getDocs(collection(libraryDb, "libraryItems", docSnap.id, "assets"));
                 const assets = assetsSnap.docs.map(a => ({ id: a.id, ...a.data() }));
@@ -1683,7 +1621,6 @@ async function loadPublishedItems() {
                 console.warn("Subcollection read fallback for", docSnap.id, err);
             }
 
-            // 2. Fallback: if format is still unknown, fetch Worker API /api/v1/library/{id}
             if (!format) {
                 try {
                     const resp = await fetch(
@@ -1713,14 +1650,12 @@ async function loadPublishedItems() {
             };
         }));
 
-        // Sort latest published first
         documents.sort((a, b) => {
             const aTime = a.publishedAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0;
             const bTime = b.publishedAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0;
             return bTime - aTime;
         });
 
-        // ONLY store real documents from database (NO HARDCODING)
         allLibraryItems = documents;
 
         updateCategoryCounters();
@@ -1747,9 +1682,6 @@ async function loadPublishedItems() {
     }
 }
 
-// --------------------------------------------------------------------------
-// Event Listeners for Filters, Search, Navigation & Audio
-// --------------------------------------------------------------------------
 categoryPills.forEach(pill => {
     pill.addEventListener("click", () => {
         categoryPills.forEach(p => {
@@ -1791,7 +1723,6 @@ if (ambientToggleBtn) {
     ambientToggleBtn.addEventListener("click", toggleAmbientAudio);
 }
 
-// Touch swipe support on 3D shelf
 let touchStartX = 0;
 let touchEndX = 0;
 if (shelfTrack) {
@@ -1817,6 +1748,5 @@ function escapeHtml(str) {
         .replace(/'/g, "&#039;");
 }
 
-// Initialize
 createAmbientParticles();
 loadPublishedItems();

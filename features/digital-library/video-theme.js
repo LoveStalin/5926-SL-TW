@@ -2,15 +2,13 @@
     const video = document.getElementById("libraryThemeVideo");
     if (!video) return;
 
-    // The theme video lives in private Backblaze B2 and is streamed through the Worker.
-    // Keep local Worker support so LAN testing does not accidentally hit production.
+    // Use the local Worker only when the page is opened with ?api=local.
     const workerBase = new URLSearchParams(window.location.search).get("api") === "local"
         ? "http://127.0.0.1:8787"
         : "https://a5-digital-library-api.thanhnguyenxuan917.workers.dev";
     video.src = workerBase.replace(/\/$/, "") + "/api/v1/theme/video";
 
-    // Try audible autoplay first. Modern mobile browsers usually block it, so
-    // fall back to muted autoplay. Scrolling always silences the video.
+    // Fall back to muted playback if the browser blocks audio autoplay.
     video.defaultMuted = false;
 
     const startVideo = async () => {
@@ -22,7 +20,7 @@
             try {
                 await video.play();
             } catch {
-                // The browser may still require a user gesture.
+                // Playback can wait for a user gesture.
             }
         }
     };
@@ -44,7 +42,7 @@
     window.addEventListener("scroll", updateScrollState, { passive: true });
     updateScrollState();
 
-    // Fade library sections into view as they enter the viewport.
+    // Reveal each section as it enters the viewport.
     const revealTargets = [
         document.getElementById("bookshelfSection"),
         document.getElementById("librarySection"),
@@ -74,7 +72,7 @@
         revealTargets.forEach(element => element.classList.add("is-visible"));
     }
 
-    // Respect accessibility preferences.
+    // Disable motion when the user requests it.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         video.pause();
         video.removeAttribute("autoplay");

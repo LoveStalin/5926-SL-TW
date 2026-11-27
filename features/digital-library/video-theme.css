@@ -143,7 +143,7 @@ main,
     z-index: 1;
 }
 
-/* Make the old dark surfaces feel like a bright editorial archive. */
+/* Light theme colors. */
 .topbar {
     background: rgba(255, 255, 255, 0.82);
     border-bottom-color: rgba(20, 40, 28, 0.10);
@@ -257,6 +257,12 @@ main,
 
 .hero-glow {
     background: radial-gradient(circle, rgba(86, 180, 121, 0.18), transparent 70%);
+}
+
+html,
+body,
+body * {
+    font-family: "Times New Roman", Times, serif !important;
 }
 
 .hero-orbit {
@@ -571,7 +577,7 @@ main,
     color: #fff;
 }
 
-/* Scroll reveal: only the main library blocks fade in, not the hero. */
+/* Reveal the main sections as they enter the viewport. */
 .reveal-on-scroll {
     opacity: 0;
     transform: translateY(28px);

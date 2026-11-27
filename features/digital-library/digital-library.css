@@ -25,9 +25,9 @@
     --radius-md: 14px;
     --radius-lg: 22px;
     --radius-full: 999px;
-    --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
-    --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-    --font-mono: "DM Mono", monospace;
+    --font-serif: "Times New Roman", Times, serif;
+    --font-sans: "Times New Roman", Times, serif;
+    --font-mono: "Times New Roman", Times, serif;
     --ease-spring: cubic-bezier(0.2, 0.9, 0.3, 1);
     --ease-fluid: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -594,7 +594,7 @@ button {
     color: var(--ink-secondary);
 }
 
-/* Category Filter Pills (Matching reference screenshot tabs!) */
+/* Category filters */
 .shelf-category-bar {
     display: flex;
     align-items: center;
@@ -863,7 +863,7 @@ button {
         transform 0.4s var(--ease-spring);
 }
 
-/* When active, expand width to let the front cover face user! */
+/* Expand the selected book to show its cover. */
 .shelf-book.is-active {
     flex-basis: 226px;
     margin: 0 28px;
@@ -871,7 +871,7 @@ button {
     z-index: 40;
 }
 
-/* Inactive book hover: slides up gracefully */
+/* Lift books slightly on hover. */
 .shelf-book:not(.is-active):hover {
     transform: translateY(-16px);
 }
@@ -893,12 +893,12 @@ button {
     transition: transform 0.65s var(--ease-spring);
 }
 
-/* Inactive: Rotated 90 degrees so the Spine directly faces forward! */
+/* Show the spine when a book is inactive. */
 .shelf-book:not(.is-active) .book-3d-box {
     transform: rotateY(90deg);
 }
 
-/* Active: Pulled forward into the spotlight, turned towards viewer in 3D! */
+/* Bring the selected book forward. */
 .shelf-book.is-active .book-3d-box {
     transform: translateZ(92px) translateY(-24px) rotateY(-14deg) rotateX(4deg);
 }
@@ -1015,7 +1015,7 @@ button {
     background: linear-gradient(115deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 42%);
 }
 
-/* Spine Face (Gáy sách - Facing forward when inactive!) */
+/* Book spine */
 .face-spine {
     left: 80px;
     top: 0;
@@ -1077,7 +1077,7 @@ button {
     letter-spacing: 0.1em;
 }
 
-/* Page Block Edges (Ruột sách - Paper textures) */
+/* Page edges */
 .face-pages-right {
     left: 80px;
     top: 0;
@@ -1149,7 +1149,7 @@ button {
     filter: blur(18px);
 }
 
-/* Custom 3D representations for Podcast & Video */
+/* Podcast and video covers */
 .podcast-vinyl-disc {
     position: absolute;
     top: 15px;
@@ -1385,7 +1385,7 @@ button {
     color: var(--ink);
 }
 
-/* Shelf Bottom Ambient Bar (Matching reference screenshot!) */
+/* Shelf footer */
 .shelf-bottom-bar {
     display: flex;
     align-items: center;
