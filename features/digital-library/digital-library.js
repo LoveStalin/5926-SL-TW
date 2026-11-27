@@ -1427,7 +1427,7 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
     accountRole.textContent = "ĐANG KIỂM TRA";
 
     addDiagnostic("Firebase Authentication", "Đã đăng nhập", "ok");
-    addDiagnostic("Email verification", user.emailVerified ? "Verified" : "Not verified", user.emailVerified ? "ok" : "error");
+    addDiagnostic("Email verification", user.emailVerified ? "Đã xác minh bạn là loài người" : "Chưa xác minh", user.emailVerified ? "ok" : "error");
     addDiagnosticValue("Firebase UID", user.uid);
 
     if (!user.emailVerified) {
@@ -1448,7 +1448,7 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
         });
         const healthData = await healthResponse.json().catch(() => ({}));
         workerOnline = healthResponse.ok && healthData.ok === true;
-        addDiagnostic("Cloudflare Worker", workerOnline ? "Online · Health OK" : "Health check failed", workerOnline ? "ok" : "error");
+        addDiagnostic("Cloudflare Worker", workerOnline ? "Health OK" : "Health check failed", workerOnline ? "ok" : "error");
     } catch {
         addDiagnostic("Cloudflare Worker", "Không kết nối được", "warn");
     }
@@ -1481,13 +1481,13 @@ async function refreshAccountDiagnostics(user = libraryAuth.currentUser) {
             return;
         }
 
-        addDiagnostic("Firestore profile", "Found · UID matched", "ok");
+        addDiagnostic("Firestore profile", "Đã tìm thấy hồ sơ", "ok");
         audienceSelection.hidden = true;
         const roleLabels = {
             admin: "ADMIN",
             teacher: "TEACHER",
             project_member: "PROJECT MEMBER",
-            viewer: profile.audienceType === "guest" ? "GUEST · VIEWER" : "STUDENT · VIEWER",
+            viewer: profile.audienceType === "guest" ? "GUEST-VIEWER" : "STUDENT-VIEWER",
             student: "STUDENT · VIEWER"
         };
         const roleLabel = roleLabels[profile.role] || "VIEWER";
