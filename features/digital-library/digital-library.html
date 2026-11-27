@@ -356,13 +356,14 @@
                     <div class="form-group file-upload-group">
                         <label for="publishFile">File đính kèm <span class="muted">(PDF / MP4 / MP3 / Ảnh...)</span></label>
                         <div class="file-upload-zone">
-                            <span class="file-zone-hint">Chọn file từ thiết bị của bạn</span>
+                            <span id="publishFileName" class="file-zone-hint">Chưa chọn file</span>
                             <input id="publishFile" name="file" type="file" accept=".pdf,.mp4,.webm,.mp3,.wav,.png,.jpg,.jpeg,.webp,.zip">
                         </div>
                     </div>
 
                     <button id="publishSubmit" class="primary-button" type="submit">Thêm và tải lên thư viện</button>
                     <p id="publishStatus" class="form-status" role="status"></p>
+                    <p class="form-help">Guest và Student đều có thể thêm tài liệu. Tài liệu sẽ được gắn với tài khoản của bạn.</p>
                 </form>
             </section>
         </section>
