@@ -521,7 +521,7 @@ function renderBookshelf() {
         const catLabel = category === "video" ? "VIDEO (MP4)" : category === "podcast" ? "PODCAST (MP3)" : "SÁCH SỐ";
         procCover.innerHTML = `
             <div class="cover-header-ornament">
-                <span>A5 ARCHIVE</span>
+                <span>A5 STUDENT</span>
                 <span>${catLabel}</span>
             </div>
             <div class="cover-title-wrap">
@@ -529,7 +529,7 @@ function renderBookshelf() {
                 <p class="cover-author">${escapeHtml(Array.isArray(item.authors) && item.authors.length ? item.authors.join(", ") : "A5-K68")}</p>
             </div>
             <div class="cover-footer">
-                <span>QUẢNG NINH</span>
+                <span>Trần Phú</span>
                 <strong>${item.year || (item.publishedAt ? new Date(item.publishedAt.toMillis?.() || Date.now()).getFullYear() : "2026")}</strong>
             </div>
         `;
@@ -550,7 +550,7 @@ function renderBookshelf() {
         } else if (category === "video") {
             const videoOverlay = document.createElement("div");
             videoOverlay.className = "video-play-overlay";
-            videoOverlay.innerHTML = '<div class="video-play-badge">Play</div>';
+            videoOverlay.innerHTML = '<div class="video-play-badge">▶🎬</div>';
             faceFront.append(videoOverlay);
         }
 
